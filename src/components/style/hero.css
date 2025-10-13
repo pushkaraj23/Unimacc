@@ -1,0 +1,58 @@
+.hero-swiper {
+  overflow: visible !important; /* let side slides show */
+  padding: 0 2rem;
+}
+
+.swiper-slide {
+  opacity: 0.5;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.swiper-slide-active {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+.swiper-slide-prev,
+.swiper-slide-next {
+  opacity: 0.7;
+}
+
+/* 🟠 Navigation Arrows */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #ff7a00 !important; /* Your brand color */
+  transition: color 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  color: #e56e00 !important;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 28px; /* Adjust arrow size */
+  font-weight: bold;
+}
+
+/* ⚪ Pagination Dots (Bullets) */
+.swiper-pagination-bullet {
+  background-color: #d1d1d1 !important; /* Inactive dot color */
+  opacity: 1;
+  width: 12px;
+  height: 12px;
+  margin: 0 5px !important;
+  transition: background-color 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #ff7a00 !important; /* Active dot color */
+}
+
+/* Optional: make dots into small lines (modern style) */
+.swiper-pagination-bullet {
+  border-radius: 6px; /* for rounded rectangle look */
+  width: 20px;
+  height: 6px;
+}

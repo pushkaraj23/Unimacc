@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "Urbanist", sans-serif;
+}
+
+.sales-swiper .swiper-slide {
+  opacity: 1 !important;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.sales-swiper .swiper-slide-active {
+  transform: scale(1);
+  opacity: 1 !important;
+}
+
+.sales-swiper .swiper-pagination-bullet {
+  background: #1a1a1a !important;
+  opacity: 0.6;
+}
+.sales-swiper .swiper-pagination-bullet-active {
+  background: #dd7427 !important;
+  opacity: 1;
+}
+
+.sales-swiper .swiper-button-prev,
+.sales-swiper .swiper-button-next {
+  color: #1a1a1a !important;
+  transition: color 0.3s ease;
+}
+.sales-swiper .swiper-button-prev:hover,
+.sales-swiper .swiper-button-next:hover {
+  color: #dd7427 !important;
+}
