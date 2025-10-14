@@ -17,7 +17,11 @@ const ProductsListing = () => {
   const [subCategory, setSubCategory] = useState("All");
 
   useEffect(() => {
-    setCategory(c);
+    if (c) {
+      setCategory(c);
+    } else {
+      setCategory("All");
+    }
   }, [c]);
 
   return (

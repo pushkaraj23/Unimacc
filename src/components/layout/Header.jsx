@@ -44,7 +44,12 @@ const Header = () => {
       <div className="flex items-center justify-between px-6 py-3">
         {/* Logo + Categories */}
         <div className="flex items-center space-x-8">
-          <img src="/logo.svg" alt="Unimacc Logo" className="h-8" />
+          <img
+            src="/logo.svg"
+            alt="Unimacc Logo"
+            className="h-8 hover:cursor-pointer"
+            onClick={() => navigate("/")}
+          />
 
           {/* Categories Dropdown */}
           <div className="relative group">
