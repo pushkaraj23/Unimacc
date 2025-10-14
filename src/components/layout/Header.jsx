@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
   FaHeart,
@@ -10,6 +11,11 @@ import { MdCompareArrows } from "react-icons/md";
 const Header = () => {
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const navigate = useNavigate();
+  const handleCategoryClick = (category) => {
+    navigate(`/products?category=${encodeURIComponent(category)}`);
+  };
 
   useEffect(() => {
     const controlHeader = () => {
@@ -63,6 +69,7 @@ const Header = () => {
                 {["Washbasin", "Kitchen", "Toilets", "Faucets"].map((item) => (
                   <li
                     key={item}
+                    onClick={() => handleCategoryClick(item)}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                   >
                     {item}
@@ -103,6 +110,7 @@ const Header = () => {
                 {["Washbasin", "Kitchen", "Toilets", "Faucets"].map((item) => (
                   <li
                     key={item}
+                    onClick={() => handleCategoryClick(item)}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                   >
                     {item}
@@ -145,13 +153,13 @@ const Header = () => {
           "Drains",
           "Racks",
         ].map((item) => (
-          <a
+          <p
             key={item}
-            href="#"
-            className="hover:text-orange-400 transition-colors duration-200"
+            onClick={() => handleCategoryClick(item)}
+            className="hover:text-orange-400 transition-colors hover:cursor-pointer duration-200"
           >
             {item}
-          </a>
+          </p>
         ))}
       </nav>
     </header>

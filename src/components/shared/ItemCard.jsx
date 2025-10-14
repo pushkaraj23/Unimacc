@@ -1,4 +1,4 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaExchangeAlt } from "react-icons/fa";
 
 const ItemCard = ({
@@ -12,8 +12,12 @@ const ItemCard = ({
   offerTime,
   isDiscountActive,
 }) => {
+  const navigate = useNavigate();
   return (
-    <div className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg hover:cursor-pointer transition-all duration-300 relative group">
+    <div
+      onClick={() => navigate(`/products/${id}`)}
+      className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg hover:cursor-pointer transition-all duration-300 relative group"
+    >
       {/* Product Image */}
       <div className="relative w-full h-[250px] overflow-hidden">
         {/* Default Image */}
