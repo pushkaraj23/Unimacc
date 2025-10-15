@@ -13,7 +13,8 @@
     "offerTime": "last 2hrs",
     "isDiscountActive": true,
     "category": "Bathroom",
-    "subCategory": "Showers"
+    "subCategory": "Showers",
+    "description": "Experience a spa-like bath every day with this luxury rain shower. Built from premium stainless steel, it delivers a high-pressure yet gentle flow for ultimate relaxation. Rust-proof and easy to clean, it complements any modern bathroom design."
   },
   {
     "id": 2,
@@ -29,7 +30,8 @@
     "offerTime": "last 1hr",
     "isDiscountActive": true,
     "category": "Kitchen",
-    "subCategory": "Faucets"
+    "subCategory": "Faucets",
+    "description": "Enhance your kitchen experience with this sleek modern faucet. Designed for durability and ease of use, it features a 360° swivel spout and water-saving aerator. Perfect for both residential and commercial kitchens."
   },
   {
     "id": 3,
@@ -45,7 +47,8 @@
     "offerTime": "ends soon",
     "isDiscountActive": true,
     "category": "Bathroom",
-    "subCategory": "Basins"
+    "subCategory": "Basins",
+    "description": "Crafted from high-quality ceramic, this elegant wash basin features a glossy white finish that resists stains and scratches. Its minimalist design adds a sophisticated touch to any bathroom setup."
   },
   {
     "id": 4,
@@ -61,7 +64,8 @@
     "offerTime": "last 4hrs",
     "isDiscountActive": true,
     "category": "Decor",
-    "subCategory": "Basins"
+    "subCategory": "Basins",
+    "description": "This elegant wall-mounted mirror brings light and depth to any room. Featuring a durable aluminum frame and premium glass clarity, it’s ideal for bedrooms, bathrooms, and living spaces alike."
   },
   {
     "id": 5,
@@ -77,7 +81,8 @@
     "offerTime": "today only",
     "isDiscountActive": true,
     "category": "Kitchen",
-    "subCategory": "Faucets"
+    "subCategory": "Faucets",
+    "description": "Add a touch of sophistication to your sink area with this elegant soap dispenser. Designed with a rust-proof body and smooth pump mechanism, it’s perfect for both liquid soap and lotion use."
   },
   {
     "id": 6,
@@ -93,7 +98,8 @@
     "offerTime": "last 3hrs",
     "isDiscountActive": true,
     "category": "Bathroom",
-    "subCategory": "Basins"
+    "subCategory": "Basins",
+    "description": "Keep your bathroom clean and clog-free with this stainless steel drain cover. Engineered for maximum durability, it prevents debris from blocking drains while maintaining a polished, modern appearance."
   },
   {
     "id": 7,
@@ -109,7 +115,8 @@
     "offerTime": "ends in 1hr",
     "isDiscountActive": true,
     "category": "Bathroom",
-    "subCategory": "Showers"
+    "subCategory": "Showers",
+    "description": "This premium wall shower mixer offers seamless temperature control with smooth lever operation. Built from corrosion-resistant brass, it delivers a luxurious bathing experience and long-lasting performance."
   },
   {
     "id": 8,
@@ -125,7 +132,8 @@
     "offerTime": "last 6hrs",
     "isDiscountActive": true,
     "category": "Decor",
-    "subCategory": "Basins"
+    "subCategory": "Basins",
+    "description": "Organize your essentials with this sturdy glass shelf rack. Its chrome brackets ensure stability while the clear tempered glass adds elegance to any bathroom or vanity space."
   },
   {
     "id": 9,
@@ -141,7 +149,8 @@
     "offerTime": "ends soon",
     "isDiscountActive": true,
     "category": "Bathroom",
-    "subCategory": "Basins"
+    "subCategory": "Basins",
+    "description": "Elevate your bathroom with this luxurious marble top wash basin. Its polished surface and natural stone texture make it both durable and visually stunning — a perfect blend of form and function."
   },
   {
     "id": 10,
@@ -157,6 +166,7 @@
     "offerTime": "last 4hrs",
     "isDiscountActive": true,
     "category": "Decor",
-    "subCategory": "Showers"
+    "subCategory": "Showers",
+    "description": "Add sophistication to your interiors with this designer wall mirror. The elegant frame and crystal-clear reflection make it ideal for hallways, bedrooms, or vanity setups."
   }
 ]

@@ -5,6 +5,9 @@ import Footer from "./components/layout/Footer";
 import ProductsListing from "./pages/ProductsListing";
 import DetailedProductPage from "./pages/DetailedProductPage";
 import ScrollToTop from "./utils/ScrollToTop";
+import CartPage from "./pages/CartPage";
+import WishlistPage from "./pages/WishlistPage";
+import CompareProducts from "./pages/CompareProducts";
 
 function App() {
   return (
@@ -15,6 +18,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsListing />} />
         <Route path="/products/:id" element={<DetailedProductPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/compare" element={<CompareProducts />} />
       </Routes>
       <Footer />
     </div>

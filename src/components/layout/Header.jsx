@@ -129,14 +129,17 @@ const Header = () => {
         {/* Icons */}
         <div className="flex items-center space-x-6 text-gray-700 text-xl">
           <MdCompareArrows
+            onClick={() => navigate("/compare")}
             className="cursor-pointer hover:text-orange-500"
             title="Compare"
           />
           <FaHeart
+            onClick={() => navigate("/wishlist")}
             className="cursor-pointer hover:text-orange-500"
             title="Wishlist"
           />
           <FaShoppingCart
+            onClick={() => navigate("/cart")}
             className="cursor-pointer hover:text-orange-500"
             title="Cart"
           />

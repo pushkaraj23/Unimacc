@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { FaHeart, FaShoppingCart, FaExchangeAlt } from "react-icons/fa";
 
 const ItemCard = ({
@@ -8,11 +9,100 @@ const ItemCard = ({
   subtitle,
   price,
   originalPrice,
+  category,
+  subCategory,
+  description,
   discountPercent,
   offerTime,
   isDiscountActive,
 }) => {
   const navigate = useNavigate();
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isCompared, setIsCompared] = useState(false);
+
+  // ✅ Load wishlist & compare states on mount
+  useEffect(() => {
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    setIsWishlisted(wishlist.some((item) => item.id === id));
+
+    const compareList = JSON.parse(localStorage.getItem("compare")) || [];
+    setIsCompared(compareList.some((item) => item.id === id));
+  }, [id]);
+
+  const product = {
+    id,
+    images,
+    title,
+    subtitle,
+    price,
+    originalPrice,
+    category,
+    subCategory,
+    description,
+    discountPercent,
+    offerTime,
+    isDiscountActive,
+  };
+
+  // ✅ Add to Cart
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingIndex = existingCart.findIndex((item) => item.id === id);
+
+    if (existingIndex !== -1) {
+      existingCart[existingIndex].quantity += 1;
+    } else {
+      existingCart.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+    alert("✅ Product added to cart!");
+  };
+
+  // 💖 Wishlist Add/Remove
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+
+    const existingWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const existingIndex = existingWishlist.findIndex((item) => item.id === id);
+
+    if (existingIndex !== -1) {
+      const updatedWishlist = existingWishlist.filter((item) => item.id !== id);
+      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
+      setIsWishlisted(false);
+      alert("💔 Removed from wishlist!");
+    } else {
+      existingWishlist.push(product);
+      localStorage.setItem("wishlist", JSON.stringify(existingWishlist));
+      setIsWishlisted(true);
+      alert("💖 Added to wishlist!");
+    }
+  };
+
+  // 🔁 Compare Add/Remove
+  const handleCompare = (e) => {
+    e.stopPropagation();
+
+    const existingCompare = JSON.parse(localStorage.getItem("compare")) || [];
+    const existingIndex = existingCompare.findIndex((item) => item.id === id);
+
+    if (existingIndex !== -1) {
+      // Remove from compare list
+      const updatedCompare = existingCompare.filter((item) => item.id !== id);
+      localStorage.setItem("compare", JSON.stringify(updatedCompare));
+      setIsCompared(false);
+      alert("❌ Removed from compare list!");
+    } else {
+      // Add to compare list
+      existingCompare.push(product);
+      localStorage.setItem("compare", JSON.stringify(existingCompare));
+      setIsCompared(true);
+      alert("🔁 Added to compare list!");
+    }
+  };
+
   return (
     <div
       onClick={() => navigate(`/products/${id}`)}
@@ -36,16 +126,26 @@ const ItemCard = ({
           />
         )}
 
-        {/* Cart Icon on Hover */}
+        {/* Cart Icon */}
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="bg-primary/80 hover:bg-theme p-2 rounded-full cursor-pointer">
+          <div
+            onClick={handleAddToCart}
+            className="bg-primary/80 hover:bg-theme p-2 rounded-full cursor-pointer"
+          >
             <FaShoppingCart className="text-white w-5 h-5" />
           </div>
         </div>
 
-        {/* Wishlist Button */}
+        {/* Wishlist Icon */}
         <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="bg-white p-2 rounded-full cursor-pointer hover:bg-theme hover:text-white">
+          <div
+            onClick={handleWishlist}
+            className={`p-2 rounded-full cursor-pointer transition-colors ${
+              isWishlisted
+                ? "bg-theme text-white shadow-md"
+                : "bg-white hover:bg-theme hover:text-white"
+            }`}
+          >
             <FaHeart className="w-5 h-5" />
           </div>
         </div>
@@ -85,7 +185,14 @@ const ItemCard = ({
           </div>
 
           {/* Compare Button */}
-          <button className="border border-gray-300 rounded-md p-2 hover:bg-theme hover:text-white transition-colors">
+          <button
+            onClick={handleCompare}
+            className={`border rounded-md p-2 transition-colors ${
+              isCompared
+                ? "bg-theme text-white border-theme"
+                : "border-gray-300 hover:bg-theme hover:text-white"
+            }`}
+          >
             <FaExchangeAlt className="w-4 h-4" />
           </button>
         </div>

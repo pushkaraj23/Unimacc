@@ -7,11 +7,59 @@ import RecommendedProducts from "../components/product/RecommendedProducts";
 const DetailedProductPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     const selected = data.find((item) => item.id === parseInt(id));
     setProduct(selected);
+
+    // check wishlist state
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    setIsWishlisted(wishlist.some((item) => item.id === parseInt(id)));
   }, [id]);
+
+  // ✅ Add to cart handler
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingIndex = existingCart.findIndex(
+      (item) => item.id === product.id
+    );
+
+    if (existingIndex !== -1) {
+      existingCart[existingIndex].quantity += 1;
+    } else {
+      existingCart.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+    alert("🛒 Product added to cart!");
+  };
+
+  // 💖 Add to wishlist handler
+  const handleAddToWishlist = () => {
+    if (!product) return;
+
+    const existingWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const existingIndex = existingWishlist.findIndex(
+      (item) => item.id === product.id
+    );
+
+    if (existingIndex !== -1) {
+      // remove if already exists
+      const updated = existingWishlist.filter((item) => item.id !== product.id);
+      localStorage.setItem("wishlist", JSON.stringify(updated));
+      setIsWishlisted(false);
+      alert("💔 Removed from wishlist!");
+    } else {
+      // add new item
+      existingWishlist.push(product);
+      localStorage.setItem("wishlist", JSON.stringify(existingWishlist));
+      setIsWishlisted(true);
+      alert("💖 Added to wishlist!");
+    }
+  };
 
   if (!product) return <p className="text-center py-10">Loading...</p>;
 
@@ -20,7 +68,6 @@ const DetailedProductPage = () => {
       <div className="flex flex-col md:flex-row gap-6 p-6 bg-mute h-screen overflow-y-hidden pt-32">
         {/* LEFT SIDEBAR */}
         <aside className="md:w-1/4 w-full flex flex-col gap-6">
-          {/* Banner */}
           <div className="relative w-full h-1/2 overflow-hidden rounded-lg">
             <img
               src="https://images.unsplash.com/photo-1693841114632-bc1c2760bbfd?ixlib=rb-4.1.0&auto=format&fit=crop&w=774&q=80"
@@ -61,20 +108,19 @@ const DetailedProductPage = () => {
 
         {/* MAIN PRODUCT SECTION */}
         <main className="md:w-3/4 w-full flex flex-col lg:flex-row gap-8">
-          {/* Image Section */}
           <div className="w-full lg:w-2/3">
             <img
               src={product.images[0]}
               alt={product.title}
-              className="w-full h-[70vh] rounded-lg mb-3"
+              className="w-full h-[70vh] object-cover rounded-lg mb-3"
             />
-            <div className="flex gap-3">
+            <div className="flex w-full justify-center gap-3">
               {product.images.map((img, i) => (
                 <img
                   key={i}
                   src={img}
                   alt={`thumb-${i}`}
-                  className="w-20 h-20 object-cover rounded-md border cursor-pointer hover:opacity-80 transition"
+                  className="w-16 h-16 object-cover rounded-md border cursor-pointer hover:opacity-80 transition"
                 />
               ))}
             </div>
@@ -89,14 +135,12 @@ const DetailedProductPage = () => {
 
             {/* Price Section */}
             <div className="flex items-center gap-3">
-              <p className="text-2xl font-bold text-black">
-                {product.price} Rs
-              </p>
+              <p className="text-2xl font-bold text-black">₹{product.price}</p>
               <p className="text-gray-400 line-through text-lg">
-                {product.originalPrice} Rs
+                ₹{product.originalPrice}
               </p>
               {product.isDiscountActive && (
-                <span className="bg-orange-500 text-white px-2 py-1 rounded-md text-sm font-medium">
+                <span className="bg-theme text-white px-2 py-1 rounded-md text-sm font-medium">
                   {product.discountPercent}% off
                 </span>
               )}
@@ -129,21 +173,33 @@ const DetailedProductPage = () => {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4 mt-5">
-              <button className="flex items-center gap-2 border border-gray-400 px-4 py-2 rounded-md hover:bg-gray-100 transition text-sm">
-                <FaHeart /> Save
+            <div className="flex gap-4 mt-5 w-full justify-between">
+              <button
+                onClick={handleAddToWishlist}
+                className={`flex items-center justify-center w-1/2 gap-2 border font-medium border-primary/75 px-4 py-2 rounded-md transition-all duration-200 text-sm ${
+                  isWishlisted
+                    ? "bg-theme text-white shadow-md"
+                    : "hover:text-theme hover:shadow-md"
+                }`}
+              >
+                <FaHeart /> {isWishlisted ? "Wishlisted" : "Save"}
               </button>
-              <button className="flex items-center gap-2 border border-gray-400 px-4 py-2 rounded-md hover:bg-gray-100 transition text-sm">
+
+              <button
+                onClick={handleAddToCart}
+                className="flex items-center justify-center w-1/2 gap-2 border border-primary/75 font-medium hover:text-theme hover:shadow-md px-4 py-2 rounded-md transition-all duration-200 text-sm"
+              >
                 <FaShoppingCart /> Add to Cart
               </button>
             </div>
 
-            <button className="bg-black text-white py-3 mt-4 rounded-md hover:bg-gray-800 transition font-medium">
+            <button className="bg-primary text-white py-3 mt-4 rounded-md hover:bg-theme transition hover:shadow-md font-medium">
               Place Order
             </button>
           </div>
         </main>
       </div>
+
       <div className="my-10">
         <RecommendedProducts />
       </div>
