@@ -144,6 +144,7 @@ const Header = () => {
             title="Cart"
           />
           <FaUserCircle
+            onClick={() => navigate("/profile")}
             className="text-orange-500 cursor-pointer text-2xl"
             title="Account"
           />
