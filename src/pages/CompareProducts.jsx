@@ -6,22 +6,39 @@ import { FaTrashAlt } from "react-icons/fa";
 const CompareProducts = () => {
   const [compareList, setCompareList] = useState([]);
 
-  // Load compare products from localStorage
-  useEffect(() => {
+  // 🧠 Load and auto-update compare products from localStorage
+useEffect(() => {
+  const loadCompareList = () => {
     const storedCompare = JSON.parse(localStorage.getItem("compare")) || [];
     setCompareList(storedCompare);
-  }, []);
+  };
+
+  // Initial load
+  loadCompareList();
+
+  // Listen for any cross-tab or in-app changes
+  window.addEventListener("storage", loadCompareList);
+  window.addEventListener("localStorageUpdated", loadCompareList);
+
+  // Cleanup on unmount
+  return () => {
+    window.removeEventListener("storage", loadCompareList);
+    window.removeEventListener("localStorageUpdated", loadCompareList);
+  };
+}, []);
+
 
   const removeFromCompare = (id) => {
     const updated = compareList.filter((item) => item.id !== id);
     setCompareList(updated);
     localStorage.setItem("compare", JSON.stringify(updated));
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
   return (
-    <div className="w-full pt-28 px-10 pb-16 min-h-screen bg-mute">
+    <div className="w-full pt-28 px-10 pb-16 min-h-screen">
       {/* Breadcrumb */}
-      <div className="flex gap-1 font-medium my-5 text-sm">
+      <div className="flex gap-1 font-medium my-3 text-sm">
         <span
           className="text-primary cursor-pointer"
           onClick={() => (window.location.href = "/")}
@@ -29,7 +46,7 @@ const CompareProducts = () => {
           Home
         </span>
         <span className="text-gray-400">/</span>
-        <span className="text-theme">Compare Products</span>
+        <span className="text-theme">Compare</span>
       </div>
 
       {/* Title */}
@@ -42,13 +59,13 @@ const CompareProducts = () => {
             <tbody>
               {/* Product Images */}
               <tr className="border-b border-theme/50">
-                <td className="p-4 font-medium text-primary/75 text-center bg-[#F5D5BE] sticky left-0 z-10 w-48 min-w-[180px]">
+                <td className="p-4 font-medium text-primary/75 text-center bg-[#F5D5BE] sticky left-0 z-10 w-36 min-w-[180px]">
                   Image
                 </td>
                 {compareList.map((item) => (
                   <td
                     key={item.id}
-                    className="p-4 text-center min-w-[22vw] max-w-[220px]"
+                    className="px-6 py-4 text-center min-w-[22vw] max-w-[220px]"
                   >
                     <div className="relative flex flex-col items-start">
                       <div className="w-full flex justify-end mb-3">
@@ -78,7 +95,7 @@ const CompareProducts = () => {
                 {compareList.map((item) => (
                   <td
                     key={item.id}
-                    className="p-4 font-semibold text-primary min-w-[22vw] max-w-[220px]"
+                    className="px-6 py-4 font-semibold text-primary min-w-[22vw] max-w-[220px]"
                   >
                     {item.title}
                   </td>
@@ -91,7 +108,7 @@ const CompareProducts = () => {
                   Price
                 </td>
                 {compareList.map((item) => (
-                  <td key={item.id} className="p-4 min-w-[22vw] max-w-[220px]">
+                  <td key={item.id} className="px-6 py-4 min-w-[22vw] max-w-[220px]">
                     <span className="font-bold text-black">
                       ₹{item.price?.toLocaleString()}
                     </span>
@@ -112,7 +129,7 @@ const CompareProducts = () => {
                 {compareList.map((item) => (
                   <td
                     key={item.id}
-                    className="p-4 text-primary/75 min-w-[22vw] max-w-[220px]"
+                    className="px-6 py-4 text-primary/75 min-w-[22vw] max-w-[220px]"
                   >
                     {item.description ? item.description : "—"}
                   </td>
@@ -127,7 +144,7 @@ const CompareProducts = () => {
                 {compareList.map((item) => (
                   <td
                     key={item.id}
-                    className="p-4 text-theme font-semibold min-w-[22vw] max-w-[220px]"
+                    className="px-6 py-4 text-theme font-semibold min-w-[22vw] max-w-[220px]"
                   >
                     {item.isDiscountActive
                       ? `${item.discountPercent}% OFF`
@@ -144,7 +161,7 @@ const CompareProducts = () => {
                 {compareList.map((item) => (
                   <td
                     key={item.id}
-                    className="p-4 text-gray-700 min-w-[22vw] max-w-[220px]"
+                    className="px-6 py-4 text-gray-700 min-w-[22vw] max-w-[220px]"
                   >
                     {item.category || "-"}
                   </td>
@@ -159,7 +176,7 @@ const CompareProducts = () => {
                 {compareList.map((item) => (
                   <td
                     key={item.id}
-                    className="p-4 text-gray-700 min-w-[22vw] max-w-[220px]"
+                    className="px-6 py-4 text-gray-700 min-w-[22vw] max-w-[220px]"
                   >
                     {item.subCategory || "-"}
                   </td>
@@ -174,7 +191,7 @@ const CompareProducts = () => {
                 {compareList.map((item) => (
                   <td
                     key={item.id}
-                    className="p-4 text-gray-700 min-w-[22vw] max-w-[220px]"
+                    className="px-6 py-4 text-gray-700 min-w-[22vw] max-w-[220px]"
                   >
                     {item.offerTime || "-"}
                   </td>

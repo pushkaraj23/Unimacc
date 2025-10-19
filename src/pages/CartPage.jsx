@@ -40,17 +40,18 @@ const CartPage = () => {
     const updatedCart = cart.filter((item) => item.id !== id);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
   return (
     <div className="w-full pt-28 p-10 min-h-screen bg-[#fafafa]">
       {/* Breadcrumb */}
-      <div className="flex gap-1 font-medium my-5 text-sm">
+      <div className="flex gap-1 font-medium my-3 text-sm">
         <button onClick={() => navigate("/")} className="text-primary">
           Home
         </button>
         <span className="text-gray-400">/</span>
-        <button className="text-orange-500">Cart</button>
+        <button className="text-theme">Cart</button>
       </div>
 
       {/* Title */}

@@ -4,6 +4,7 @@
 
 * {
   font-family: "Urbanist", sans-serif;
+  scroll-behavior: smooth;
 }
 
 .sales-swiper .swiper-slide {
@@ -41,6 +42,16 @@
 }
 
 .no-scrollbar {
-  -ms-overflow-style: none;  /* Internet Explorer and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.mySwiper .swiper-slide img {
+  filter: brightness(30%);
+  transition: filter 0.3s ease-in-out;
+}
+
+/* Active thumbnail – fully bright */
+.mySwiper .swiper-slide-thumb-active img {
+  filter: brightness(100%);
 }

@@ -10,7 +10,7 @@ import TrendingSection from "../components/home/TrendingSection";
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen pt-28">
+    <div className="min-h-screen pt-28 w-full overflow-x-hidden">
       <HeroSection />
       <SalesSection />
       <Banner />

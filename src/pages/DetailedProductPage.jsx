@@ -1,13 +1,18 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import data from "../data.json";
 import { useState, useEffect } from "react";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import RecommendedProducts from "../components/product/RecommendedProducts";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Thumbs } from "swiper/modules";
 
 const DetailedProductPage = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [thumbsSwiper, setThumbsSwiper] = useState(null);
+  const [isAdded, setIsAdded] = useState(false);
 
   useEffect(() => {
     const selected = data.find((item) => item.id === parseInt(id));
@@ -16,10 +21,13 @@ const DetailedProductPage = () => {
     // check wishlist state
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
     setIsWishlisted(wishlist.some((item) => item.id === parseInt(id)));
+
+    const cartlist = JSON.parse(localStorage.getItem("cart")) || [];
+    setIsAdded(cartlist.some((item) => item.id === parseInt(id)));
   }, [id]);
 
   // ✅ Add to cart handler
-  const handleAddToCart = () => {
+  const handleAddToCart = (placeorder) => {
     if (!product) return;
 
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -27,14 +35,26 @@ const DetailedProductPage = () => {
       (item) => item.id === product.id
     );
 
+    let updatedCart;
+
     if (existingIndex !== -1) {
-      existingCart[existingIndex].quantity += 1;
+      // ❌ Remove item if it already exists
+      updatedCart = existingCart.filter((item) => item.id !== product.id);
+      alert("🗑️ Product removed from cart!");
+      setIsAdded(false);
     } else {
-      existingCart.push({ ...product, quantity: 1 });
+      // ✅ Add item if not present
+      updatedCart = [...existingCart, { ...product, quantity: 1 }];
+      alert("🛒 Product added to cart!");
+      setIsAdded(true);
     }
 
-    localStorage.setItem("cart", JSON.stringify(existingCart));
-    alert("🛒 Product added to cart!");
+    if (placeorder) {
+      navigate("/cart");
+    }
+
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
   // 💖 Add to wishlist handler
@@ -59,6 +79,7 @@ const DetailedProductPage = () => {
       setIsWishlisted(true);
       alert("💖 Added to wishlist!");
     }
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
   if (!product) return <p className="text-center py-10">Loading...</p>;
@@ -109,27 +130,57 @@ const DetailedProductPage = () => {
         {/* MAIN PRODUCT SECTION */}
         <main className="md:w-3/4 w-full flex flex-col lg:flex-row gap-8">
           <div className="w-full lg:w-2/3">
-            <img
-              src={product.images[0]}
-              alt={product.title}
-              className="w-full h-[70vh] object-cover rounded-lg mb-3"
-            />
-            <div className="flex w-full justify-center gap-3">
-              {product.images.map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt={`thumb-${i}`}
-                  className="w-16 h-16 object-cover rounded-md border cursor-pointer hover:opacity-80 transition"
-                />
+            {/* Main Image Swiper */}
+            <Swiper
+              style={{
+                "--swiper-navigation-color": "#000",
+                "--swiper-pagination-color": "#000",
+              }}
+              loop={true}
+              spaceBetween={10}
+              navigation={true}
+              thumbs={{ swiper: thumbsSwiper }}
+              modules={[Navigation, Thumbs]}
+              className="mySwiper2 rounded-lg overflow-hidden"
+            >
+              {product.images.map((img, index) => (
+                <SwiperSlide key={index}>
+                  <img
+                    src={img}
+                    alt={`${product.title}-${index}`}
+                    className="w-full h-[65vh] object-cover rounded-lg"
+                  />
+                </SwiperSlide>
               ))}
-            </div>
+            </Swiper>
+
+            {/* Thumbnail Swiper */}
+            <Swiper
+              onSwiper={setThumbsSwiper}
+              spaceBetween={6}
+              slidesPerView={5}
+              freeMode={true}
+              watchSlidesProgress={true}
+              modules={[Thumbs]}
+              className="mySwiper mt-3"
+            >
+              {product.images.map((img, index) => (
+                <SwiperSlide key={index} className="!w-auto">
+                  <img
+                    src={img}
+                    alt={`thumb-${index}`}
+                    className="w-16 h-16 object-cover rounded-md border border-gray-200 hover:border-theme transition-all duration-200 cursor-pointer"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
 
           {/* Product Details */}
           <div className="flex flex-col gap-3 lg:w-1/3">
-            <p className="text-sm text-gray-500">
-              {product.category} &gt; {product.subCategory}
+            <p className="text-sm text-primary/70 font-medium">
+              {product.category} /{" "}
+              <span className="text-theme">{product.subCategory}</span>
             </p>
             <h2 className="text-2xl font-semibold">{product.title}</h2>
 
@@ -165,18 +216,15 @@ const DetailedProductPage = () => {
             <div className="mt-4">
               <p className="text-sm font-semibold mb-1">Description</p>
               <p className="text-gray-500 text-sm leading-relaxed">
-                Crafted from high-grade rust-resistant steel, it ensures
-                long-lasting shine and strength even in humid environments. The
-                sleek chrome finish complements any modern bathroom decor while
-                providing a sturdy hold for towels, robes, or accessories.
+                {product.description}
               </p>
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4 mt-5 w-full justify-between">
+            <div className="flex gap-2 mt-5 w-full">
               <button
                 onClick={handleAddToWishlist}
-                className={`flex items-center justify-center w-1/2 gap-2 border font-medium border-primary/75 px-4 py-2 rounded-md transition-all duration-200 text-sm ${
+                className={`flex items-center justify-center gap-2 border font-medium border-primary/75 px-4 py-2 rounded-md transition-all duration-200 text-sm ${
                   isWishlisted
                     ? "bg-theme text-white shadow-md"
                     : "hover:text-theme hover:shadow-md"
@@ -186,14 +234,19 @@ const DetailedProductPage = () => {
               </button>
 
               <button
-                onClick={handleAddToCart}
-                className="flex items-center justify-center w-1/2 gap-2 border border-primary/75 font-medium hover:text-theme hover:shadow-md px-4 py-2 rounded-md transition-all duration-200 text-sm"
+                onClick={() => handleAddToCart(false)}
+                className={`flex items-center justify-center gap-2 bordsm border-primary/75 font-medium ${
+                  isAdded ? "text-theme shadow-lg" : ""
+                } hover:text-theme hover:shadow-md px-4 py-2 rounded-md transition-all duration-200 text-sm`}
               >
-                <FaShoppingCart /> Add to Cart
+                <FaShoppingCart /> {isAdded ? "Already Added" : "Add to cart"}
               </button>
             </div>
 
-            <button className="bg-primary text-white py-3 mt-4 rounded-md hover:bg-theme transition hover:shadow-md font-medium">
+            <button
+              onClick={() => handleAddToCart(true)}
+              className="bg-primary text-white py-3 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
+            >
               Place Order
             </button>
           </div>

@@ -6,10 +6,13 @@ const ProfilePage = () => {
     name: "",
     phone: "",
     address: "",
+    city: "",
+    state: "",
+    pincode: "",
   });
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // 🧾 Mock Orders
+  // 🧾 Mock Orders (replace later with real data)
   const mockOrders = [
     {
       id: "ORD12345",
@@ -20,7 +23,6 @@ const ProfilePage = () => {
         { name: "Elegant Soap Dispenser", qty: 1, price: 899 },
         { name: "Modern Kitchen Faucet", qty: 1, price: 551 },
       ],
-      deliveryAddress: "",
       paymentMethod: "UPI",
     },
     {
@@ -29,7 +31,6 @@ const ProfilePage = () => {
       total: 2400,
       status: "Shipped",
       items: [{ name: "Luxury Rain Shower Head", qty: 2, price: 1200 }],
-      deliveryAddress: "",
       paymentMethod: "Credit Card",
     },
   ];
@@ -46,87 +47,171 @@ const ProfilePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Save user data in localStorage
-    localStorage.setItem("user", JSON.stringify(formData));
-    setUser(formData);
+    const newUser = {
+      name: formData.name,
+      phone: formData.phone,
+      addresses: [
+        {
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+        },
+      ],
+    };
+
+    // Save to localStorage
+    localStorage.setItem("user", JSON.stringify(newUser));
+    setUser(newUser);
 
     alert("✅ Profile saved successfully!");
   };
 
-  // 🧩 Handle form field updates
+  // 🧩 Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🧾 Mock order list linked to address
+  // 🧾 Attach address 0th as delivery address
   const orders = mockOrders.map((order) => ({
     ...order,
-    deliveryAddress: user?.address || "",
+    deliveryAddress: user?.addresses?.[0]
+      ? `${user.addresses[0].address}, ${user.addresses[0].city}, ${user.addresses[0].state} - ${user.addresses[0].pincode}`
+      : "No address found",
   }));
 
   return (
-    <div className="pt-32 p-10 min-h-screen">
-      <h1 className="text-3xl font-semibold mb-8">My Profile</h1>
+    <div className="pt-28 p-10">
+      <div className="flex gap-1 font-medium my-3 text-sm">
+        <button onClick={() => navigate("/")} className="text-primary">
+          Home
+        </button>
+        <span className="text-gray-400">/</span>
+        <button className="text-theme">Profile</button>
+      </div>
+      <h1 className="text-3xl font-semibold mb-6">Profile</h1>
 
       {/* If user not logged in → Show form */}
       {!user ? (
-        <div className="max-w-lg mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <h2 className="text-2xl font-semibold mb-6 text-center">
+        <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8">
+          <h2 className="text-2xl font-medium mb-8 text-primary">
             Complete Your Profile
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter your full name"
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                required
-              />
+
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-10"
+          >
+            {/* LEFT SIDE — Personal Info */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-theme focus:border-theme transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Enter your phone number"
+                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-theme focus:border-theme transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Pincode
+                </label>
+                <input
+                  type="text"
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleChange}
+                  placeholder="Pincode"
+                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-theme focus:border-theme transition-all"
+                  required
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Enter your phone number"
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                required
-              />
+            {/* RIGHT SIDE — Address Info */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Address
+                </label>
+                <textarea
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Flat, Building, Area"
+                  rows="4"
+                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm shadow-sm resize-none focus:ring-2 focus:ring-theme focus:border-theme transition-all"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="City"
+                    className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-theme focus:border-theme transition-all"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    placeholder="State"
+                    className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-theme focus:border-theme transition-all"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Address
-              </label>
-              <textarea
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Enter your address"
-                rows="3"
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                required
-              />
+            {/* SUBMIT BUTTON — Full Width Below Both Columns */}
+            <div className="md:col-span-2 mt-6">
+              <button
+                type="submit"
+                className="w-full md:w-fit px-7 bg-theme hover:bg-theme/80 text-white py-3 rounded-lg text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-transform duration-200"
+              >
+                Save Profile
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className="w-full bg-black text-white py-3 rounded-md hover:bg-theme transition-all duration-200"
-            >
-              Save Profile
-            </button>
           </form>
         </div>
       ) : (
@@ -134,29 +219,55 @@ const ProfilePage = () => {
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* LEFT — Profile Info */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-theme/10 rounded-2xl shadow-sm border border-theme p-6">
               <h2 className="text-xl font-semibold mb-4">Personal Details</h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-gray-500 text-sm">Full Name</p>
+                  <p className="text-primary/80 text-sm">Full Name</p>
                   <p className="font-medium text-lg">{user.name}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 text-sm">Phone Number</p>
+                  <p className="text-primary/80 text-sm">Phone Number</p>
                   <p className="font-medium text-lg">{user.phone}</p>
                 </div>
+
                 <div>
-                  <p className="text-gray-500 text-sm">Selected Address</p>
-                  <p className="font-medium text-base leading-relaxed">
-                    {user.address}
+                  <p className="text-primary/80 text-sm mb-2">
+                    Saved Addresses
                   </p>
+                  {user.addresses && user.addresses.length > 0 ? (
+                    user.addresses.map((addr, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg mb-2 border ${
+                          index === 0
+                            ? "border-theme bg-theme/10"
+                            : "border-gray-200"
+                        }`}
+                      >
+                        <p className="font-semibold text-primary">
+                          {addr.name}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {addr.address}, {addr.city}, {addr.state} -{" "}
+                          {addr.pincode}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-primary/80 text-sm">
+                      No addresses found.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* RIGHT — Orders */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-semibold mb-4">My Orders</h2>
+              <h2 className="text-xl text-theme font-semibold mb-4">
+                My Orders
+              </h2>
               {orders.length > 0 ? (
                 <div className="space-y-4">
                   {orders.map((order) => (
@@ -200,19 +311,17 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Full-Screen Order Details Modal */}
+          {/* Order Details Modal */}
           {selectedOrder && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+            <div className="fixed inset-0 bg-primary/50 backdrop-blur-sm flex justify-center items-center z-50">
               <div className="bg-white rounded-2xl shadow-lg w-[90%] lg:w-[70%] xl:w-[60%] max-h-[90vh] overflow-y-auto p-8 relative">
-                {/* Close Button */}
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="absolute top-4 right-4 text-gray-600 hover:text-black text-2xl font-bold"
+                  className="absolute top-4 right-4 text-gray-600 hover:text-primary text-2xl font-bold"
                 >
                   ×
                 </button>
 
-                {/* Order Info */}
                 <h2 className="text-2xl font-semibold mb-4">
                   Order Details - #{selectedOrder.id}
                 </h2>
@@ -223,7 +332,6 @@ const ProfilePage = () => {
                   </span>
                 </p>
 
-                {/* Order Items */}
                 <div className="border-t border-gray-200 pt-4 space-y-4">
                   {selectedOrder.items.map((item, idx) => (
                     <div
@@ -234,14 +342,13 @@ const ProfilePage = () => {
                         <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-gray-500">Qty: {item.qty}</p>
                       </div>
-                      <p className="font-semibold text-black">
+                      <p className="font-semibold text-primary">
                         ₹{item.price.toLocaleString()}
                       </p>
                     </div>
                   ))}
                 </div>
 
-                {/* Summary */}
                 <div className="mt-6 space-y-2 border-t border-gray-200 pt-4">
                   <p className="flex justify-between">
                     <span className="text-gray-600">Payment Method:</span>
@@ -251,13 +358,12 @@ const ProfilePage = () => {
                   </p>
                   <p className="flex justify-between">
                     <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-semibold text-lg text-black">
+                    <span className="font-semibold text-lg text-primary">
                       ₹{selectedOrder.total.toLocaleString()}
                     </span>
                   </p>
                 </div>
 
-                {/* Delivery Address */}
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold mb-2">
                     Delivery Address

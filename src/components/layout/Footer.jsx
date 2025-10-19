@@ -25,7 +25,7 @@ const Footer = () => {
   return (
     <footer className="w-full pt-12 px-10 bg-primary/5 font-urbanist">
       {/* Newsletter Section */}
-      <section className="bg-primary w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between py-6 px-8 lg:text-left">
+      <section className="bg-gradient-to-tl from-primary to-theme w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between py-6 px-8 lg:text-left">
         <h1 className="text-white text-4xl leading-snug font-normal">
           Stay Up to Date With Our Latest Offers
         </h1>

@@ -58,6 +58,7 @@ const ItemCard = ({
     }
 
     localStorage.setItem("cart", JSON.stringify(existingCart));
+    window.dispatchEvent(new Event("localStorageUpdated"));
     alert("✅ Product added to cart!");
   };
 
@@ -79,6 +80,7 @@ const ItemCard = ({
       setIsWishlisted(true);
       alert("💖 Added to wishlist!");
     }
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
   // 🔁 Compare Add/Remove
@@ -101,6 +103,7 @@ const ItemCard = ({
       setIsCompared(true);
       alert("🔁 Added to compare list!");
     }
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
   return (

@@ -16,6 +16,7 @@ const WishlistPage = () => {
   const updateLocalStorage = (updatedList) => {
     setWishlist(updatedList);
     localStorage.setItem("wishlist", JSON.stringify(updatedList));
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
   // Increase/decrease quantity
@@ -53,20 +54,20 @@ const WishlistPage = () => {
   };
 
   return (
-    <div className="w-full pt-28 p-10 min-h-screen bg-[#fafafa]">
+    <div className="w-full pt-28 p-10 min-h-screen">
       {/* Breadcrumb */}
-      <div className="flex gap-1 font-medium my-5 text-sm">
+      <div className="flex gap-1 font-medium my-3 text-sm">
         <button onClick={() => navigate("/")} className="text-primary">
           Home
         </button>
         <span className="text-gray-400">/</span>
-        <button className="text-orange-500">Wishlist</button>
+        <button className="text-theme">Wishlist</button>
       </div>
 
       {/* Page Title */}
       <h1 className="text-3xl font-semibold mb-8">Your Wishlist</h1>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
         {wishlist.length > 0 ? (
           wishlist.map((item, index) => (
             <div key={item.id}>
@@ -88,7 +89,7 @@ const WishlistPage = () => {
                       <br />
                       Subcategory: {item.subCategory || "-"}
                     </p>
-                    <p className="font-semibold text-lg mt-1 text-black">
+                    <p className="font-semibold text-lg mt-1 text-primary">
                       ₹{item.price?.toLocaleString()}
                     </p>
                   </div>
