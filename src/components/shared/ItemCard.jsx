@@ -47,7 +47,6 @@ const ItemCard = ({
   // ✅ Add to Cart
   const handleAddToCart = (e) => {
     e.stopPropagation();
-
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
     const existingIndex = existingCart.findIndex((item) => item.id === id);
 
@@ -65,7 +64,6 @@ const ItemCard = ({
   // 💖 Wishlist Add/Remove
   const handleWishlist = (e) => {
     e.stopPropagation();
-
     const existingWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
     const existingIndex = existingWishlist.findIndex((item) => item.id === id);
 
@@ -86,18 +84,15 @@ const ItemCard = ({
   // 🔁 Compare Add/Remove
   const handleCompare = (e) => {
     e.stopPropagation();
-
     const existingCompare = JSON.parse(localStorage.getItem("compare")) || [];
     const existingIndex = existingCompare.findIndex((item) => item.id === id);
 
     if (existingIndex !== -1) {
-      // Remove from compare list
       const updatedCompare = existingCompare.filter((item) => item.id !== id);
       localStorage.setItem("compare", JSON.stringify(updatedCompare));
       setIsCompared(false);
       alert("❌ Removed from compare list!");
     } else {
-      // Add to compare list
       existingCompare.push(product);
       localStorage.setItem("compare", JSON.stringify(existingCompare));
       setIsCompared(true);
@@ -112,7 +107,7 @@ const ItemCard = ({
       className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg hover:cursor-pointer transition-all duration-300 relative group"
     >
       {/* Product Image */}
-      <div className="relative w-full h-[250px] overflow-hidden">
+      <div className="relative w-full h-[220px] sm:h-[250px] md:h-[280px] overflow-hidden">
         {/* Default Image */}
         <img
           src={images[0]}
@@ -133,9 +128,9 @@ const ItemCard = ({
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div
             onClick={handleAddToCart}
-            className="bg-primary/80 hover:bg-theme p-2 rounded-full cursor-pointer"
+            className="bg-primary/80 hover:bg-theme p-2 sm:p-2.5 rounded-full cursor-pointer"
           >
-            <FaShoppingCart className="text-white w-5 h-5" />
+            <FaShoppingCart className="text-white w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
 
@@ -143,19 +138,19 @@ const ItemCard = ({
         <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div
             onClick={handleWishlist}
-            className={`p-2 rounded-full cursor-pointer transition-colors ${
+            className={`p-2 sm:p-2.5 rounded-full cursor-pointer transition-colors ${
               isWishlisted
                 ? "bg-theme text-white shadow-md"
                 : "bg-white hover:bg-theme hover:text-white"
             }`}
           >
-            <FaHeart className="w-5 h-5" />
+            <FaHeart className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
 
         {/* Offer Time Badge */}
         {isDiscountActive && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-[85%] flex justify-between items-center bg-theme text-white text-[13px] font-semibold px-3 py-1 rounded-md">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-[85%] flex justify-between items-center bg-theme text-white text-[2.2vw] md:text-[.9vw] font-semibold px-2 sm:px-3 py-1 rounded-md">
             <span>Limited Time Deal</span>
             <span>{offerTime}</span>
           </div>
@@ -163,25 +158,32 @@ const ItemCard = ({
       </div>
 
       {/* Product Info */}
-      <div className="p-4 text-left">
-        <p className="text-gray-400 text-sm">{subtitle}</p>
-        <h3 className="font-semibold text-primary text-base leading-snug">
-          {title}
+      <div className="p-3 sm:p-4 text-left">
+        <p className="text-gray-400 text-xs sm:text-sm">
+          {subtitle.length > 50 ? `${subtitle.slice(0, 30)}…` : subtitle}
+        </p>
+        <h3
+          className="font-semibold text-primary text-sm sm:text-base leading-snug truncate"
+          title={title} // shows full title on hover
+        >
+          {title.length > 50 ? `${title.slice(0, 50)}…` : title}
         </h3>
 
         {/* Price Section */}
         <div className="flex items-center justify-between mt-2">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-primary font-bold text-lg">₹{price}</span>
+              <span className="text-primary font-bold text-base sm:text-lg">
+                ₹{price}
+              </span>
               {originalPrice && (
-                <span className="text-gray-400 line-through text-sm">
+                <span className="text-gray-400 line-through text-xs sm:text-sm">
                   ₹{originalPrice}
                 </span>
               )}
             </div>
             {discountPercent && (
-              <span className="text-theme text-sm font-semibold">
+              <span className="text-theme text-xs sm:text-sm font-semibold">
                 {discountPercent}% OFF
               </span>
             )}
@@ -190,13 +192,13 @@ const ItemCard = ({
           {/* Compare Button */}
           <button
             onClick={handleCompare}
-            className={`border rounded-md p-2 transition-colors ${
+            className={`border rounded-md p-1.5 sm:p-2 transition-colors ${
               isCompared
                 ? "bg-theme text-white border-theme"
                 : "border-gray-300 hover:bg-theme hover:text-white"
             }`}
           >
-            <FaExchangeAlt className="w-4 h-4" />
+            <FaExchangeAlt className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>

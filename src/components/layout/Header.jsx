@@ -7,6 +7,7 @@ import {
   FaUserCircle,
   FaBars,
   FaTimes,
+  FaHome
 } from "react-icons/fa";
 import { MdCompareArrows } from "react-icons/md";
 
@@ -67,7 +68,7 @@ const Header = () => {
           showHeader ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="flex items-center justify-between px-5 md:px-6 py-3">
+        <div className="flex items-center justify-between px-5 md:px-6 py-3 max-sm:py-4">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
             {/* Hamburger for mobile */}
@@ -88,19 +89,19 @@ const Header = () => {
           </div>
 
           {/* Search (hidden on mobile) */}
-          <div className="hidden md:flex items-center border border-gray-400 rounded-full px-4 py-2 w-1/2">
-            <FaSearch className="text-gray-500 mr-3" />
+          <div className="flex items-center border border-gray-400 rounded-full px-4 py-2 w-1/2 max-sm:w-1/3 relative">
+            <FaSearch className="text-gray-500 mr-3 max-sm:absolute " />
             <input
               type="text"
-              placeholder="Search for products..."
-              className="bg-transparent flex-grow outline-none text-gray-700 placeholder-gray-400"
+              placeholder="Search..."
+              className="bg-transparent flex-grow outline-none text-gray-700 placeholder-gray-400 max-sm:ml-6 w-full"
             />
           </div>
 
           {/* Icons */}
-          <div className="flex items-center space-x-4 md:space-x-6 text-gray-700 text-xl relative">
+          <div className="flex items-center space-x-6 text-gray-700 text-xl relative max-sm:pr-3">
             {/* Compare */}
-            <div className="relative hidden md:block">
+            <div className="relative md:block">
               <MdCompareArrows
                 onClick={() => navigate("/compare")}
                 className="cursor-pointer hover:text-orange-500"
@@ -114,7 +115,7 @@ const Header = () => {
             </div>
 
             {/* Wishlist */}
-            <div className="relative">
+            <div className="relative hidden md:block">
               <FaHeart
                 onClick={() => navigate("/wishlist")}
                 className="cursor-pointer hover:text-orange-500"
@@ -128,7 +129,7 @@ const Header = () => {
             </div>
 
             {/* Cart */}
-            <div className="relative">
+            <div className="relative hidden md:block">
               <FaShoppingCart
                 onClick={() => navigate("/cart")}
                 className="cursor-pointer hover:text-orange-500"
@@ -144,7 +145,7 @@ const Header = () => {
             {/* Profile */}
             <FaUserCircle
               onClick={() => navigate("/profile")}
-              className="text-orange-500 cursor-pointer text-2xl"
+              className="text-orange-500 cursor-pointer text-2xl hidden md:block"
               title="Account"
             />
           </div>
@@ -174,17 +175,11 @@ const Header = () => {
 
       {/* Mobile Drawer */}
       <div
-        className={`fixed top-0 left-0 w-64 bg-white h-full shadow-lg z-40 transform transition-transform duration-300 ${
+        className={`fixed top-0 left-0 w-64 bg-white h-full shadow-lg z-40 transform transition-transform duration-300 pt-20 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Categories</h2>
-          <FaTimes
-            className="text-gray-600 cursor-pointer"
-            onClick={() => setMenuOpen(false)}
-          />
-        </div>
+        <h2 className="text-xl font-bold my-3 px-6">Categories</h2>
         <ul className="text-gray-700">
           {[
             "Washbasin",
@@ -207,16 +202,19 @@ const Header = () => {
       </div>
 
       {/* Mobile Bottom Nav */}
-      <div className="fixed bottom-0 left-0 w-full bg-white shadow-t flex justify-around items-center py-2 md:hidden border-t">
-        <div onClick={() => navigate("/")} className="text-center text-gray-700">
-          <FaSearch className="mx-auto text-lg" />
-          <p className="text-xs">Search</p>
+      <div className="fixed bottom-0 z-50 left-0 w-full bg-white shadow-t flex justify-around items-center py-3 md:hidden border-t">
+        <div
+          onClick={() => navigate("/")}
+          className="text-center text-gray-700"
+        >
+          <FaHome className="mx-auto text-lg mb-1" size={22} />
+          <p className="text-xs">Home</p>
         </div>
         <div
           onClick={() => navigate("/wishlist")}
           className="text-center text-gray-700 relative"
         >
-          <FaHeart className="mx-auto text-lg" />
+          <FaHeart className="mx-auto text-lg mb-1" size={22} />
           {wishlistCount > 0 && (
             <span className="absolute top-0 right-4 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
               {wishlistCount}
@@ -228,7 +226,7 @@ const Header = () => {
           onClick={() => navigate("/cart")}
           className="text-center text-gray-700 relative"
         >
-          <FaShoppingCart className="mx-auto text-lg" />
+          <FaShoppingCart className="mx-auto text-lg mb-1" size={22} />
           {cartCount > 0 && (
             <span className="absolute top-0 right-4 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
               {cartCount}
@@ -240,7 +238,10 @@ const Header = () => {
           onClick={() => navigate("/profile")}
           className="text-center text-gray-700"
         >
-          <FaUserCircle className="mx-auto text-lg text-orange-500" />
+          <FaUserCircle
+            className="mx-auto text-lg text-orange-500 mb-1"
+            size={22}
+          />
           <p className="text-xs">Account</p>
         </div>
       </div>

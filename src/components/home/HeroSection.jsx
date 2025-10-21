@@ -74,19 +74,19 @@ const HeroSection = () => {
         }}
         navigation={true}
         modules={[EffectCoverflow, Pagination, Navigation, Autoplay]} // ✅ Added Autoplay here
-        className="h-[75vh]"
+        className="h-[75vh] max-sm:h-[60vh]"
       >
         {slides.map((slide) => (
           <SwiperSlide
             key={slide.id}
-            className="relative h-[50vh] overflow-hidden rounded-3xl shadow-2xl"
+            className="relative overflow-hidden rounded-3xl shadow-2xl"
           >
             <img
               src={slide.img}
               alt={slide.title}
               className="w-full h-[80vh] object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/20 flex flex-col justify-center px-16 text-white">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/20 flex flex-col justify-center px-16 max-sm:px-10 text-white">
               <p className="text-4xl font-thin text-mute/75">{slide.title}</p>
               <h2 className="text-6xl font-bold text-mute mb-3">
                 {slide.subtitle}

@@ -3,7 +3,7 @@ import React from "react";
 const Banner = () => {
   return (
     <div className="relative">
-      <section className="relative w-full bg-primary min-h-[30vh] my-16 px-16 flex items-center overflow-hidden">
+      <section className="relative w-full bg-primary min-h-[30vh] max-sm:min-h-[65vh] my-16 px-16 flex items-center overflow-hidden max-sm:items-start max-sm:py-16">
         <div>
           <h2 className="text-mute/50 uppercase font-light text-2xl">
             Upgrade Your Bathroom.
@@ -16,9 +16,9 @@ const Banner = () => {
           </p>
         </div>
         {/* Orange Oval */}
-        <div className="w-[40vw] h-[40vw] absolute bg-theme rounded-full -right-5 top-12" />
+        <div className="w-[40vw] h-[40vw] max-sm:w-[100vw] max-sm:h-[100vw] absolute bg-theme rounded-full -right-5 top-16 max-sm:top-[70%]" />
       </section>
-      <img src="/sample/banner-item.png" className="absolute h-[40vh] right-8 -top-[5vh]" alt="sample-product" />
+      <img src="/sample/banner-item.png" className="absolute h-[40vh] right-8 max-sm:right-0 -top-[5vh] max-sm:top-[50%]" alt="sample-product" />
     </div>
   );
 };

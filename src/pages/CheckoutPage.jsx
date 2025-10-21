@@ -114,9 +114,9 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="w-full min-h-screen pt-28 p-10">
+    <div className="w-full min-h-screen pt-28 max-sm:pt-24 max-sm:px-6 p-10">
       {/* Breadcrumb */}
-      <div className="flex gap-1 font-medium my-3 text-sm">
+      <div className="flex gap-1 font-medium my-3 max-sm:my-0 text-sm">
         <button onClick={() => navigate("/")} className="text-primary">
           Home
         </button>
@@ -128,7 +128,7 @@ const CheckoutPage = () => {
         <button className="text-theme">Checkout</button>
       </div>
 
-      <h1 className="text-3xl font-semibold mb-6">Checkout</h1>
+      <h1 className="text-3xl font-semibold mb-6 max-sm:text-2xl">Checkout</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* LEFT SIDE */}

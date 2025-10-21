@@ -2,7 +2,7 @@ import { FaPlay } from "react-icons/fa";
 
 const CategoryListing = () => {
   return (
-    <div className="px-10 grid grid-cols-2 my-10 gap-3 min-h-[80vh]">
+    <div className="px-10 max-sm:px-6 grid grid-cols-2 max-sm:grid-cols-1 my-10 gap-3 min-h-[80vh]">
       <section className="h-full col-span-1 flex flex-col gap-3">
         {/* Card 1 */}
         <div className="w-full relative h-1/2 bg-gradient-to-br from-primary/20 to-primary/70 p-10 rounded-xl hover:shadow-lg hover:scale-[1.01] hover:cursor-pointer transition-all duration-200">

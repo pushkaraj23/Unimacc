@@ -84,15 +84,15 @@ const ProfilePage = () => {
   }));
 
   return (
-    <div className="pt-28 p-10">
-      <div className="flex gap-1 font-medium my-3 text-sm">
+    <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
+      <div className="flex gap-1 font-medium my-3 max-sm:my-0 text-sm">
         <button onClick={() => navigate("/")} className="text-primary">
           Home
         </button>
         <span className="text-gray-400">/</span>
         <button className="text-theme">Profile</button>
       </div>
-      <h1 className="text-3xl font-semibold mb-6">Profile</h1>
+      <h1 className="text-3xl font-semibold mb-6 max-sm:mt-1">Profile</h1>
 
       {/* If user not logged in → Show form */}
       {!user ? (

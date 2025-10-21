@@ -23,7 +23,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full pt-12 px-10 bg-primary/5 font-urbanist">
+    <footer className="w-full pt-12 px-10 max-sm:px-6 bg-primary/5 font-urbanist">
       {/* Newsletter Section */}
       <section className="bg-gradient-to-tl from-primary to-theme w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between py-6 px-8 lg:text-left">
         <h1 className="text-white text-4xl leading-snug font-normal">
@@ -45,8 +45,8 @@ const Footer = () => {
       </section>
 
       {/* Main Footer Links */}
-      <section className="w-full flex flex-col lg:flex-row justify-between items-center mt-10 max-sm:mt-[34vw] border-b border-black/30 pb-10 lg:text-left px-5">
-        <div className="w-full lg:w-[23vw] mb-6 lg:mb-0 max-sm:px-[7vw]">
+      <section className="w-full flex flex-col lg:flex-row justify-between items-center mt-10 max-sm:mt-[34vw] border-b border-black/30 pb-10 lg:text-left px-5 max-sm:px-0">
+        <div className="w-full lg:w-[23vw] mb-6 lg:mb-0 max-sm:px-2">
           <img src="/logo.svg" className="h-16" alt="logo" />
           <p className="text-primary/60 mt-3">
             We have products that suit your style and which you’re proud to own.
@@ -73,7 +73,7 @@ const Footer = () => {
         </div>
 
         {/* Footer Navigation */}
-        <div className="grid grid-cols-2 lg:flex lg:space-x-16 text-primary/60 gap-8 tracking-wide">
+        <div className="grid grid-cols-2 lg:flex lg:space-x-16 text-primary/60 gap-8 tracking-wide max-sm:w-full max-sm:px-3">
           <div>
             <h3 className="uppercase font-semibold text-primary mb-1">
               Company
@@ -115,7 +115,7 @@ const Footer = () => {
       </section>
 
       {/* Payment Icons */}
-      <section className="w-full p-4">
+      <section className="w-full p-4 max-sm:pb-24">
         <div className="flex justify-center space-x-4 max-sm:space-x-2 max-sm:mt-4 text-primary/80 mb-3 text-4xl">
           <FaCcVisa />
           <FaCcMastercard />
