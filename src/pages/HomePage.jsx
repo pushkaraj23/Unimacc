@@ -10,6 +10,7 @@ import PopularSection from "../components/home/PopularSection";
 import SalesSection from "../components/home/SalesSection";
 import TrendingSection from "../components/home/TrendingSection";
 import ServiceBanner from "../components/shared/ServiceBanner";
+import VideoSection from "../components/home/VideoSection";
 
 const HomePage = () => {
   return (
@@ -24,6 +25,7 @@ const HomePage = () => {
       <AdBanners />
       <CategoryOne />
       <Bestsellers />
+      <VideoSection />
       <CategoryTwo />
       <CategoryListing />
     </div>
