@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories } from "../../api/userApi";
 import {
   FaSearch,
   FaHeart,
@@ -7,7 +9,7 @@ import {
   FaUserCircle,
   FaBars,
   FaTimes,
-  FaHome
+  FaHome,
 } from "react-icons/fa";
 import { MdCompareArrows } from "react-icons/md";
 
@@ -19,6 +21,15 @@ const Header = () => {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
   const navigate = useNavigate();
+
+  const {
+    data: categories = [],
+    isLoading: isCategoriesLoading,
+    isError: isCategoriesError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
 
   const handleCategoryClick = (category) => {
     setMenuOpen(false);
@@ -88,6 +99,50 @@ const Header = () => {
             />
           </div>
 
+          {/* Categories Dropdown */}
+          <div className="hidden md:block relative group">
+            <button className="flex items-center text-primary/80 font-medium">
+              Categories
+              <svg
+                className="w-4 h-4 ml-1 text-primary/80"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <div className="absolute hidden group-hover:block bg-white shadow-md mt-2 rounded w-48 -translate-y-2 z-50">
+              <ul className="text-sm text-primary/60 py-2 font-medium">
+                {isCategoriesLoading ? (
+                  <li className="px-4 py-2 text-gray-400">Loading...</li>
+                ) : isCategoriesError ? (
+                  <li className="px-4 py-2 text-red-500">Error loading</li>
+                ) : categories.length === 0 ? (
+                  <li className="px-4 py-2 text-gray-400">No Categories</li>
+                ) : (
+                  categories
+                    .filter((cat) => cat.isactive) // ✅ only show active categories
+                    .map((cat) => (
+                      <li
+                        key={cat.id}
+                        onClick={() => handleCategoryClick(cat.name)}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        {cat.name}
+                      </li>
+                    ))
+                )}
+              </ul>
+            </div>
+          </div>
+
           {/* Search (hidden on mobile) */}
           <div className="flex items-center border border-gray-400 rounded-full px-4 py-2 w-1/2 max-sm:w-1/3 relative">
             <FaSearch className="text-gray-500 mr-3 max-sm:absolute " />
@@ -153,23 +208,23 @@ const Header = () => {
 
         {/* Desktop Bottom Nav */}
         <nav className="hidden md:flex bg-black text-white text-sm justify-center space-x-8 py-2">
-          {[
-            "Washbasin",
-            "Kitchen",
-            "Toilets",
-            "Faucets",
-            "Showers",
-            "Drains",
-            "Racks",
-          ].map((item) => (
-            <p
-              key={item}
-              onClick={() => handleCategoryClick(item)}
-              className="hover:text-orange-400 transition-colors hover:cursor-pointer duration-200"
-            >
-              {item}
-            </p>
-          ))}
+          {isCategoriesLoading ? (
+            <p>Loading...</p>
+          ) : isCategoriesError ? (
+            <p>Error loading categories</p>
+          ) : (
+            categories
+              .filter((cat) => cat.isactive)
+              .map((cat) => (
+                <p
+                  key={cat.id}
+                  onClick={() => handleCategoryClick(cat.name)}
+                  className="hover:text-orange-400 transition-colors hover:cursor-pointer duration-200"
+                >
+                  {cat.name}
+                </p>
+              ))
+          )}
         </nav>
       </header>
 
@@ -181,23 +236,21 @@ const Header = () => {
       >
         <h2 className="text-xl font-bold my-3 px-6">Categories</h2>
         <ul className="text-gray-700">
-          {[
-            "Washbasin",
-            "Kitchen",
-            "Toilets",
-            "Faucets",
-            "Showers",
-            "Drains",
-            "Racks",
-          ].map((item) => (
-            <li
-              key={item}
-              onClick={() => handleCategoryClick(item)}
-              className="px-6 py-3 border-b hover:bg-gray-100 cursor-pointer"
-            >
-              {item}
-            </li>
-          ))}
+          {isCategoriesLoading ? (
+            <li className="px-6 py-3 text-gray-400">Loading...</li>
+          ) : isCategoriesError ? (
+            <li className="px-6 py-3 text-red-500">Error loading</li>
+          ) : (
+            categories.map((cat) => (
+              <li
+                key={cat.id}
+                onClick={() => handleCategoryClick(cat.name)}
+                className="px-6 py-3 border-b hover:bg-gray-100 cursor-pointer"
+              >
+                {cat.name}
+              </li>
+            ))
+          )}
         </ul>
       </div>
 
