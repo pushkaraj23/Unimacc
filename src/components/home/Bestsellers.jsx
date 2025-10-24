@@ -1,14 +1,49 @@
 import { useState } from "react";
-import products from "../../data.json"; // adjust path if needed
+import { useQuery } from "@tanstack/react-query";
 import ItemCard from "../shared/ItemCard";
+import { fetchProducts, fetchCategories } from "../../api/userApi";
 
 const Bestsellers = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Derive unique categories from data
-  const categories = ["All", ...new Set(products.map((p) => p.category))];
+  // ✅ Fetch products & categories from API
+  const {
+    data: products = [],
+    isLoading: productsLoading,
+    isError: productsError,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
-  // Filter products by category
+  const {
+    data: categoriesData = [],
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
+
+  // ✅ Handle loading & error states
+  if (productsLoading || categoriesLoading)
+    return (
+      <div className="w-full h-[50vh] flex items-center justify-center text-primary/60">
+        Loading bestsellers...
+      </div>
+    );
+
+  if (productsError || categoriesError)
+    return (
+      <div className="w-full h-[50vh] flex items-center justify-center text-red-500">
+        Failed to load bestsellers. Please try again later.
+      </div>
+    );
+
+  // ✅ Derive unique categories from API
+  const categories = ["All", ...new Set(categoriesData.map((c) => c.name))];
+
+  // ✅ Filter products by selected category
   const filteredProducts =
     selectedCategory === "All"
       ? products
@@ -44,7 +79,16 @@ const Bestsellers = () => {
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
           {filteredProducts.map((item) => (
-            <ItemCard key={item.id} {...item} />
+            <ItemCard
+              key={item.id}
+              id={item.id}
+              title={item.name}
+              subtitle={item.category}
+              images={[item.thumbnailimage]}
+              price={item.sellingprice}
+              category={item.category}
+              subCategory={item.subcategory}
+            />
           ))}
         </div>
       ) : (

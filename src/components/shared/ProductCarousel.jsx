@@ -6,15 +6,41 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import ItemCard from "./ItemCard";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProducts } from "../../api/userApi";
 
 const ProductCarousel = ({
   title = "Section Title",
-  items = [],
   viewAllRoute = "/",
   slidesMobile = 2,
   slidesDesktop = 5,
 }) => {
   const navigate = useNavigate();
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="w-full h-full flex items-center text-red-600 justify-center">
+        Something went wrong! Try again later!
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6 md:px-10">
@@ -63,18 +89,31 @@ const ProductCarousel = ({
             1280: { slidesPerView: slidesDesktop },
           }}
         >
-          {items.length > 0 ? (
-            items.map((item) => (
-              <SwiperSlide key={item.id} className="pb-10">
-                <ItemCard {...item} />
-              </SwiperSlide>
-            ))
+          {products.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center text-primary/60">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/7486/7486740.png"
+                alt="No Products"
+                className="w-24 mb-4 opacity-80"
+              />
+              <h2 className="text-xl font-semibold mb-2">No Products Found</h2>
+              <p className="text-sm text-primary/50 max-w-md">
+                We couldn’t find any products. Try refreshing the page.
+              </p>
+            </div>
           ) : (
-            <SwiperSlide>
-              <div className="flex justify-center items-center h-[200px] text-gray-400">
-                No items to display
-              </div>
-            </SwiperSlide>
+            products.map((item) => (
+              <ItemCard
+                key={item.id}
+                id={item.id}
+                title={item.name}
+                subtitle={item.category}
+                images={[item.thumbnailimage, item.thumbnailimage]}
+                price={item.sellingprice}
+                category={item.category}
+                subCategory={item.subcategory}
+              />
+            ))
           )}
         </Swiper>
       </section>
