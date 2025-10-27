@@ -54,7 +54,7 @@ const WishlistPage = () => {
   };
 
   return (
-    <div className="w-full pt-28 px-10 max-lg:px-6 max-sm:px-4 max-sm:py-24">
+    <div className="w-full py-28 px-10 max-lg:px-6 max-sm:px-4 max-sm:py-24">
       {/* Breadcrumb */}
       <div className="flex gap-1 font-medium my-3 max-sm:my-0 text-sm flex-wrap">
         <button onClick={() => navigate("/")} className="text-primary">
@@ -78,20 +78,20 @@ const WishlistPage = () => {
                 <div className="flex items-center max-lg:items-start gap-4 w-full">
                   <img
                     onClick={() => navigate(`/products/${item.id}`)}
-                    src={item.images?.[0]}
-                    alt={item.title}
+                    src={item.thumbnailimage}
+                    alt={item.name}
                     className="w-24 h-24 sm:w-28 sm:h-28 max-sm:w-20 max-sm:h-20 object-cover rounded-lg border hover:cursor-pointer"
                   />
                   <div className="flex flex-col">
                     <h3 className="font-semibold text-lg max-sm:text-base line-clamp-2">
-                      {item.title || "Unnamed Product"}
+                      {item.name || "Unnamed Product"}
                     </h3>
                     <p className="text-sm max-sm:text-xs text-gray-500 mt-1">
                       Category: {item.category || "-"} <br />
                       Subcategory: {item.subCategory || "-"}
                     </p>
                     <p className="font-semibold text-lg max-sm:text-base mt-1 text-primary">
-                      ₹{item.price?.toLocaleString()}
+                      ₹{item.sellingprice?.toLocaleString()}
                     </p>
                   </div>
                 </div>

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import data from "../data.json";
 import ItemCard from "../components/shared/ItemCard";
 import { FaTrashAlt } from "react-icons/fa";
+import { fetchProducts } from "../api/userApi";
+import { useQuery } from "@tanstack/react-query";
 
 const CompareProducts = () => {
   const [compareList, setCompareList] = useState([]);
@@ -26,6 +28,15 @@ const CompareProducts = () => {
       window.removeEventListener("localStorageUpdated", loadCompareList);
     };
   }, []);
+
+  const {
+    data: products = [],
+    isLoading: productsLoading,
+    isError: productsError,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
   const removeFromCompare = (id) => {
     const updated = compareList.filter((item) => item.id !== id);
@@ -80,8 +91,8 @@ const CompareProducts = () => {
 
                       {/* Product Image */}
                       <img
-                        src={item.images?.[0]}
-                        alt={item.title}
+                        src={item.thumbnailimage}
+                        alt={item.name}
                         className="w-full h-[20vh] sm:h-[30vh] object-cover rounded-lg border border-theme/50"
                       />
                     </div>
@@ -99,7 +110,7 @@ const CompareProducts = () => {
                     key={item.id}
                     className="px-2 sm:px-6 py-3 sm:py-4 font-semibold text-primary min-w-[160px] sm:min-w-[22vw] max-w-[220px] text-xs sm:text-sm"
                   >
-                    <span className="line-clamp-2">{item.title}</span>
+                    <span className="line-clamp-2">{item.name}</span>
                   </td>
                 ))}
               </tr>
@@ -115,11 +126,11 @@ const CompareProducts = () => {
                     className="px-2 sm:px-6 py-3 sm:py-4 min-w-[160px] sm:min-w-[22vw] max-w-[220px]"
                   >
                     <span className="font-bold text-black text-sm sm:text-base">
-                      ₹{item.price?.toLocaleString()}
+                      ₹{item.sellingprice?.toLocaleString()}
                     </span>
-                    {item.originalPrice && (
+                    {item.mrp && (
                       <span className="ml-1 sm:ml-2 text-gray-400 line-through text-xs sm:text-sm">
-                        ₹{item.originalPrice}
+                        ₹{item.mrp}
                       </span>
                     )}
                   </td>
@@ -219,8 +230,8 @@ const CompareProducts = () => {
           Add More Products for Comparison
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {data.map((product) => (
-            <ItemCard key={product.id} {...product} />
+          {products.map((item, index) => (
+            <ItemCard key={index} product={item} />
           ))}
         </div>
       </div>

@@ -7,9 +7,11 @@ import "swiper/css/pagination";
 import "../style/sales.css";
 import ItemCard from "../shared/ItemCard";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { fetchProducts } from "../../api/userApi";
 
 const SalesSection = () => {
+  const navigate = useNavigate();
   const {
     data: products = [],
     isLoading: isProductsLoading,
@@ -34,7 +36,10 @@ const SalesSection = () => {
               </button>
             ))}
           </div>
-          <button className="flex items-center gap-2 text-primary font-medium hover:text-theme transition-all duration-200">
+          <button
+            onClick={() => navigate("/products")}
+            className="flex items-center gap-2 text-primary font-medium hover:text-theme transition-all duration-200"
+          >
             View All
             <FaPlay className="text-sm" />
           </button>

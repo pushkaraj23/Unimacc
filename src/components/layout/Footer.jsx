@@ -23,7 +23,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full relative pt-12 px-10 max-sm:px-6 bg-[#e2e1e1] font-urbanist z-50">
+    <footer className="w-full relative pt-12 px-10 max-sm:px-6 bg-[#e2e1e1] font-urbanist z-40">
       {/* Newsletter Section */}
       <section className="bg-gradient-to-tl from-primary to-theme w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between py-6 px-8 lg:text-left">
         <h1 className="text-white text-4xl leading-snug font-normal">

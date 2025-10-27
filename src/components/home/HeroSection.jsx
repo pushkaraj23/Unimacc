@@ -11,10 +11,12 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "../style/hero.css";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { fetchHeroSectionContent } from "../../api/userApi";
 
 const HeroSection = () => {
   // ✅ Fetch data using React Query
+  const navigate = useNavigate();
   const {
     data: heroSlides = [],
     isLoading,
@@ -84,7 +86,10 @@ const HeroSection = () => {
               <h2 className="text-5xl font-bold mb-3 drop-shadow-md">
                 {slide.title}
               </h2>
-              <button className="bg-[#FF7A00] hover:bg-[#e56e00] text-primary font-semibold px-7 py-3 rounded-full shadow-md transition duration-300 w-fit">
+              <button
+                onClick={() => navigate("/products")}
+                className="bg-[#FF7A00] hover:bg-[#e56e00] text-primary font-semibold px-7 py-3 rounded-full shadow-md transition duration-300 w-fit"
+              >
                 Shop Now →
               </button>
             </div>

@@ -1,6 +1,8 @@
 import { FaPlay } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const AdBanners = () => {
+  const navigate = useNavigate();
   return (
     <div className="px-10 grid grid-cols-5 my-10 gap-3 max-sm:gap-0 max-sm:grid-cols-1 max-sm:px-6">
       {/* Card 1 */}
@@ -15,7 +17,10 @@ const AdBanners = () => {
           src="/sample/basin.png"
           alt="basin-image"
         />
-        <button className="px-8 py-3 shadow-xl w-fit bg-theme text-primary font-semibold hover:bg-mute hover:text-theme transition-colors duration-300">
+        <button
+          onClick={() => navigate("/products")}
+          className="px-8 py-3 shadow-xl w-fit bg-theme text-primary font-semibold hover:bg-mute hover:text-theme transition-colors duration-300"
+        >
           Shop Now
         </button>
       </div>
@@ -26,7 +31,10 @@ const AdBanners = () => {
             Reflect{" "}
             <span className="text-primary font-extrabold">Perfection.</span>
           </h1>
-          <button className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200">
+          <button
+            onClick={() => navigate("/products")}
+            className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200"
+          >
             View All
             <FaPlay className="text-sm" />
           </button>
@@ -41,7 +49,10 @@ const AdBanners = () => {
             Where Comfort{" "}
             <span className="text-primary font-extrabold">Flows.</span>
           </h1>
-          <button className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200 ml-auto">
+          <button
+            onClick={() => navigate("/products")}
+            className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200 ml-auto"
+          >
             View All
             <FaPlay className="text-sm" />
           </button>

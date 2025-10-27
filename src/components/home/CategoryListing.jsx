@@ -1,6 +1,8 @@
 import { FaPlay } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const CategoryListing = () => {
+  const navigate = useNavigate();
   return (
     <div className="px-10 max-sm:px-6 grid grid-cols-2 max-sm:grid-cols-1 my-10 gap-3 min-h-[80vh]">
       <section className="h-full col-span-1 flex flex-col gap-3">
@@ -10,7 +12,7 @@ const CategoryListing = () => {
             Reflect{" "}
             <span className="text-primary font-extrabold">Perfection.</span>
           </h1>
-          <button className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200">
+          <button onClick={() => navigate("/products")} className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200">
             View All
             <FaPlay className="text-sm" />
           </button>
@@ -26,7 +28,7 @@ const CategoryListing = () => {
             Reflect{" "}
             <span className="text-primary font-extrabold">Perfection.</span>
           </h1>
-          <button className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200">
+          <button onClick={() => navigate("/products")} className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200">
             View All
             <FaPlay className="text-sm" />
           </button>
@@ -44,7 +46,7 @@ const CategoryListing = () => {
             Where Comfort{" "}
             <span className="text-primary font-extrabold">Flows.</span>
           </h1>
-          <button className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200 ml-auto">
+          <button onClick={() => navigate("/products")} className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200 ml-auto">
             View All
             <FaPlay className="text-sm" />
           </button>
@@ -60,7 +62,7 @@ const CategoryListing = () => {
             Where Comfort{" "}
             <span className="text-primary font-extrabold">Flows.</span>
           </h1>
-          <button className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200 ml-auto">
+          <button onClick={() => navigate("/products")} className="flex items-center gap-2 text-mute my-1 font-medium hover:text-theme transition-all duration-200 ml-auto">
             View All
             <FaPlay className="text-sm" />
           </button>

@@ -11,6 +11,7 @@ import { fetchProducts } from "../../api/userApi";
 
 const ProductCarousel = ({
   title = "Section Title",
+  items,
   viewAllRoute = "/",
   slidesMobile = 2,
   slidesDesktop = 5,
@@ -108,10 +109,11 @@ const ProductCarousel = ({
               1280: { slidesPerView: slidesDesktop },
             }}
           >
-            {products.map((item, index) => (
+            {items.map((item, index) => (
               <SwiperSlide key={index}>
-                <div className="pb-10"><ItemCard product={item} /></div>
-                
+                <div className="pb-10">
+                  <ItemCard product={item} />
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>

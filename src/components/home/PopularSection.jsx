@@ -1,17 +1,59 @@
-import products from "../../data.json"; // ← your product data file
-import ProductCarousel from "../shared/ProductCarousel"; // ← reusable component we created
+import { useQuery } from "@tanstack/react-query";
+import ProductCarousel from "../shared/ProductCarousel";
+import { fetchProducts } from "../../api/userApi";
 
 const PopularSection = () => {
-  // Optionally, filter or sort popular products
-  const popularProducts = products.filter(
-    (p) => p.isPopular || p.isDiscountActive // sample logic
-  );
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
+  // ✅ Filter premium products
+  const premiumProducts = products.filter((item) => item.ispremium);
+
+  // ✅ Loading State
+  if (isLoading) {
+    return (
+      <section className="py-10 flex justify-center items-center">
+        <div className="animate-pulse text-gray-500 text-sm">
+          Loading popular products...
+        </div>
+      </section>
+    );
+  }
+
+  // ✅ Error State
+  if (isError) {
+    return (
+      <section className="py-10 flex justify-center items-center">
+        <p className="text-red-500 text-sm font-medium">
+          ⚠️ Failed to load products. Please try again later.
+        </p>
+      </section>
+    );
+  }
+
+  // ✅ Empty or Filtered-Out Case
+  if (premiumProducts.length === 0) {
+    return (
+      <section className="py-10 flex justify-center items-center">
+        <p className="text-gray-400 text-sm font-medium">
+          No popular products available at the moment.
+        </p>
+      </section>
+    );
+  }
+
+  // ✅ Main Section
   return (
     <section className="py-8">
       <ProductCarousel
         title="Popular Products"
-        items={popularProducts}
+        items={premiumProducts}
         viewAllRoute="/products"
       />
     </section>
@@ -19,3 +61,4 @@ const PopularSection = () => {
 };
 
 export default PopularSection;
+

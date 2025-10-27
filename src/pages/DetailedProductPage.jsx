@@ -18,11 +18,7 @@ const DetailedProductPage = () => {
   const [isAdded, setIsAdded] = useState(false);
 
   // ✅ Fetch product using React Query
-  const {
-    data,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["product", id],
     queryFn: () => fetchProductById(id),
     enabled: !!id,
@@ -45,33 +41,32 @@ const DetailedProductPage = () => {
     if (!product) return;
 
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingIndex = existingCart.findIndex((item) => item.id === product.id);
+    const existingIndex = existingCart.findIndex(
+      (item) => item.id === product.id
+    );
 
     let updatedCart;
 
     if (existingIndex !== -1) {
-      updatedCart = existingCart.filter((item) => item.id !== product.id);
-      alert("🗑️ Product removed from cart!");
-      setIsAdded(false);
+      if (!placeorder) {
+        updatedCart = existingCart.filter((item) => item.id !== product.id);
+        alert("🗑️ Product removed from cart!");
+        setIsAdded(false);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        window.dispatchEvent(new Event("localStorageUpdated"));
+      }
     } else {
       updatedCart = [
         ...existingCart,
         {
-          id: product.id,
-          name: product.name,
-          price: product.sellingprice,
-          mrp: product.mrp,
-          image: product.thumbnailimage,
-          category: product.category,
-          quantity: 1,
+          ...product,
         },
       ];
       alert("🛒 Product added to cart!");
       setIsAdded(true);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      window.dispatchEvent(new Event("localStorageUpdated"));
     }
-
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event("localStorageUpdated"));
 
     if (placeorder) navigate("/cart");
   };
@@ -81,7 +76,9 @@ const DetailedProductPage = () => {
     if (!product) return;
 
     const existingWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    const existingIndex = existingWishlist.findIndex((item) => item.id === product.id);
+    const existingIndex = existingWishlist.findIndex(
+      (item) => item.id === product.id
+    );
 
     if (existingIndex !== -1) {
       const updated = existingWishlist.filter((item) => item.id !== product.id);
@@ -100,11 +97,12 @@ const DetailedProductPage = () => {
   // ✅ Loading & Error States
   if (isLoading) return <p className="text-center py-10">Loading product...</p>;
   if (isError || !product)
-    return <p className="text-center py-10 text-red-600">Failed to load product.</p>;
+    return (
+      <p className="text-center py-10 text-red-600">Failed to load product.</p>
+    );
 
   // ✅ Image sources (handle both main + variant images)
   const allImages = [
-    ...(product.imagepath || []),
     ...(product.stocktable?.[0]?.images || []),
   ];
 
@@ -135,7 +133,7 @@ const DetailedProductPage = () => {
               loop={true}
               spaceBetween={10}
               navigation={true}
-              thumbs={{ swiper: thumbsSwiper }}
+              thumbs={thumbsSwiper && !thumbsSwiper.destroyed ? { swiper: thumbsSwiper } : undefined}
               modules={[Navigation, Thumbs]}
               className="rounded-lg overflow-hidden"
             >
@@ -182,11 +180,17 @@ const DetailedProductPage = () => {
               )}
             </p>
 
-            <h2 className="text-xl sm:text-2xl font-semibold">{product.name}</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold">
+              {product.name}
+            </h2>
 
             <div className="flex items-center gap-3 mt-1">
-              <p className="text-2xl font-bold text-black">₹{product.sellingprice}</p>
-              <p className="text-gray-400 line-through text-lg">₹{product.mrp}</p>
+              <p className="text-2xl font-bold text-black">
+                ₹{product.sellingprice}
+              </p>
+              <p className="text-gray-400 line-through text-lg">
+                ₹{product.mrp}
+              </p>
               {parseFloat(product.mrp) > parseFloat(product.sellingprice) && (
                 <span className="bg-theme text-white px-2 py-1 rounded-md text-sm font-medium">
                   {Math.round(
@@ -225,33 +229,34 @@ const DetailedProductPage = () => {
             {/* BUTTONS */}
             <div className="flex flex-wrap gap-2 mt-5">
               <button
-                onClick={handleAddToWishlist}
-                className={`flex items-center justify-center gap-2 border font-medium border-primary/75 px-4 py-2 rounded-md text-sm transition-all ${
-                  isWishlisted
-                    ? "bg-theme text-white shadow-md"
-                    : "hover:text-theme hover:shadow-md"
-                }`}
-              >
-                <FaHeart /> {isWishlisted ? "Wishlisted" : "Save"}
-              </button>
-
-              <button
-                onClick={() => handleAddToCart(false)}
-                className={`flex items-center justify-center gap-2 border border-primary/75 font-medium px-4 py-2 rounded-md text-sm transition-all ${
-                  isAdded
-                    ? "text-theme shadow-lg"
-                    : "hover:text-theme hover:shadow-md"
-                }`}
-              >
-                <FaShoppingCart /> {isAdded ? "Already Added" : "Add to Cart"}
-              </button>
-
-              <button
                 onClick={() => handleAddToCart(true)}
-                className="w-full sm:w-auto bg-primary text-white py-3 px-6 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
+                className="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
               >
                 Place Order
               </button>
+              <div className="w-full flex justify-between gap-2">
+                <button
+                  onClick={handleAddToWishlist}
+                  className={`flex items-center w-2/5 justify-center gap-2 border font-medium border-primary/75 px-4 py-3 rounded-md text-sm transition-all ${
+                    isWishlisted
+                      ? "bg-theme text-white shadow-md"
+                      : "hover:text-theme hover:shadow-md"
+                  }`}
+                >
+                  <FaHeart /> {isWishlisted ? "Wishlisted" : "Save"}
+                </button>
+
+                <button
+                  onClick={() => handleAddToCart(false)}
+                  className={`flex items-center justify-center gap-2 border w-3/5 border-primary/75 font-medium px-4 py-3 rounded-md text-sm transition-all ${
+                    isAdded
+                      ? "text-theme shadow-lg"
+                      : "hover:text-theme hover:shadow-md"
+                  }`}
+                >
+                  <FaShoppingCart /> {isAdded ? "Already Added" : "Add to Cart"}
+                </button>
+              </div>
             </div>
           </div>
         </main>
@@ -259,7 +264,7 @@ const DetailedProductPage = () => {
 
       {/* Recommended Products */}
       <div className="mb-10">
-        <RecommendedProducts />
+        <RecommendedProducts id={id} />
       </div>
     </>
   );

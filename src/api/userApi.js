@@ -6,6 +6,26 @@ export const fetchProducts = async () => {
   return res.data.body || [];
 };
 
+// ✅ Fetch Products by Category (reuses fetchProducts)
+export const fetchProductsByCategory = async (categoryName) => {
+  try {
+    // Get all products
+    const allProducts = await fetchProducts();
+
+    // Filter locally based on category name (case-insensitive)
+    const filtered = allProducts.filter(
+      (item) =>
+        item.category?.toLowerCase() === categoryName?.toLowerCase()
+    );
+
+    return filtered;
+  } catch (error) {
+    console.error("❌ fetchProductsByCategory error:", error.message);
+    throw error;
+  }
+};
+
+
 export const fetchCategories = async () => {
   const res = await axiosInstance.get("/categories");
   if (res.status !== 200) throw new Error("Failed to fetch categories");
@@ -73,6 +93,18 @@ export const fetchProductById = async (id) => {
     return res.data.body || res.data;
   } catch (error) {
     console.error("❌ fetchProductById error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// ✅ Fetch Recommended / Related Products by Product ID
+export const fetchRecommendedProducts = async (id) => {
+  try {
+    const res = await axiosInstance.get(`/products/recommended/${id}`);
+    if (res.status !== 200) throw new Error("Failed to fetch recommended products");
+    return res.data.body || [];
+  } catch (error) {
+    console.error("❌ fetchRecommendedProducts error:", error.response?.data || error.message);
     throw error;
   }
 };

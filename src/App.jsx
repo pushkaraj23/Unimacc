@@ -10,6 +10,7 @@ import WishlistPage from "./pages/WishlistPage";
 import CompareProducts from "./pages/CompareProducts";
 import ProfilePage from "./pages/ProfilePage";
 import CheckoutPage from "./pages/CheckoutPage";
+import OffersPage from "./pages/OffersPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/compare" element={<CompareProducts />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/offers/:id" element={<OffersPage />} />
       </Routes>
       <Footer />
     </div>
