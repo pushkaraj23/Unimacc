@@ -2,25 +2,42 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FaHeart, FaShoppingCart, FaExchangeAlt } from "react-icons/fa";
 
-const ItemCard = ({
-  id,
-  images = [],
-  title,
-  subtitle,
-  price,
-  originalPrice,
-  category,
-  subCategory,
-  description,
-  discountPercent,
-  offerTime,
-  isDiscountActive,
-}) => {
+const ItemCard = ({ product }) => {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isCompared, setIsCompared] = useState(false);
 
-  // ✅ Load wishlist & compare states on mount
+  // ✅ Safely extract product fields
+  const {
+    id,
+    name,
+    description,
+    category,
+    subcategory,
+    imagepath = [],
+    mrp,
+    sellingprice,
+    discount,
+  } = product || {};
+
+  // ✅ Compute prices & discounts
+  const originalPrice = mrp ? parseFloat(mrp) : 0;
+  const price = sellingprice ? parseFloat(sellingprice) : 0;
+  const discountPercent = discount?.value
+    ? discount.value
+    : originalPrice && price
+    ? Math.round(((originalPrice - price) / originalPrice) * 100)
+    : null;
+
+  const isDiscountActive = !!discountPercent;
+
+  // ✅ Image fallback
+  const images =
+    product?.stocktable?.[0]?.images?.length > 0
+      ? product.stocktable[0].images
+      : imagepath;
+
+  // ✅ Load wishlist & compare states
   useEffect(() => {
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
     setIsWishlisted(wishlist.some((item) => item.id === id));
@@ -29,75 +46,66 @@ const ItemCard = ({
     setIsCompared(compareList.some((item) => item.id === id));
   }, [id]);
 
-  const product = {
-    id,
-    images,
-    title,
-    subtitle,
-    price,
-    originalPrice,
-    category,
-    subCategory,
-    description,
-    discountPercent,
-    offerTime,
-    isDiscountActive,
-  };
-
-  // ✅ Add to Cart
+  // ✅ Add / Remove from Cart
   const handleAddToCart = (e) => {
     e.stopPropagation();
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
     const existingIndex = existingCart.findIndex((item) => item.id === id);
 
+    let updatedCart;
     if (existingIndex !== -1) {
-      existingCart[existingIndex].quantity += 1;
+      // ❌ Remove if exists
+      updatedCart = existingCart.filter((item) => item.id !== id);
+      alert("🗑️ Product removed from cart!");
     } else {
-      existingCart.push({ ...product, quantity: 1 });
+      // ✅ Add if not exists
+      updatedCart = [...existingCart, { ...product, quantity: 1 }];
+      alert("🛒 Product added to cart!");
     }
 
-    localStorage.setItem("cart", JSON.stringify(existingCart));
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("localStorageUpdated"));
-    alert("✅ Product added to cart!");
   };
 
-  // 💖 Wishlist Add/Remove
+  // 💖 Wishlist Add / Remove
   const handleWishlist = (e) => {
     e.stopPropagation();
-    const existingWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    const existingIndex = existingWishlist.findIndex((item) => item.id === id);
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const existingIndex = wishlist.findIndex((item) => item.id === id);
 
+    let updatedWishlist;
     if (existingIndex !== -1) {
-      const updatedWishlist = existingWishlist.filter((item) => item.id !== id);
-      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
+      updatedWishlist = wishlist.filter((item) => item.id !== id);
       setIsWishlisted(false);
       alert("💔 Removed from wishlist!");
     } else {
-      existingWishlist.push(product);
-      localStorage.setItem("wishlist", JSON.stringify(existingWishlist));
+      updatedWishlist = [...wishlist, product];
       setIsWishlisted(true);
       alert("💖 Added to wishlist!");
     }
+
+    localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // 🔁 Compare Add/Remove
+  // 🔁 Compare Add / Remove
   const handleCompare = (e) => {
     e.stopPropagation();
-    const existingCompare = JSON.parse(localStorage.getItem("compare")) || [];
-    const existingIndex = existingCompare.findIndex((item) => item.id === id);
+    const compareList = JSON.parse(localStorage.getItem("compare")) || [];
+    const existingIndex = compareList.findIndex((item) => item.id === id);
 
+    let updatedCompare;
     if (existingIndex !== -1) {
-      const updatedCompare = existingCompare.filter((item) => item.id !== id);
-      localStorage.setItem("compare", JSON.stringify(updatedCompare));
+      updatedCompare = compareList.filter((item) => item.id !== id);
       setIsCompared(false);
       alert("❌ Removed from compare list!");
     } else {
-      existingCompare.push(product);
-      localStorage.setItem("compare", JSON.stringify(existingCompare));
+      updatedCompare = [...compareList, product];
       setIsCompared(true);
       alert("🔁 Added to compare list!");
     }
+
+    localStorage.setItem("compare", JSON.stringify(updatedCompare));
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
@@ -108,18 +116,16 @@ const ItemCard = ({
     >
       {/* Product Image */}
       <div className="relative w-full h-[220px] sm:h-[250px] md:h-[280px] overflow-hidden">
-        {/* Default Image */}
         <img
           src={images[0]}
-          alt={title}
+          alt={name}
           className="w-full h-full object-cover rounded-t-xl transition-opacity duration-500 group-hover:opacity-0"
         />
 
-        {/* Hover Image */}
         {images[1] && (
           <img
             src={images[1]}
-            alt={title}
+            alt={name}
             className="absolute top-0 left-0 w-full h-full object-cover rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           />
         )}
@@ -148,11 +154,11 @@ const ItemCard = ({
           </div>
         </div>
 
-        {/* Offer Time Badge */}
+        {/* Offer Badge */}
         {isDiscountActive && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-[85%] flex justify-between items-center bg-theme text-white text-[2.2vw] md:text-[.9vw] font-semibold px-2 sm:px-3 py-1 rounded-md">
             <span>Limited Time Deal</span>
-            <span>{offerTime}</span>
+            <span>{discountPercent}% OFF</span>
           </div>
         )}
       </div>
@@ -160,13 +166,13 @@ const ItemCard = ({
       {/* Product Info */}
       <div className="p-3 sm:p-4 text-left">
         <p className="text-gray-400 text-xs sm:text-sm">
-          {subtitle.length > 50 ? `${subtitle.slice(0, 30)}…` : subtitle}
+          {category || "—"}
         </p>
         <h3
           className="font-semibold text-primary text-sm sm:text-base leading-snug truncate"
-          title={title} // shows full title on hover
+          title={name}
         >
-          {title.length > 50 ? `${title.slice(0, 50)}…` : title}
+          {name?.length > 50 ? `${name.slice(0, 50)}…` : name}
         </h3>
 
         {/* Price Section */}
@@ -174,11 +180,11 @@ const ItemCard = ({
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span className="text-primary font-bold text-base sm:text-lg">
-                ₹{price}
+                ₹{price.toLocaleString()}
               </span>
-              {originalPrice && (
+              {originalPrice > 0 && (
                 <span className="text-gray-400 line-through text-xs sm:text-sm">
-                  ₹{originalPrice}
+                  ₹{originalPrice.toLocaleString()}
                 </span>
               )}
             </div>

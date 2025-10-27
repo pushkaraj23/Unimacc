@@ -11,34 +11,43 @@ const CartPage = () => {
   const [total, setTotal] = useState(0);
   const discountPercent = 20;
 
+  // ✅ Load cart from localStorage
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(savedCart);
   }, []);
 
+  // ✅ Recalculate totals whenever cart changes
   useEffect(() => {
-    const sub = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const sub = cart.reduce((acc, item) => {
+      const price = parseFloat(item.sellingprice || 0);
+      return acc + price * (item.quantity || 1);
+    }, 0);
+
     const disc = (sub * discountPercent) / 100;
     setSubtotal(sub);
     setDiscount(disc);
     setTotal(sub - disc + deliveryFee);
   }, [cart]);
 
+  // ✅ Quantity updates
   const updateQuantity = (id, delta) => {
     const updatedCart = cart
       .map((item) => {
         if (item.id === id) {
-          const newQty = Math.max(0, item.quantity + delta);
+          const newQty = Math.max(0, (item.quantity || 1) + delta);
           return { ...item, quantity: newQty };
         }
         return item;
       })
-      .filter((item) => item.quantity > 0); // remove zero quantity items automatically
+      .filter((item) => item.quantity > 0); // remove zero quantity items
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
+    window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
+  // ✅ Remove item
   const removeItem = (id) => {
     const updatedCart = cart.filter((item) => item.id !== id);
     setCart(updatedCart);
@@ -62,72 +71,87 @@ const CartPage = () => {
         Your Cart
       </h1>
 
-      {/* Main Layout */}
+      {/* Layout */}
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Cart Items Section */}
+        {/* 🛒 Cart Items */}
         <div className="flex-1 bg-white p-6 max-sm:p-4 h-fit rounded-2xl shadow-sm border border-gray-100">
           {cart.length > 0 ? (
-            cart.map((item, index) => (
-              <div key={item.id}>
-                <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
-                  {/* Product Info */}
-                  <div className="flex items-center max-sm:items-start gap-4 w-full">
-                    <img
-                      onClick={() => navigate(`/products/${item.id}`)}
-                      src={item.images?.[0]}
-                      alt={item.title}
-                      className="w-24 h-24 sm:w-28 sm:h-28 max-sm:w-20 max-sm:h-20 hover:cursor-pointer rounded-lg object-cover border"
-                    />
-                    <div>
-                      <h3 className="font-semibold text-lg max-sm:text-base line-clamp-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm max-sm:text-xs text-gray-500 mt-1">
-                        Size: Large <br /> Color: White
-                      </p>
-                      <p className="font-semibold text-lg max-sm:text-base mt-1 text-primary">
-                        ₹{item.price.toLocaleString()}
-                      </p>
+            cart.map((item, index) => {
+              const image =
+                item.imagepath?.[0] ||
+                item.thumbnailimage ||
+                item.stocktable?.[0]?.images?.[0] ||
+                "https://cdn-icons-png.flaticon.com/512/679/679821.png";
+
+              const name = item.name || "Unnamed Product";
+              const category = item.category || "Misc";
+              const price = parseFloat(item.sellingprice || 0);
+
+              return (
+                <div key={item.id}>
+                  <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
+                    {/* Product Info */}
+                    <div className="flex items-center max-sm:items-start gap-4 w-full">
+                      <img
+                        onClick={() => navigate(`/products/${item.id}`)}
+                        src={image}
+                        alt={name}
+                        className="w-24 h-24 sm:w-28 sm:h-28 max-sm:w-20 max-sm:h-20 hover:cursor-pointer rounded-lg object-cover border"
+                      />
+                      <div>
+                        <h3 className="font-semibold text-lg max-sm:text-base line-clamp-2">
+                          {name}
+                        </h3>
+                        <p className="text-sm max-sm:text-xs text-gray-500 mt-1">
+                          Category: {category}
+                        </p>
+                        <p className="font-semibold text-lg max-sm:text-base mt-1 text-primary">
+                          ₹{price.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Quantity + Delete */}
+                    <div className="flex items-center max-md:w-full justify-end max-md:justify-between gap-5">
+                      {/* Quantity Control */}
+                      <div className="flex items-center border rounded-full px-4 py-1 max-sm:px-3 max-sm:py-0.5">
+                        <button
+                          onClick={() => updateQuantity(item.id, -1)}
+                          className="text-lg font-bold text-gray-600 max-sm:text-base"
+                        >
+                          -
+                        </button>
+                        <span className="px-4 text-lg max-sm:px-2 max-sm:text-base">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className="text-lg font-bold text-gray-600 max-sm:text-base"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Delete */}
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-500 hover:text-red-600"
+                      >
+                        <FaTrashAlt
+                          size={16}
+                          className="max-sm:w-4 max-sm:h-4"
+                        />
+                      </button>
                     </div>
                   </div>
 
-                  {/* Quantity + Delete */}
-                  <div className="flex items-center max-md:w-full justify-end max-md:justify-between gap-5">
-                    {/* Quantity Control */}
-                    <div className="flex items-center border rounded-full px-4 py-1 max-sm:px-3 max-sm:py-0.5">
-                      <button
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className="text-lg font-bold text-gray-600 max-sm:text-base"
-                      >
-                        -
-                      </button>
-                      <span className="px-4 text-lg max-sm:px-2 max-sm:text-base">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className="text-lg font-bold text-gray-600 max-sm:text-base"
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    {/* Delete */}
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-500 hover:text-red-600"
-                    >
-                      <FaTrashAlt size={16} className="max-sm:w-4 max-sm:h-4" />
-                    </button>
-                  </div>
+                  {/* Divider */}
+                  {index < cart.length - 1 && (
+                    <div className="border-t border-gray-200 my-4 max-sm:my-3"></div>
+                  )}
                 </div>
-
-                {/* Divider */}
-                {index < cart.length - 1 && (
-                  <div className="border-t border-gray-200 my-4 max-sm:my-3"></div>
-                )}
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-gray-500 text-center py-10">
               Your cart is empty.
@@ -135,7 +159,7 @@ const CartPage = () => {
           )}
         </div>
 
-        {/* Order Summary Section */}
+        {/* 💰 Order Summary */}
         <div className="w-full lg:w-1/3 bg-white p-6 max-sm:p-4 rounded-2xl shadow-sm border border-gray-100 h-fit lg:sticky lg:top-5">
           <h2 className="font-semibold text-lg mb-4 max-sm:text-base">
             Order Summary

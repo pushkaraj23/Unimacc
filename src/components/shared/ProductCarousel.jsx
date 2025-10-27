@@ -68,54 +68,54 @@ const ProductCarousel = ({
         {/* Right Fade */}
         <div className="hidden md:block pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-mute/70 to-transparent z-10" />
 
-        <Swiper
-          modules={[Navigation, Pagination, Autoplay]}
-          spaceBetween={15}
-          slidesPerView={slidesMobile}
-          navigation
-          pagination={{ clickable: true }}
-          grabCursor={true}
-          loop={true}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-          }}
-          className="sales-swiper"
-          breakpoints={{
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1280: { slidesPerView: slidesDesktop },
-          }}
-        >
-          {products.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center text-primary/60">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/7486/7486740.png"
-                alt="No Products"
-                className="w-24 mb-4 opacity-80"
-              />
-              <h2 className="text-xl font-semibold mb-2">No Products Found</h2>
-              <p className="text-sm text-primary/50 max-w-md">
-                We couldn’t find any products. Try refreshing the page.
-              </p>
-            </div>
-          ) : (
-            products.map((item) => (
-              <ItemCard
-                key={item.id}
-                id={item.id}
-                title={item.name}
-                subtitle={item.category}
-                images={[item.thumbnailimage, item.thumbnailimage]}
-                price={item.sellingprice}
-                category={item.category}
-                subCategory={item.subcategory}
-              />
-            ))
-          )}
-        </Swiper>
+        {products.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-20 text-center text-primary/60">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/7486/7486740.png"
+              alt="No Products"
+              className="w-24 mb-4 opacity-80"
+            />
+            <h2 className="text-xl font-semibold mb-2">No Products Found</h2>
+            <p className="text-sm text-primary/50 max-w-md">
+              We couldn’t find any products. Try refreshing the page.
+            </p>
+          </div>
+        ) : products.length < 6 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {products.map((item, index) => (
+              <ItemCard key={index} product={item} />
+            ))}
+          </div>
+        ) : (
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay]}
+            spaceBetween={15}
+            slidesPerView={slidesMobile}
+            navigation
+            pagination={{ clickable: true }}
+            grabCursor={true}
+            loop={true}
+            autoplay={{
+              delay: 2500,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }}
+            className="sales-swiper"
+            breakpoints={{
+              640: { slidesPerView: 2 },
+              768: { slidesPerView: 3 },
+              1024: { slidesPerView: 4 },
+              1280: { slidesPerView: slidesDesktop },
+            }}
+          >
+            {products.map((item, index) => (
+              <SwiperSlide key={index}>
+                <div className="pb-10"><ItemCard product={item} /></div>
+                
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </section>
     </div>
   );

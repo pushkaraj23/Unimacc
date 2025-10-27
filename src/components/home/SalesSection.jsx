@@ -6,9 +6,18 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "../style/sales.css";
 import ItemCard from "../shared/ItemCard";
-import products from "../../data.json";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProducts } from "../../api/userApi";
 
 const SalesSection = () => {
+  const {
+    data: products = [],
+    isLoading: isProductsLoading,
+    isError: isProductsError,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
   return (
     <div className="mt-10 px-10 max-sm:px-6">
       {/* --- Header Section --- */}
@@ -65,10 +74,10 @@ const SalesSection = () => {
             768: { slidesPerView: 5, spaceBetween: 15 }, // switch to 5 slides on laptop and above
           }}
         >
-          {products.map((item) => (
-            <SwiperSlide key={item.id}>
+          {products.map((item, index) => (
+            <SwiperSlide key={index}>
               <div className="h-full pb-10">
-                <ItemCard {...item} />
+                <ItemCard product={item} />
               </div>
             </SwiperSlide>
           ))}

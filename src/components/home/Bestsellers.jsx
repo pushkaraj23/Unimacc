@@ -78,17 +78,8 @@ const Bestsellers = () => {
       {/* --- Product Grid --- */}
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-          {filteredProducts.map((item) => (
-            <ItemCard
-              key={item.id}
-              id={item.id}
-              title={item.name}
-              subtitle={item.category}
-              images={[item.thumbnailimage]}
-              price={item.sellingprice}
-              category={item.category}
-              subCategory={item.subcategory}
-            />
+          {filteredProducts.map((item, index) => (
+            <ItemCard key={index} product={item} />
           ))}
         </div>
       ) : (
