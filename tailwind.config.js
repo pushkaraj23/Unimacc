@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        theme: "#DD7427",   // main brand orange
-        primary: "#1A1A1A", // main dark color
-        mute: "#F5F5F5",    // light gray / background
+        theme: "#ef790b",   // main brand orange
+        primary: "#263243", // main dark color
+        mute: "#e8e4de",    // light gray / background
       },
     },
   },

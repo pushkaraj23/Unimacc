@@ -20,6 +20,7 @@ const Header = () => {
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
   const {
@@ -31,9 +32,18 @@ const Header = () => {
     queryFn: fetchCategories,
   });
 
-  const handleCategoryClick = (category) => {
+  // ✅ Updated navigation to handle category & subcategory
+  const handleCategoryClick = (parent, child) => {
     setMenuOpen(false);
-    navigate(`/products?category=${encodeURIComponent(category)}`);
+    if (child) {
+      navigate(
+        `/products?category=${encodeURIComponent(
+          parent
+        )}&subcategory=${encodeURIComponent(child)}`
+      );
+    } else {
+      navigate(`/products?category=${encodeURIComponent(parent)}`);
+    }
   };
 
   // ✅ Scroll hide/show header
@@ -51,7 +61,7 @@ const Header = () => {
     return () => window.removeEventListener("scroll", controlHeader);
   }, [lastScrollY]);
 
-  // ✅ Update counts
+  // ✅ Update counts from localStorage
   const updateCounts = () => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
@@ -70,6 +80,16 @@ const Header = () => {
       window.removeEventListener("localStorageUpdated", updateCounts);
     };
   }, []);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const trimmed = query.trim();
+      if (trimmed) {
+        navigate(`/products?search=${encodeURIComponent(trimmed)}`);
+      }
+    }
+  };
 
   return (
     <>
@@ -118,37 +138,49 @@ const Header = () => {
               </svg>
             </button>
 
-            <div className="absolute hidden group-hover:block bg-white shadow-md mt-2 rounded w-48 -translate-y-2 z-50">
+            <div className="absolute hidden group-hover:block bg-white shadow-md mt-2 rounded w-56 -translate-y-2 z-50">
               <ul className="text-sm text-primary/60 py-2 font-medium">
                 {isCategoriesLoading ? (
                   <li className="px-4 py-2 text-gray-400">Loading...</li>
                 ) : isCategoriesError ? (
                   <li className="px-4 py-2 text-red-500">Error loading</li>
-                ) : categories.length === 0 ? (
+                ) : !categories || Object.keys(categories).length === 0 ? (
                   <li className="px-4 py-2 text-gray-400">No Categories</li>
                 ) : (
-                  categories
-                    .filter((cat) => cat.isactive) // ✅ only show active categories
-                    .map((cat) => (
-                      <li
-                        key={cat.id}
-                        onClick={() => handleCategoryClick(cat.name)}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  Object.entries(categories).map(([parent, children]) => (
+                    <li key={parent} className="px-4 py-2 hover:bg-gray-50">
+                      <span
+                        className="font-semibold text-primary cursor-pointer hover:text-theme"
                       >
-                        {cat.name}
-                      </li>
-                    ))
+                        {parent}
+                      </span>
+                      <ul className="pl-3 mt-1">
+                        {children.map((child, index) => (
+                          <li
+                            key={index}
+                            onClick={() => handleCategoryClick(child)}
+                            className="py-1 px-2 hover:bg-gray-100 rounded cursor-pointer text-primary/70"
+                          >
+                            {child}
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))
                 )}
               </ul>
             </div>
           </div>
 
-          {/* Search (hidden on mobile) */}
+          {/* Search */}
           <div className="flex items-center border border-gray-400 rounded-full px-4 py-2 w-1/2 max-sm:w-1/3 relative">
             <FaSearch className="text-gray-500 mr-3 max-sm:absolute " />
             <input
               type="text"
               placeholder="Search..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="bg-transparent flex-grow outline-none text-gray-700 placeholder-gray-400 max-sm:ml-6 w-full"
             />
           </div>
@@ -207,23 +239,39 @@ const Header = () => {
         </div>
 
         {/* Desktop Bottom Nav */}
-        <nav className="hidden md:flex bg-black text-white text-sm justify-center space-x-8 py-2">
+        <nav className="hidden md:flex bg-primary text-white text-sm justify-center space-x-8">
           {isCategoriesLoading ? (
             <p>Loading...</p>
           ) : isCategoriesError ? (
             <p>Error loading categories</p>
+          ) : !categories || Object.keys(categories).length === 0 ? (
+            <p>No categories</p>
           ) : (
-            categories
-              .filter((cat) => cat.isactive)
-              .map((cat) => (
+            Object.entries(categories).map(([parent, children]) => (
+              <div key={parent} className="group relative py-2">
+                {/* --- Parent Category --- */}
                 <p
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat.name)}
-                  className="hover:text-orange-400 transition-colors hover:cursor-pointer duration-200"
+                  className="hover:text-orange-400 transition-colors duration-200 cursor-pointer"
                 >
-                  {cat.name}
+                  {parent}
                 </p>
-              ))
+
+                {/* --- Dropdown (Subcategories) --- */}
+                <div className="absolute hidden group-hover:block -translate-y- bg-white text-primary shadow-md mt-2 rounded w-48 z-50">
+                  <ul className="text-sm py-2 font-medium">
+                    {children.map((child, index) => (
+                      <li
+                        key={index}
+                        onClick={() => handleCategoryClick(child)}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        {child}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))
           )}
         </nav>
       </header>
@@ -240,14 +288,30 @@ const Header = () => {
             <li className="px-6 py-3 text-gray-400">Loading...</li>
           ) : isCategoriesError ? (
             <li className="px-6 py-3 text-red-500">Error loading</li>
+          ) : !categories || Object.keys(categories).length === 0 ? (
+            <li className="px-6 py-3 text-gray-400">No Categories</li>
           ) : (
-            categories.map((cat) => (
-              <li
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat.name)}
-                className="px-6 py-3 border-b hover:bg-gray-100 cursor-pointer"
-              >
-                {cat.name}
+            Object.entries(categories).map(([parent, children]) => (
+              <li key={parent} className="border-b last:border-b-0">
+                {/* --- Parent Name --- */}
+                <div
+                  className="px-6 py-3 font-semibold text-primary bg-gray-50 cursor-pointer"
+                >
+                  {parent}
+                </div>
+
+                {/* --- Child Categories --- */}
+                <ul>
+                  {children.map((child, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleCategoryClick(child)}
+                      className="px-8 py-2 hover:bg-gray-100 cursor-pointer text-gray-600"
+                    >
+                      {child}
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))
           )}

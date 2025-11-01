@@ -4,29 +4,51 @@ import { FaPlay } from "react-icons/fa";
 import ItemCard from "../components/shared/ItemCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchProducts, fetchCategories } from "../api/userApi";
+import {
+  fetchProducts,
+  fetchCategories,
+  fetchProductsBySearch,
+} from "../api/userApi";
 
 const ProductsListing = () => {
   const [toggleSidebar, setToggleSidebar] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category");
-  const [category, setCategory] = useState(categoryParam || "All");
 
-  // ✅ Fetch Products
+  // ✅ Extract routing params
+  const categoryParam = searchParams.get("category");
+  const subcategoryParam = searchParams.get("subcategory");
+  const searchQuery = searchParams.get("search");
+
+  // ✅ States
+  const [category, setCategory] = useState(categoryParam || "All");
+  const [subcategory, setSubcategory] = useState(subcategoryParam || "All");
+
+  // ✅ Fetch products
   const {
     data: products = [],
     isLoading: isProductsLoading,
     isError: isProductsError,
   } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryKey: searchQuery
+      ? ["searchProducts", searchQuery]
+      : ["products"],
+    queryFn: () =>
+      searchQuery ? fetchProductsBySearch(searchQuery) : fetchProducts(),
   });
 
-  // 1️⃣ Initialize price to 0 first
-  const [price, setPrice] = useState(0);
+  // ✅ Fetch categories (parent → subcategories mapping)
+  const {
+    data: categories = {},
+    isLoading: isCategoriesLoading,
+    isError: isCategoriesError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
 
-  // 2️⃣ Compute maxPrice once products are fetched
+  // ✅ Price filter setup
+  const [price, setPrice] = useState(0);
   const maxPrice = useMemo(
     () =>
       products.length
@@ -35,38 +57,46 @@ const ProductsListing = () => {
     [products]
   );
 
-  // 3️⃣ Once data arrives, set slider to max price
   useEffect(() => {
-    if (products.length > 0) {
-      setPrice(maxPrice);
-    }
+    if (products.length > 0) setPrice(maxPrice);
   }, [maxPrice, products]);
 
-  // ✅ Fetch Categories
-  const {
-    data: categories = [],
-    isLoading: isCategoriesLoading,
-    isError: isCategoriesError,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchCategories,
-  });
-
-  // ✅ Sync category from URL param
+  // ✅ Sync state with query params
   useEffect(() => {
     setCategory(categoryParam || "All");
-  }, [categoryParam]);
+    setSubcategory(subcategoryParam || "All");
+  }, [categoryParam, subcategoryParam]);
 
-  // ✅ Derived filtered products
+  // ✅ Auto-detect parent if only subcategory is given
+  useEffect(() => {
+    if (subcategoryParam && !categoryParam && categories) {
+      const foundParent = Object.entries(categories).find(([parent, subs]) =>
+        subs.some(
+          (child) =>
+            child.toLowerCase() === subcategoryParam.toLowerCase()
+        )
+      );
+      if (foundParent) setCategory(foundParent[0]);
+    }
+  }, [subcategoryParam, categoryParam, categories]);
+
+  // ✅ Filter logic
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       const matchesCategory =
         category === "All" ||
+        p.parentcategory?.toLowerCase() === category.toLowerCase() ||
         p.category?.toLowerCase() === category.toLowerCase();
+
+      const matchesSubcategory =
+        subcategory === "All" ||
+        p.category?.toLowerCase() === subcategory.toLowerCase();
+
       const matchesPrice = p.sellingprice <= price;
-      return matchesCategory && matchesPrice;
+
+      return matchesCategory && matchesSubcategory && matchesPrice;
     });
-  }, [products, category, price]);
+  }, [products, category, subcategory, price]);
 
   // ✅ Loading / Error
   if (isProductsLoading || isCategoriesLoading)
@@ -83,6 +113,22 @@ const ProductsListing = () => {
       </div>
     );
 
+  // ✅ Handlers for dropdowns
+  const handleCategoryChange = (selectedCategory) => {
+    setCategory(selectedCategory);
+    setSubcategory("All");
+    navigate(`/products?category=${encodeURIComponent(selectedCategory)}`);
+  };
+
+  const handleSubcategoryChange = (selectedSub) => {
+    setSubcategory(selectedSub);
+    navigate(
+      `/products?category=${encodeURIComponent(
+        category
+      )}&subcategory=${encodeURIComponent(selectedSub)}`
+    );
+  };
+
   return (
     <div className="w-full pt-28 max-sm:pt-20 flex flex-col lg:flex-row relative min-h-screen">
       {/* --- Sidebar --- */}
@@ -93,7 +139,7 @@ const ProductsListing = () => {
             : "w-[4vw] max-sm:hidden"
         } bg-gradient-to-b from-mute to-primary/40 transition-all duration-300 lg:h-[100vh] px-4`}
       >
-        {/* Header Row */}
+        {/* --- Header --- */}
         <div
           className={`flex pb-2 border-b-2 mb-5 border-primary/75 ${
             toggleSidebar ? "justify-between" : "justify-center"
@@ -142,16 +188,13 @@ const ProductsListing = () => {
               <div className="relative">
                 <select
                   value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                    navigate(`/products?category=${e.target.value}`);
-                  }}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
                   className="w-full bg-transparent border-2 border-primary/40 font-medium rounded-lg py-3 px-4 pr-10 text-primary/75 focus:outline-none appearance-none"
                 >
                   <option value="All">All</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
+                  {Object.keys(categories).map((parent) => (
+                    <option key={parent} value={parent}>
+                      {parent}
                     </option>
                   ))}
                 </select>
@@ -161,26 +204,66 @@ const ProductsListing = () => {
                 />
               </div>
             </div>
+
+            {/* ✅ Subcategory Dropdown */}
+            {category !== "All" && Array.isArray(categories[category]) && (
+              <div>
+                <h2 className="text-primary/75 font-bold mb-2">Subcategory</h2>
+                <div className="relative">
+                  <select
+                    value={subcategory}
+                    onChange={(e) => handleSubcategoryChange(e.target.value)}
+                    className="w-full bg-transparent border-2 border-primary/40 font-medium rounded-lg py-3 px-4 pr-10 text-primary/75 focus:outline-none appearance-none"
+                  >
+                    <option value="All">All</option>
+                    {categories[category].map((child, index) => (
+                      <option key={index} value={child}>
+                        {child}
+                      </option>
+                    ))}
+                  </select>
+                  <FaPlay
+                    size={10}
+                    className="absolute rotate-90 right-3 top-1/2 transform -translate-y-1/2 text-[#DD7427]"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </aside>
 
-      {/* --- Products Section --- */}
+      {/* --- Product Section --- */}
       <section className="flex-1 relative overflow-y-auto pb-4 no-scrollbar w-full h-[100vh]">
-        {/* Header */}
-        <div className="bg-mute sticky top-0 px-5 z-20 flex justify-between items-center text-primary/75 text-sm font-medium  max-sm:mt-2">
+        {/* --- Breadcrumb --- */}
+        <div className="bg-mute sticky top-0 px-5 z-20 flex justify-between items-center text-primary/75 text-sm font-medium max-sm:mt-2">
           <div className="font-normal py-1">
             <button className="text-primary" onClick={() => navigate("/")}>
               Home
             </button>{" "}
             /{" "}
-            <button className="text-primary" onClick={() => setCategory("All")}>
+            <button
+              className="text-primary"
+              onClick={() => navigate("/products")}
+            >
               Products
             </button>
             {category !== "All" && (
               <>
                 {" "}
                 / <span className="text-theme">{category}</span>
+              </>
+            )}
+            {subcategory !== "All" && (
+              <>
+                {" "}
+                / <span className="text-theme">{subcategory}</span>
+              </>
+            )}
+            {searchQuery && (
+              <>
+                {" "}
+                / <span className="text-theme">Search: {searchQuery}</span>
               </>
             )}
           </div>
@@ -193,7 +276,7 @@ const ProductsListing = () => {
           </button>
         </div>
 
-        {/* Product Grid */}
+        {/* --- Product Grid --- */}
         <div
           className={`w-full gap-3 grid px-4 py-4 ${
             toggleSidebar ? "lg:grid-cols-4" : "lg:grid-cols-5"
@@ -208,7 +291,8 @@ const ProductsListing = () => {
               />
               <h2 className="text-xl font-semibold mb-2">No Products Found</h2>
               <p className="text-sm text-primary/50 max-w-md">
-                We couldn’t find any products in this category or range.
+                We couldn’t find any products in this category, subcategory, or
+                range.
               </p>
             </div>
           ) : (

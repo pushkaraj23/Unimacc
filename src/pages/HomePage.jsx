@@ -24,7 +24,7 @@ const HomePage = () => {
       <PopularSection />
       <AdBanners />
       <CategoryOne />
-      <Bestsellers />
+      {/* <Bestsellers /> */}
       <VideoSection />
       <CategoryTwo />
       <CategoryListing />

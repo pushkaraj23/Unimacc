@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import data from "../data.json";
 import ItemCard from "../components/shared/ItemCard";
 import { FaTrashAlt } from "react-icons/fa";
 import { fetchProducts } from "../api/userApi";

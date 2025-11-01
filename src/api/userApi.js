@@ -6,16 +6,11 @@ export const fetchProducts = async () => {
   return res.data.body || [];
 };
 
-// ✅ Fetch Products by Category (reuses fetchProducts)
 export const fetchProductsByCategory = async (categoryName) => {
   try {
-    // Get all products
     const allProducts = await fetchProducts();
-
-    // Filter locally based on category name (case-insensitive)
     const filtered = allProducts.filter(
-      (item) =>
-        item.category?.toLowerCase() === categoryName?.toLowerCase()
+      (item) => item.category?.toLowerCase() === categoryName?.toLowerCase()
     );
 
     return filtered;
@@ -25,34 +20,73 @@ export const fetchProductsByCategory = async (categoryName) => {
   }
 };
 
-
 export const fetchCategories = async () => {
-  const res = await axiosInstance.get("/categories");
-  if (res.status !== 200) throw new Error("Failed to fetch categories");
-  return res.data.body || [];
-};
+  try {
+    const res = await axiosInstance.get("/categories");
+    if (res.status !== 200) throw new Error("Failed to fetch categories");
 
-export const fetchHeroSectionContent = async () => {
-  const res = await axiosInstance.get("/content");
-  if (res.status !== 200) throw new Error("Failed to fetch content");
+    const allCategories = res.data.body || [];
 
-  const allContent = res.data.body || [];
+    // ✅ Separate parent and child categories
+    const parentCategories = allCategories.filter((cat) => cat.parentid === null);
+    const childCategories = allCategories.filter((cat) => cat.parentid !== null);
 
-  // Filter only Hero Section and parse nested JSON
-  const heroSection = allContent
-    .filter((item) => item.contenttypes === "Hero Section" && !item.isdeleted)
-    .map((item) => {
-      const parsed = JSON.parse(item.content || "{}");
-      return {
-        id: item.id,
-        contentimage: item.contentimage,
-        title: parsed.title || "",
-        mobileImage: parsed.mobileImage || "",
-      };
+    // ✅ Build dictionary structure
+    const categoryMap = {};
+
+    parentCategories.forEach((parent) => {
+      categoryMap[parent.name] = []; // start with empty array
+
+      const children = childCategories
+        .filter((child) => child.parentid === parent.id)
+        .map((child) => child.name);
+
+      categoryMap[parent.name] = children;
     });
 
-  return heroSection;
+    return categoryMap;
+  } catch (error) {
+    console.error(
+      "❌ fetchCategories error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
+
+
+
+export const fetchHeroSectionContent = async () => {
+  try {
+    const res = await axiosInstance.get("/content");
+    if (res.status !== 200) throw new Error("Failed to fetch content");
+
+    const allContent = res.data.body || [];
+
+    // 🔹 Filter only active Hero Sections
+    const heroSection = allContent
+      .filter((item) => item.contenttypes === "Hero Section" && !item.isdeleted)
+      .map((item) => {
+        const parsed = JSON.parse(item.content || "{}");
+        return {
+          id: item.id,
+          contentimage: item.contentimage,
+          title: parsed.title || "",
+          mobileImage: parsed.mobileImage || "",
+          offer_id: item.offer_id || null, // ✅ Include offer_id
+        };
+      });
+
+    return heroSection;
+  } catch (error) {
+    console.error(
+      "❌ fetchHeroSectionContent error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
 
 export const generateOtp = async (payload) => {
   const res = await axiosInstance.post("/manageotp/get-otp", payload);
@@ -72,7 +106,6 @@ export const addCustomerAddress = async (payload) => {
   return res.data.body || res.data;
 };
 
-// ✅ Create new Order (used in Razorpay checkout)
 export const createOrder = async (payload) => {
   try {
     const res = await axiosInstance.post("/orders", payload);
@@ -80,31 +113,156 @@ export const createOrder = async (payload) => {
     if (res.status !== 200) throw new Error("Failed to create order");
     return res.data.body || res.data;
   } catch (error) {
-    console.error("❌ createOrder error:", error.response?.data || error.message);
+    console.error(
+      "❌ createOrder error:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
 
-// ✅ Fetch Single Product by ID
 export const fetchProductById = async (id) => {
   try {
     const res = await axiosInstance.get(`/products/${id}`);
     if (res.status !== 200) throw new Error("Failed to fetch product");
     return res.data.body || res.data;
   } catch (error) {
-    console.error("❌ fetchProductById error:", error.response?.data || error.message);
+    console.error(
+      "❌ fetchProductById error:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
 
-// ✅ Fetch Recommended / Related Products by Product ID
 export const fetchRecommendedProducts = async (id) => {
   try {
     const res = await axiosInstance.get(`/products/recommended/${id}`);
-    if (res.status !== 200) throw new Error("Failed to fetch recommended products");
+    if (res.status !== 200)
+      throw new Error("Failed to fetch recommended products");
     return res.data.body || [];
   } catch (error) {
-    console.error("❌ fetchRecommendedProducts error:", error.response?.data || error.message);
+    console.error(
+      "❌ fetchRecommendedProducts error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchDiscountById = async (id) => {
+  try {
+    const res = await axiosInstance.get(`/discounts/${id}`);
+    if (res.status !== 200) throw new Error("Failed to fetch discount");
+    return res.data.body || res.data; // return the document body or fallback to raw data
+  } catch (error) {
+    console.error(
+      "❌ fetchDiscountById error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchProductCollections = async () => {
+  try {
+    const res = await axiosInstance.get("/productcollections");
+    if (res.status !== 200)
+      throw new Error("Failed to fetch product collections");
+    return res.data.body || res.data; // return list of collections
+  } catch (error) {
+    console.error(
+      "❌ fetchProductCollections error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchPromotions = async () => {
+  try {
+    const res = await axiosInstance.get("/promotions");
+    if (res.status !== 200) throw new Error("Failed to fetch promotions");
+    return res.data.body || res.data; // return list of promotions
+  } catch (error) {
+    console.error(
+      "❌ fetchPromotions error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchPromotionalVideos = async () => {
+  try {
+    const res = await axiosInstance.get("/promotionalvideos");
+    if (res.status !== 200)
+      throw new Error("Failed to fetch promotional videos");
+    return res.data.body || res.data; // returns the list of videos
+  } catch (error) {
+    console.error(
+      "❌ fetchPromotionalVideos error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchProductsBySearch = async (productName) => {
+  try {
+    if (!productName) throw new Error("Search query cannot be empty");
+
+    const res = await axiosInstance.get(
+      `/products/search/${encodeURIComponent(productName)}`
+    );
+    if (res.status !== 200)
+      throw new Error("Failed to fetch products by search");
+
+    return res.data.body || res.data; // return list of matching products
+  } catch (error) {
+    console.error(
+      "❌ fetchProductsBySearch error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchDiscountPercents = async () => {
+  try {
+    const res = await axiosInstance.get("/products/get-products/by/discount-percents");
+    if (res.status !== 200) throw new Error("Failed to fetch discount percents");
+
+    const data = res.data.body || [];
+
+    // 🔹 Filter out zero and sort descending
+    const filtered = data
+      .filter((d) => d > 0)
+      .sort((a, b) => b - a);
+
+    return filtered;
+  } catch (error) {
+    console.error(
+      "❌ fetchDiscountPercents error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchProductsByDiscountPercent = async (percent) => {
+  try {
+    if (!percent) throw new Error("Discount percent is required");
+
+    const res = await axiosInstance.get(`/products?discountpercent=${percent}`);
+    if (res.status !== 200) throw new Error("Failed to fetch products by discount percent");
+
+    return res.data.body || [];
+  } catch (error) {
+    console.error(
+      "❌ fetchProductsByDiscountPercent error:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };

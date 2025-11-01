@@ -23,7 +23,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full relative pt-12 px-10 max-sm:px-6 bg-[#e2e1e1] font-urbanist z-40">
+    <footer className="w-full relative pt-12 px-10 max-sm:px-6 bg-[#c6c3bf]/50 font-urbanist z-40">
       {/* Newsletter Section */}
       <section className="bg-gradient-to-tl from-primary to-theme w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between py-6 px-8 lg:text-left">
         <h1 className="text-white text-4xl leading-snug font-normal">
@@ -35,7 +35,7 @@ const Footer = () => {
             <input
               type="text"
               placeholder="Enter Your Email Address..."
-              className="bg-transparent outline-none text-[3vw] py-[1.5vw] lg:py-0 lg:text-[1vw] text-black/60 ml-2 w-full placeholder-gray-400"
+              className="bg-transparent outline-none text-[3vw] py-[1.5vw] lg:py-0 lg:text-[1vw] text-primary/60 ml-2 w-full placeholder-gray-400"
             />
           </div>
           <button className="w-full bg-white rounded-full py-[3vw] lg:py-[.5vw] text-[3.3vw] lg:text-[1.1vw] font-semibold mt-4 hover:bg-gray-100 transition">
@@ -45,10 +45,10 @@ const Footer = () => {
       </section>
 
       {/* Main Footer Links */}
-      <section className="w-full flex flex-col lg:flex-row justify-between items-center mt-10 max-sm:mt-[34vw] border-b border-black/30 pb-10 lg:text-left px-5 max-sm:px-0">
+      <section className="w-full flex flex-col lg:flex-row justify-between items-center mt-10 max-sm:mt-[34vw] border-b border-primary/30 pb-10 lg:text-left px-5 max-sm:px-0">
         <div className="w-full lg:w-[23vw] mb-6 lg:mb-0 max-sm:px-2">
           <img src="/logo.svg" className="h-16" alt="logo" />
-          <p className="text-primary/60 mt-3">
+          <p className="text-[#827e7b] font-medium mt-3">
             We have products that suit your style and which you’re proud to own.
             From bathroom to kitchen essentials.
           </p>
@@ -62,8 +62,8 @@ const Footer = () => {
                 onMouseLeave={() => setHovered("")}
                 className={`p-3 rounded-full cursor-pointer transition ${
                   hovered === item.name
-                    ? "bg-white text-black"
-                    : "bg-black text-white"
+                    ? "bg-white text-primary"
+                    : "bg-primary text-white"
                 }`}
               >
                 <div className="text-lg lg:text-xl">{item.icon}</div>
@@ -123,7 +123,7 @@ const Footer = () => {
           <FaApplePay />
           <FaGooglePay />
         </div>
-        <p className="text-[3vw] lg:text-[.9vw] font-medium text-center text-black/50 mt-1">
+        <p className="text-[3vw] lg:text-[.9vw] font-medium text-center text-primary/50 mt-1">
           Shop.co © 2000-2025, All Rights Reserved
         </p>
       </section>

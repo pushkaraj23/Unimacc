@@ -17,7 +17,7 @@ const Bestsellers = () => {
   });
 
   const {
-    data: categoriesData = [],
+    data: categoriesData = {},
     isLoading: categoriesLoading,
     isError: categoriesError,
   } = useQuery({
@@ -40,10 +40,15 @@ const Bestsellers = () => {
       </div>
     );
 
-  // ✅ Derive unique categories from API
-  const categories = ["All", ...new Set(categoriesData.map((c) => c.name))];
+  // ✅ Flatten dictionary into array of child category names
+  const flattenedCategories = Object.entries(categoriesData).flatMap(
+    ([parent, children]) => children
+  );
 
-  // ✅ Filter products by selected category
+  // ✅ Create category button list
+  const categories = ["All", ...new Set(flattenedCategories)];
+
+  // ✅ Filter products by selected category (subcategory)
   const filteredProducts =
     selectedCategory === "All"
       ? products

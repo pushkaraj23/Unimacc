@@ -167,7 +167,7 @@ const CheckoutPage = () => {
         discounts: [{}],
         items: cartItems.map((item) => ({
           productid: item.id, // from your product object
-          productvariantid: item.stocktable?.[0]?.variantid || null, // optional
+          productvariantid: item.stocktable?.[0]?.id || null, // optional
           productvariantsizeid: item.stocktable?.[0]?.sizes?.[0]?.id || null, // optional
           quantity: item.quantity || 1,
           price: item.sellingprice?.toString() || "0.00",
@@ -203,12 +203,12 @@ const CheckoutPage = () => {
           alert("✅ Payment Successful!");
 
           // ✅ (Optional) confirm payment to backend here
-          // await confirmPayment({
-          //   backendOrderId,
-          //   razorpay_payment_id: response.razorpay_payment_id,
-          //   razorpay_order_id: response.razorpay_order_id,
-          //   razorpay_signature: response.razorpay_signature
-          // });
+          await confirmPayment({
+            backendOrderId,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+          });
 
           // ✅ Cleanup after success
           localStorage.removeItem("cart");

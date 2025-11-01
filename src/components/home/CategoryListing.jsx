@@ -1,5 +1,6 @@
 import { FaPlay } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { fetchProductCollections } from "../../api/userApi";
 
 const CategoryListing = () => {
   const navigate = useNavigate();
