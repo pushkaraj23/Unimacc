@@ -30,26 +30,35 @@ const CartPage = () => {
     setTotal(sub - disc + deliveryFee);
   }, [cart]);
 
-  // ✅ Quantity updates
-  const updateQuantity = (id, delta) => {
+  // ✅ Quantity updates (now checks product + variant)
+  const updateQuantity = (productId, variantId, delta) => {
     const updatedCart = cart
       .map((item) => {
-        if (item.id === id) {
+        if (
+          item.id === productId &&
+          item.stocktable?.[0]?.id === variantId
+        ) {
           const newQty = Math.max(0, (item.quantity || 1) + delta);
           return { ...item, quantity: newQty };
         }
         return item;
       })
-      .filter((item) => item.quantity > 0); // remove zero quantity items
+      .filter((item) => item.quantity > 0);
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // ✅ Remove item
-  const removeItem = (id) => {
-    const updatedCart = cart.filter((item) => item.id !== id);
+  // ✅ Remove specific product variant
+  const removeItem = (productId, variantId) => {
+    const updatedCart = cart.filter(
+      (item) =>
+        !(
+          item.id === productId &&
+          item.stocktable?.[0]?.id === variantId
+        )
+    );
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("localStorageUpdated"));
@@ -77,10 +86,11 @@ const CartPage = () => {
         <div className="flex-1 bg-white p-6 max-sm:p-4 h-fit rounded-2xl shadow-sm border border-gray-100">
           {cart.length > 0 ? (
             cart.map((item, index) => {
+              const variantId = item.stocktable?.[0]?.id;
+              const variantColor = item.stocktable?.[0]?.color;
               const image =
-                item.imagepath?.[0] ||
+                variantColor ||
                 item.thumbnailimage ||
-                item.stocktable?.[0]?.images?.[0] ||
                 "https://cdn-icons-png.flaticon.com/512/679/679821.png";
 
               const name = item.name || "Unnamed Product";
@@ -88,7 +98,7 @@ const CartPage = () => {
               const price = parseFloat(item.sellingprice || 0);
 
               return (
-                <div key={item.id}>
+                <div key={`${item.id}-${variantId}`}>
                   <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
                     {/* Product Info */}
                     <div className="flex items-center max-sm:items-start gap-4 w-full">
@@ -105,6 +115,9 @@ const CartPage = () => {
                         <p className="text-sm max-sm:text-xs text-gray-500 mt-1">
                           Category: {category}
                         </p>
+                        <p className="text-xs text-gray-400 italic mt-0.5">
+                          Variant ID: {variantId}
+                        </p>
                         <p className="font-semibold text-lg max-sm:text-base mt-1 text-primary">
                           ₹{price.toLocaleString()}
                         </p>
@@ -116,16 +129,20 @@ const CartPage = () => {
                       {/* Quantity Control */}
                       <div className="flex items-center border rounded-full px-4 py-1 max-sm:px-3 max-sm:py-0.5">
                         <button
-                          onClick={() => updateQuantity(item.id, -1)}
+                          onClick={() =>
+                            updateQuantity(item.id, variantId, -1)
+                          }
                           className="text-lg font-bold text-gray-600 max-sm:text-base"
                         >
                           -
                         </button>
                         <span className="px-4 text-lg max-sm:px-2 max-sm:text-base">
-                          {item.quantity}
+                          {item.quantity || 1}
                         </span>
                         <button
-                          onClick={() => updateQuantity(item.id, 1)}
+                          onClick={() =>
+                            updateQuantity(item.id, variantId, 1)
+                          }
                           className="text-lg font-bold text-gray-600 max-sm:text-base"
                         >
                           +
@@ -134,7 +151,7 @@ const CartPage = () => {
 
                       {/* Delete */}
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.id, variantId)}
                         className="text-red-500 hover:text-red-600"
                       >
                         <FaTrashAlt

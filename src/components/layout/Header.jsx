@@ -149,9 +149,7 @@ const Header = () => {
                 ) : (
                   Object.entries(categories).map(([parent, children]) => (
                     <li key={parent} className="px-4 py-2 hover:bg-gray-50">
-                      <span
-                        className="font-semibold text-primary cursor-pointer hover:text-theme"
-                      >
+                      <span className="font-semibold text-primary cursor-pointer hover:text-theme">
                         {parent}
                       </span>
                       <ul className="pl-3 mt-1">
@@ -240,6 +238,12 @@ const Header = () => {
 
         {/* Desktop Bottom Nav */}
         <nav className="hidden md:flex bg-primary text-white text-sm justify-center space-x-8">
+          <p
+            onClick={() => navigate("/products")}
+            className="py-2 hover:text-orange-400 transition-colors duration-200 cursor-pointer"
+          >
+            All
+          </p>
           {isCategoriesLoading ? (
             <p>Loading...</p>
           ) : isCategoriesError ? (
@@ -250,9 +254,7 @@ const Header = () => {
             Object.entries(categories).map(([parent, children]) => (
               <div key={parent} className="group relative py-2">
                 {/* --- Parent Category --- */}
-                <p
-                  className="hover:text-orange-400 transition-colors duration-200 cursor-pointer"
-                >
+                <p className="hover:text-orange-400 transition-colors duration-200 cursor-pointer">
                   {parent}
                 </p>
 
@@ -294,9 +296,7 @@ const Header = () => {
             Object.entries(categories).map(([parent, children]) => (
               <li key={parent} className="border-b last:border-b-0">
                 {/* --- Parent Name --- */}
-                <div
-                  className="px-6 py-3 font-semibold text-primary bg-gray-50 cursor-pointer"
-                >
+                <div className="px-6 py-3 font-semibold text-primary bg-gray-50 cursor-pointer">
                   {parent}
                 </div>
 

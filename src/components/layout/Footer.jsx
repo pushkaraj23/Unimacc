@@ -11,9 +11,11 @@ import {
   FaApplePay,
   FaGooglePay,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const [hovered, setHovered] = useState("");
+  const navigate = useNavigate();
 
   const socialIcons = [
     { name: "twitter", icon: <FaTwitter /> },
@@ -87,20 +89,20 @@ const Footer = () => {
             <h3 className="uppercase font-semibold text-primary mb-1">
               Help
             </h3>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">
-              Customer Support
+            <p onClick={() => navigate("shipping_policy")} className="hover:cursor-pointer hover:underline text-sm mb-1">
+              Shipping Policy
             </p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">
-              Delivery Details
+            <p onClick={() => navigate("return_refund_policy")} className="hover:cursor-pointer hover:underline text-sm mb-1">
+              Return & Refund Policy
             </p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">
+            <p  onClick={() => navigate("termsandconditions")} className="hover:cursor-pointer hover:underline text-sm mb-1">
               Terms & Conditions
             </p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">
+            <p onClick={() => navigate("privacy_policy")} className="hover:cursor-pointer hover:underline text-sm mb-1">
               Privacy Policy
             </p>
           </div>
-          <div>
+          {/* <div>
             <h3 className="uppercase font-semibold text-primary mb-1">
               FAQ
             </h3>
@@ -110,7 +112,7 @@ const Footer = () => {
             </p>
             <p className="hover:cursor-pointer hover:underline text-sm mb-1">Orders</p>
             <p className="hover:cursor-pointer hover:underline text-sm mb-1">Payments</p>
-          </div>
+          </div> */}
         </div>
       </section>
 

@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { FaPlay } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import "../style/sales.css";
 import ItemCard from "../shared/ItemCard";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDiscountPercents, fetchProductsByDiscountPercent } from "../../api/userApi";
@@ -55,9 +53,9 @@ const SalesSection = () => {
       {/* --- Header Section --- */}
       <section className="border-b-2 border-primary/60 py-2 mb-5 flex pr-2 justify-between items-center">
         <h1 className="text-3xl text-primary font-normal">Save Big on Sales</h1>
-        <div className="flex gap-5">
+        <div className="flex">
           {/* Desktop discount buttons */}
-          <div className="flex gap-5 max-sm:hidden">
+          <div className="flex gap-3 max-sm:hidden">
             {isDiscountsLoading ? (
               <p className="text-primary/50 italic">Loading discounts...</p>
             ) : isDiscountsError ? (
@@ -84,7 +82,7 @@ const SalesSection = () => {
       </section>
 
       {/* --- Mobile Buttons --- */}
-      <div className="flex gap-5 md:hidden mb-4">
+      <div className="flex gap-2 justify-center flex-wrap md:hidden mb-4">
         {isDiscountsLoading ? (
           <p className="text-primary/50 italic">Loading...</p>
         ) : isDiscountsError ? (

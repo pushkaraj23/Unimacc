@@ -11,6 +11,10 @@ import CompareProducts from "./pages/CompareProducts";
 import ProfilePage from "./pages/ProfilePage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OffersPage from "./pages/OffersPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import ReturnRefundPolicy from "./pages/ReturnRefundPolicy";
 
 function App() {
   return (
@@ -27,6 +31,10 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/offers/:id" element={<OffersPage />} />
+        <Route path="/privacy_policy" element={<PrivacyPolicy />} />
+        <Route path="/shipping_policy" element={<ShippingPolicy />} />
+        <Route path="/termsandconditions" element={<TermsAndConditions />} />
+          <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
       </Routes>
       <Footer />
     </div>

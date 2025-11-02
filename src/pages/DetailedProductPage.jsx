@@ -14,10 +14,12 @@ const DetailedProductPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
+  const [mainSwiper, setMainSwiper] = useState(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(null); // ✅ store selected stock variant
 
-  // ✅ Fetch product using React Query
+  // ✅ Fetch product
   const { data, isLoading, isError } = useQuery({
     queryKey: ["product", id],
     queryFn: () => fetchProductById(id),
@@ -26,43 +28,74 @@ const DetailedProductPage = () => {
 
   const product = data;
 
-  // ✅ Update wishlist/cart state from localStorage
+  // ✅ Initialize selected variant (first one)
   useEffect(() => {
-    if (!product) return;
+    if (product?.stocktable?.length > 0 && !selectedVariant) {
+      setSelectedVariant(product.stocktable[0]);
+    }
+  }, [product, selectedVariant]);
+
+  // ✅ Wishlist / Cart status
+  useEffect(() => {
+    if (!product || !selectedVariant) return;
+
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    setIsWishlisted(wishlist.some((item) => item.id === product.id));
+    const isInWishlist = wishlist.some(
+      (item) =>
+        item.id === product.id &&
+        item.stocktable?.[0]?.id === selectedVariant.id
+    );
+    setIsWishlisted(isInWishlist);
 
     const cartlist = JSON.parse(localStorage.getItem("cart")) || [];
-    setIsAdded(cartlist.some((item) => item.id === product.id));
-  }, [product]);
+    const isInCart = cartlist.some(
+      (item) =>
+        item.id === product.id &&
+        item.stocktable?.[0]?.id === selectedVariant.id
+    );
+    setIsAdded(isInCart);
+  }, [product, selectedVariant]);
 
   // ✅ Handle Add to Cart
   const handleAddToCart = (placeorder) => {
-    if (!product) return;
+    if (!product || !selectedVariant) return;
 
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // Check if this exact variant already exists
     const existingIndex = existingCart.findIndex(
-      (item) => item.id === product.id
+      (item) =>
+        item.id === product.id &&
+        item.stocktable?.[0]?.id === selectedVariant.id
     );
 
     let updatedCart;
 
+    // Prepare product with only the selected variant
+    const productToStore = {
+      ...product,
+      stocktable: [selectedVariant],
+    };
+
     if (existingIndex !== -1) {
+      // Variant already in cart → remove it if not placing order
       if (!placeorder) {
-        updatedCart = existingCart.filter((item) => item.id !== product.id);
-        alert("🗑️ Product removed from cart!");
+        updatedCart = existingCart.filter(
+          (item) =>
+            !(
+              item.id === product.id &&
+              item.stocktable?.[0]?.id === selectedVariant.id
+            )
+        );
+        alert("🗑️ Variant removed from cart!");
         setIsAdded(false);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         window.dispatchEvent(new Event("localStorageUpdated"));
       }
     } else {
-      updatedCart = [
-        ...existingCart,
-        {
-          ...product,
-        },
-      ];
-      alert("🛒 Product added to cart!");
+      // Add new variant
+      updatedCart = [...existingCart, productToStore];
+      alert("🛒 Variant added to cart!");
       setIsAdded(true);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       window.dispatchEvent(new Event("localStorageUpdated"));
@@ -73,43 +106,71 @@ const DetailedProductPage = () => {
 
   // ✅ Handle Wishlist
   const handleAddToWishlist = () => {
-    if (!product) return;
+    if (!product || !selectedVariant) return;
 
     const existingWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    // Check if this variant already exists
     const existingIndex = existingWishlist.findIndex(
-      (item) => item.id === product.id
+      (item) =>
+        item.id === product.id &&
+        item.stocktable?.[0]?.id === selectedVariant.id
     );
 
+    const productToStore = {
+      ...product,
+      stocktable: [selectedVariant],
+    };
+
     if (existingIndex !== -1) {
-      const updated = existingWishlist.filter((item) => item.id !== product.id);
+      // Remove that exact variant only
+      const updated = existingWishlist.filter(
+        (item) =>
+          !(
+            item.id === product.id &&
+            item.stocktable?.[0]?.id === selectedVariant.id
+          )
+      );
       localStorage.setItem("wishlist", JSON.stringify(updated));
       setIsWishlisted(false);
       alert("💔 Removed from wishlist!");
     } else {
-      existingWishlist.push(product);
+      // Add that specific variant
+      existingWishlist.push(productToStore);
       localStorage.setItem("wishlist", JSON.stringify(existingWishlist));
       setIsWishlisted(true);
       alert("💖 Added to wishlist!");
     }
+
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // ✅ Loading & Error States
-  if (isLoading) return <p className="text-center py-10">Loading product...</p>;
+  // ✅ Handle Variant Change
+  const handleVariantSelect = (variant) => {
+    setSelectedVariant(variant);
+    setThumbsSwiper(null); // reset thumbnails to avoid stale refs
+  };
+
+  // ✅ Image list from selected variant
+  const allImages = selectedVariant?.images?.length
+    ? selectedVariant.images
+    : product?.imagepath || [];
+
+  // ✅ Loading and Error States
+  if (isLoading)
+    return (
+      <p className="text-center py-10 text-primary/70">Loading product...</p>
+    );
+
   if (isError || !product)
     return (
       <p className="text-center py-10 text-red-600">Failed to load product.</p>
     );
 
-  // ✅ Image sources (handle both main + variant images)
-  const allImages = [
-    ...(product.stocktable?.[0]?.images || []),
-  ];
-
   return (
     <>
       <div className="flex flex-col pt-24 lg:flex-row gap-8 px-5 sm:px-8 md:px-10 lg:px-6 lg:pt-32 bg-mute min-h-screen">
-        {/* LEFT SIDEBAR */}
+        {/* LEFT AD SECTION */}
         <aside className="hidden lg:flex flex-col gap-6 w-1/4">
           <div className="relative w-full overflow-hidden rounded-lg">
             <img
@@ -124,18 +185,22 @@ const DetailedProductPage = () => {
           </div>
         </aside>
 
-        {/* MAIN PRODUCT SECTION */}
+        {/* MAIN SECTION */}
         <main className="flex flex-col lg:flex-row gap-8 w-full lg:w-3/4">
           {/* PRODUCT IMAGES */}
           <div className="w-full lg:w-2/3">
+            {/* --- Main Image Slider --- */}
             <Swiper
-              style={{ "--swiper-navigation-color": "#000" }}
-              loop={true}
+              onSwiper={setMainSwiper}
               spaceBetween={10}
-              navigation={true}
-              thumbs={thumbsSwiper && !thumbsSwiper.destroyed ? { swiper: thumbsSwiper } : undefined}
+              navigation
+              thumbs={{
+                swiper:
+                  thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
+              }}
               modules={[Navigation, Thumbs]}
               className="rounded-lg overflow-hidden"
+              loop={false} // 🔹 important fix — must be false for proper syncing
             >
               {allImages.map((img, index) => (
                 <SwiperSlide key={index}>
@@ -148,6 +213,7 @@ const DetailedProductPage = () => {
               ))}
             </Swiper>
 
+            {/* --- Thumbnails --- */}
             <Swiper
               onSwiper={setThumbsSwiper}
               spaceBetween={8}
@@ -172,10 +238,11 @@ const DetailedProductPage = () => {
           {/* PRODUCT DETAILS */}
           <div className="flex flex-col gap-3 lg:w-1/3">
             <p className="text-sm text-primary/70 font-medium">
-              {product.category}{" "}
+              {product.category}
               {product.subcategory && (
                 <>
-                  / <span className="text-theme">{product.subcategory}</span>
+                  {" / "}
+                  <span className="text-theme">{product.subcategory}</span>
                 </>
               )}
             </p>
@@ -201,17 +268,23 @@ const DetailedProductPage = () => {
               )}
             </div>
 
-            {/* COLOR OPTIONS */}
+            {/* VARIANT COLORS */}
             {product.stocktable?.length > 0 && (
               <div className="mt-3">
                 <p className="text-sm font-medium mb-2">Available Colors</p>
                 <div className="flex gap-2 flex-wrap">
-                  {product.stocktable.map((stock, i) => (
+                  {product.stocktable.map((variant, i) => (
                     <img
                       key={i}
-                      src={stock.color}
+                      src={variant.color}
                       alt={`color-${i}`}
-                      className="w-10 sm:w-12 h-10 sm:h-12 object-cover border rounded-md cursor-pointer hover:scale-105 transition"
+                      className={`w-10 sm:w-12 h-10 sm:h-12 object-cover border-2 rounded-md cursor-pointer transition 
+                        ${
+                          selectedVariant?.id === variant.id
+                            ? "border-theme scale-110"
+                            : "border-gray-300 hover:border-theme/70"
+                        }`}
+                      onClick={() => handleVariantSelect(variant)}
                     />
                   ))}
                 </div>
