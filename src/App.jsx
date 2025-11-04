@@ -15,6 +15,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import ReturnRefundPolicy from "./pages/ReturnRefundPolicy";
+import BlogsDetailed from "./pages/BlogsDetailed";
 
 function App() {
   return (
@@ -31,10 +32,11 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/offers/:id" element={<OffersPage />} />
+        <Route path="/blogs/:id" element={<BlogsDetailed />} />
         <Route path="/privacy_policy" element={<PrivacyPolicy />} />
         <Route path="/shipping_policy" element={<ShippingPolicy />} />
         <Route path="/termsandconditions" element={<TermsAndConditions />} />
-          <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
+        <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
       </Routes>
       <Footer />
     </div>

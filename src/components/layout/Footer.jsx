@@ -27,11 +27,11 @@ const Footer = () => {
   return (
     <footer className="w-full relative pt-12 px-10 max-sm:px-6 bg-[#c6c3bf]/50 font-urbanist z-40">
       {/* Newsletter Section */}
-      <section className="bg-gradient-to-tl from-primary to-theme w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between py-6 px-8 lg:text-left">
+      <section className="bg-gradient-to-tl from-primary to-theme w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-center py-6 px-8 lg:text-left">
         <h1 className="text-white text-4xl leading-snug font-normal">
           Stay Up to Date With Our Latest Offers
         </h1>
-        <div className="w-full lg:w-[30vw] mt-6 lg:mt-0">
+        {/* <div className="w-full lg:w-[30vw] mt-6 lg:mt-0">
           <div className="flex items-center bg-white rounded-full px-4 py-2 w-full">
             <Mail className="text-gray-400 h-4 lg:h-5" />
             <input
@@ -43,7 +43,7 @@ const Footer = () => {
           <button className="w-full bg-white rounded-full py-[3vw] lg:py-[.5vw] text-[3.3vw] lg:text-[1.1vw] font-semibold mt-4 hover:bg-gray-100 transition">
             Subscribe to Newsletter
           </button>
-        </div>
+        </div> */}
       </section>
 
       {/* Main Footer Links */}
@@ -102,17 +102,6 @@ const Footer = () => {
               Privacy Policy
             </p>
           </div>
-          {/* <div>
-            <h3 className="uppercase font-semibold text-primary mb-1">
-              FAQ
-            </h3>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">Account</p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">
-              Manage Deliveries
-            </p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">Orders</p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">Payments</p>
-          </div> */}
         </div>
       </section>
 

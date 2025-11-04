@@ -55,3 +55,196 @@
 .mySwiper .swiper-slide-thumb-active img {
   filter: brightness(100%);
 }
+
+/* Blogs Custom CSS */
+/* blog-content.css */
+
+.blog-content {
+  /* neutral defaults that won't fight inline styles */
+  color: inherit;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+/* Headings: spacing only (do not force sizes/colors) */
+.blog-content :where(h1, h2, h3, h4, h5, h6) {
+  line-height: 1.25;
+  font-weight: 700;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  color: inherit;
+}
+
+/* Level-specific sizes and tone */
+.blog-content :where(h1) {
+  font-size: 2rem; /* ~32px */
+  font-weight: 800;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.3em;
+}
+
+.blog-content :where(h2) {
+  font-size: 1.75rem; /* ~28px */
+  font-weight: 700;
+  border-left: 4px solid var(--theme, #dd7427);
+  padding-left: 0.5em;
+}
+
+.blog-content :where(h3) {
+  font-size: 1.5rem; /* ~24px */
+  font-weight: 700;
+  color: var(--theme, #dd7427);
+}
+
+.blog-content :where(h4) {
+  font-size: 1.25rem; /* ~20px */
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.blog-content :where(h5) {
+  font-size: 1.1rem; /* ~18px */
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.blog-content :where(h6) {
+  font-size: 1rem; /* ~16px */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Paragraphs & common blocks */
+.blog-content :where(p, ul, ol, pre, blockquote, table, figure) {
+  margin: 0.75em 0;
+}
+
+/* Lists */
+.blog-content :where(ul) {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.blog-content :where(ol) {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.blog-content :where(li > ul, li > ol) {
+  margin-top: 0.25em;
+}
+
+/* Links */
+.blog-content :where(a) {
+  color: var(--theme, #dd7427);
+  text-decoration: underline;
+}
+.blog-content :where(a:hover) {
+  opacity: 0.9;
+}
+
+/* Images & media */
+.blog-content :where(img, video, iframe) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  display: block;
+}
+.blog-content :where(figure) {
+  display: block;
+  text-align: center;
+}
+.blog-content :where(figcaption) {
+  font-size: 0.9em;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 0.25rem;
+}
+
+/* Blockquote */
+.blog-content :where(blockquote) {
+  border-left: 4px solid var(--theme, #dd7427);
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 0.5rem;
+  font-style: italic;
+}
+
+/* Code & preformatted */
+.blog-content :where(code) {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 0.35rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+}
+.blog-content :where(pre) {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+  overflow: auto;
+  border-radius: 0.75rem;
+}
+.blog-content :where(pre code) {
+  background: transparent;
+  padding: 0;
+}
+
+/* Tables */
+.blog-content :where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+.blog-content :where(th, td) {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.6rem 0.8rem;
+  vertical-align: top;
+}
+.blog-content :where(th) {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Superscript/Subscript spacing */
+.blog-content :where(sup) {
+  vertical-align: super;
+  font-size: 0.75em;
+}
+.blog-content :where(sub) {
+  vertical-align: sub;
+  font-size: 0.75em;
+}
+
+/* Horizontal rule */
+.blog-content :where(hr) {
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 1.5rem 0;
+}
+
+/* Alignments injected by editors (style="text-align:center" etc.) are preserved.
+   If your editor outputs classes like .ql-align-center or .align-center, support them: */
+.blog-content :where(.align-left, .ql-align-left) {
+  text-align: left;
+}
+.blog-content :where(.align-center, .ql-align-center) {
+  text-align: center;
+}
+.blog-content :where(.align-right, .ql-align-right) {
+  text-align: right;
+}
+.blog-content :where(.align-justify, .ql-align-justify) {
+  text-align: justify;
+}
+
+/* Respect inline colors/backgrounds set by the editor; we do NOT override them. */
+
+/* Dark-ish background compatibility (mute bg):
+   If your page uses a dark 'primary', ensure inherited color works.
+   You can also expose theme color via CSS var from Tailwind: */
+:root {
+  --theme: #dd7427; /* fallback; your Tailwind 'theme' color can set this via a utility on <body> */
+}

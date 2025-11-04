@@ -53,7 +53,7 @@ const CheckoutPage = () => {
     mutationFn: generateOtp,
     onSuccess: (data) => {
       alert(`✅ OTP sent successfully to ${userData.phone}!`);
-      setOtp(data.code)
+      setOtp(data.code);
     },
     onError: () => alert("❌ Failed to send OTP. Please try again."),
   });
@@ -122,19 +122,18 @@ const CheckoutPage = () => {
   };
 
   // ✅ Totals (updated logic)
-  const itemTotal = cartItems.reduce(
+  const subTotal = cartItems.reduce(
     (sum, i) => sum + parseFloat(i.sellingprice || 0) * (i.quantity || 1),
     0
   );
 
-  const discount = cartItems.reduce((sum, i) => {
+  const savings = cartItems.reduce((sum, i) => {
     const mrp = parseFloat(i.mrp || 0);
     const sell = parseFloat(i.sellingprice || 0);
     const qty = i.quantity || 1;
-    return mrp > sell ? sum + (mrp - sell) * qty : sum;
+    return sum + Math.max(0, mrp - sell) * qty;
   }, 0);
 
-  const subTotal = itemTotal;
   const payableAmount = subTotal + deliveryCharge;
 
   // ✅ Razorpay Loader
@@ -148,13 +147,15 @@ const CheckoutPage = () => {
     });
 
   // ✅ Start Payment
-    // ✅ Start Payment (with proper /orders integration)
+  // ✅ Start Payment (with proper /orders integration)
   async function startPayment() {
     if (!verified) return alert("⚠️ Please verify your contact details first!");
     if (selectedAddress === null)
       return alert("⚠️ Please select a delivery address before proceeding!");
 
-    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
     if (!res) return alert("❌ Razorpay SDK failed to load.");
 
     setLoading(true);
@@ -176,7 +177,10 @@ const CheckoutPage = () => {
       };
 
       // ✅ Step 2: Call backend API to create the order
-      console.log("🧾 ORDER PAYLOAD BEING SENT:", JSON.stringify(orderPayload, null, 2));
+      console.log(
+        "🧾 ORDER PAYLOAD BEING SENT:",
+        JSON.stringify(orderPayload, null, 2)
+      );
       const orderResponse = await createOrder(orderPayload);
       console.log("✅ Order created successfully:", orderResponse);
 
@@ -207,7 +211,7 @@ const CheckoutPage = () => {
             backendOrderId,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature
+            razorpay_signature: response.razorpay_signature,
           });
 
           // ✅ Cleanup after success
@@ -296,7 +300,7 @@ const CheckoutPage = () => {
                     placeholder="Enter OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
-                    className="w-full border text-sm border-gray-300 rounded-md px-4 py-2"
+                    className={`w-full border text-sm border-gray-300 rounded-md px-4 py-2 ${otp?"":"hidden"}`}
                   />
                   <div className="flex gap-2">
                     <button
@@ -503,12 +507,15 @@ const CheckoutPage = () => {
               <div className="space-y-2 text-sm bg-theme/10 border border-theme/60 rounded-md p-5">
                 <p className="flex justify-between">
                   <span>Item Total</span>
-                  <span>₹{itemTotal.toLocaleString()}</span>
+                  <span>₹{subTotal.toLocaleString()}</span>
                 </p>
-                <p className="flex justify-between text-red-600">
-                  <span>Discount</span>
-                  <span>-₹{discount.toLocaleString()}</span>
-                </p>
+                {savings > 0 && (
+                  <p className="flex justify-between text-green-600 font-medium">
+                    <span>You Saved</span>
+                    <span>-₹{savings.toLocaleString()}</span>
+                  </p>
+                )}
+
                 <p className="flex justify-between">
                   <span>Delivery Charges</span>
                   <span>₹{deliveryCharge}</span>

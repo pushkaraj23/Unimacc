@@ -28,8 +28,12 @@ export const fetchCategories = async () => {
     const allCategories = res.data.body || [];
 
     // ✅ Separate parent and child categories
-    const parentCategories = allCategories.filter((cat) => cat.parentid === null);
-    const childCategories = allCategories.filter((cat) => cat.parentid !== null);
+    const parentCategories = allCategories.filter(
+      (cat) => cat.parentid === null
+    );
+    const childCategories = allCategories.filter(
+      (cat) => cat.parentid !== null
+    );
 
     // ✅ Build dictionary structure
     const categoryMap = {};
@@ -53,8 +57,6 @@ export const fetchCategories = async () => {
     throw error;
   }
 };
-
-
 
 export const fetchHeroSectionContent = async () => {
   try {
@@ -86,7 +88,6 @@ export const fetchHeroSectionContent = async () => {
     throw error;
   }
 };
-
 
 export const generateOtp = async (payload) => {
   const res = await axiosInstance.post("/manageotp/get-otp", payload);
@@ -230,15 +231,16 @@ export const fetchProductsBySearch = async (productName) => {
 
 export const fetchDiscountPercents = async () => {
   try {
-    const res = await axiosInstance.get("/products/get-products/by/discount-percents");
-    if (res.status !== 200) throw new Error("Failed to fetch discount percents");
+    const res = await axiosInstance.get(
+      "/products/get-products/by/discount-percents"
+    );
+    if (res.status !== 200)
+      throw new Error("Failed to fetch discount percents");
 
     const data = res.data.body || [];
 
     // 🔹 Filter out zero and sort descending
-    const filtered = data
-      .filter((d) => d > 0)
-      .sort((a, b) => b - a);
+    const filtered = data.filter((d) => d > 0).sort((a, b) => b - a);
 
     return filtered;
   } catch (error) {
@@ -255,7 +257,8 @@ export const fetchProductsByDiscountPercent = async (percent) => {
     if (!percent) throw new Error("Discount percent is required");
 
     const res = await axiosInstance.get(`/products?discountpercent=${percent}`);
-    if (res.status !== 200) throw new Error("Failed to fetch products by discount percent");
+    if (res.status !== 200)
+      throw new Error("Failed to fetch products by discount percent");
 
     return res.data.body || [];
   } catch (error) {
@@ -264,5 +267,61 @@ export const fetchProductsByDiscountPercent = async (percent) => {
       error.response?.data || error.message
     );
     throw error;
+  }
+};
+
+export const fetchBlogs = async () => {
+  try {
+    const res = await axiosInstance.get("/blogs");
+    if (res.status !== 200) throw new Error("Failed to fetch blogs");
+
+    return res.data.body || [];
+  } catch (error) {
+    console.error(
+      "❌ fetchBlogs error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchBlogById = async (id) => {
+  try {
+    if (!id) throw new Error("Blog ID is required");
+    const res = await axiosInstance.get(`/blogs/${id}`);
+    if (res.status !== 200) throw new Error("Failed to fetch blog details");
+
+    return res.data.body || null;
+  } catch (error) {
+    console.error(
+      "❌ fetchBlogById error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// ✅ Fetch category name by ID (Axios version)
+export const fetchCategoryNameById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/categories/${id}`);
+
+    // Check response status
+    if (response.status !== 200) {
+      throw new Error(`Failed to fetch category with ID ${id}`);
+    }
+
+    const data = response.data;
+
+    // Validate and return category name
+    if (data?.code === 200 && data?.body?.name) {
+      return data.body.name;
+    } else {
+      console.warn("Unexpected response format:", data);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching category name:", error);
+    return null;
   }
 };

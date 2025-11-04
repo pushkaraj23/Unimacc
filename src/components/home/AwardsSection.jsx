@@ -1,3 +1,5 @@
+import React from "react";
+
 const AwardsSection = () => {
   const awards = [
     {
@@ -19,48 +21,60 @@ const AwardsSection = () => {
   ];
 
   return (
-    <section className="pb-24 px-6 sm:px-10 md:px-20 bg-mute relative overflow-hidden">
-      {/* subtle background gradient blob */}
-      {/* <div className="absolute -top-20 right-0 w-72 h-72 bg-theme/20 blur-3xl rounded-full opacity-30 animate-pulse"></div> */}
-      {/* <div className="absolute -bottom-20 left-0 w-64 h-64 bg-theme/10 blur-3xl rounded-full opacity-20"></div> */}
-
+    <section className="relative w-full overflow- pb-20 pt-8 px-6 sm:px-10 md:px-20">
       {/* Section Title */}
-      <div className="text-center mb-12 relative z-10">
-        <h2 className="text-3xl sm:text-4xl font-bold text-primary relative inline-block">
+      <div className="text-center mb-16 relative z-10">
+        <h2 className="text-4xl sm:text-5xl font-extrabold text-primary">
           Awards & Accolades
-          <span className="block w-24 h-1 bg-theme mx-auto mt-2 rounded-full"></span>
         </h2>
-        <p className="text-primary/60 mt-3 text-sm sm:text-base">
-          Recognizing our journey of innovation, excellence, and trust.
+        <div className="w-24 h-1 bg-theme mx-auto mt-4 rounded-full"></div>
+        <p className="text-primary/70 mt-4 text-base sm:text-lg max-w-2xl mx-auto">
+          Celebrating excellence, innovation, and our commitment to delivering
+          world-class products.
         </p>
       </div>
 
       {/* Awards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 justify-items-center relative z-10">
+      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         {awards.map((award, index) => (
           <div
             key={index}
-            className="group relative bg-white/90 border border-theme/30 hover:border-theme/80 rounded-2xl p-6 sm:p-7 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-theme/30"
+            className="group bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-2xl hover:shadow-theme/20 transition-all duration-500 hover:-translate-y-2 relative overflow-hidden"
           >
-            {/* Icon */}
-            <div className="w-16 h-16 bg-theme/10 flex items-center justify-center rounded-full mb-4 group-hover:bg-theme/20 transition-all">
+            {/* Animated Glow Line */}
+            <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-theme/70 transition-all duration-500"></div>
+
+            {/* Award Icon */}
+            <div className="w-20 h-20 mx-auto flex items-center justify-center bg-theme/10 rounded-full mb-6 relative">
               <img
                 src={award.img}
                 alt={award.title}
-                className="w-8 h-8 object-contain opacity-90 group-hover:scale-110 transition-transform duration-300"
+                className="w-10 h-10 object-contain transition-transform duration-500 group-hover:scale-110"
               />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-theme/10 to-transparent opacity-0 group-hover:opacity-100 blur-lg transition-all"></div>
             </div>
 
             {/* Title */}
-            <p className="text-primary text-sm sm:text-base font-semibold leading-snug">
+            <p className="text-center text-primary font-semibold text-base sm:text-lg leading-snug tracking-wide group-hover:text-theme transition-colors">
               {award.title}
             </p>
-
-            {/* Glow border effect */}
-            <div className="absolute inset-0 rounded-2xl border-2 border-theme/0 group-hover:border-theme/60 transition-all duration-500"></div>
           </div>
         ))}
       </div>
+
+      {/* Subtle Animated Shine Overlay */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-[-150%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform rotate-12 animate-[shine_6s_infinite]"></div>
+      </div>
+
+      {/* Custom Animation */}
+      <style>{`
+        @keyframes shine {
+          0% { left: -150%; }
+          50% { left: 150%; }
+          100% { left: 150%; }
+        }
+      `}</style>
     </section>
   );
 };

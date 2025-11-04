@@ -11,6 +11,7 @@ import SalesSection from "../components/home/SalesSection";
 import TrendingSection from "../components/home/TrendingSection";
 import ServiceBanner from "../components/shared/ServiceBanner";
 import VideoSection from "../components/home/VideoSection";
+import BlogsSection from "../components/home/BlogsSection";
 
 const HomePage = () => {
   return (
@@ -21,6 +22,7 @@ const HomePage = () => {
       <TrendingSection />
       <AwardsSection />
       <ServiceBanner />
+      <div className="h-10" />
       <PopularSection />
       <AdBanners />
       <CategoryOne />
@@ -28,6 +30,7 @@ const HomePage = () => {
       <VideoSection />
       <CategoryTwo />
       <CategoryListing />
+      <BlogsSection />
     </div>
   );
 };

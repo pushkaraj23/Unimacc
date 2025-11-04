@@ -6,38 +6,40 @@ const CartPage = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
-  const [discount, setDiscount] = useState(0);
+  const [savings, setSavings] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(15);
   const [total, setTotal] = useState(0);
-  const discountPercent = 20;
 
-  // ✅ Load cart from localStorage
+  // ✅ Load cart
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(savedCart);
   }, []);
 
-  // ✅ Recalculate totals whenever cart changes
+  // ✅ Dynamic totals
   useEffect(() => {
     const sub = cart.reduce((acc, item) => {
       const price = parseFloat(item.sellingprice || 0);
       return acc + price * (item.quantity || 1);
     }, 0);
 
-    const disc = (sub * discountPercent) / 100;
+    const totalSavings = cart.reduce((acc, item) => {
+      const mrp = parseFloat(item.mrp || 0);
+      const sell = parseFloat(item.sellingprice || 0);
+      const qty = item.quantity || 1;
+      return acc + Math.max(0, mrp - sell) * qty;
+    }, 0);
+
     setSubtotal(sub);
-    setDiscount(disc);
-    setTotal(sub - disc + deliveryFee);
+    setSavings(totalSavings);
+    setTotal(sub + deliveryFee);
   }, [cart]);
 
-  // ✅ Quantity updates (now checks product + variant)
+  // ✅ Update quantity
   const updateQuantity = (productId, variantId, delta) => {
     const updatedCart = cart
       .map((item) => {
-        if (
-          item.id === productId &&
-          item.stocktable?.[0]?.id === variantId
-        ) {
+        if (item.id === productId && item.stocktable?.[0]?.id === variantId) {
           const newQty = Math.max(0, (item.quantity || 1) + delta);
           return { ...item, quantity: newQty };
         }
@@ -50,7 +52,7 @@ const CartPage = () => {
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // ✅ Remove specific product variant
+  // ✅ Remove item
   const removeItem = (productId, variantId) => {
     const updatedCart = cart.filter(
       (item) =>
@@ -67,7 +69,7 @@ const CartPage = () => {
   return (
     <div className="w-full pt-28 max-sm:pt-24 px-10 max-lg:px-6 max-sm:px-4 min-h-screen">
       {/* Breadcrumb */}
-      <div className="flex gap-1 font-medium my-3 max-sm:my-0 text-sm flex-wrap">
+      <div className="flex gap-1 font-medium my-3 text-sm flex-wrap">
         <button onClick={() => navigate("/")} className="text-primary">
           Home
         </button>
@@ -75,96 +77,75 @@ const CartPage = () => {
         <button className="text-theme">Cart</button>
       </div>
 
-      {/* Title */}
-      <h1 className="text-3xl font-semibold mb-8 max-sm:mt-1 max-sm:mb-6">
-        Your Cart
-      </h1>
+      <h1 className="text-3xl font-semibold mb-8 max-sm:mt-1">Your Cart</h1>
 
-      {/* Layout */}
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-8 mb-12">
         {/* 🛒 Cart Items */}
-        <div className="flex-1 bg-white p-6 max-sm:p-4 h-fit rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           {cart.length > 0 ? (
             cart.map((item, index) => {
               const variantId = item.stocktable?.[0]?.id;
-              const variantColor = item.stocktable?.[0]?.color;
               const image =
-                variantColor ||
+                item.stocktable?.[0]?.color ||
                 item.thumbnailimage ||
                 "https://cdn-icons-png.flaticon.com/512/679/679821.png";
-
-              const name = item.name || "Unnamed Product";
-              const category = item.category || "Misc";
-              const price = parseFloat(item.sellingprice || 0);
 
               return (
                 <div key={`${item.id}-${variantId}`}>
                   <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
                     {/* Product Info */}
-                    <div className="flex items-center max-sm:items-start gap-4 w-full">
+                    <div className="flex items-center gap-4 w-full">
                       <img
                         onClick={() => navigate(`/products/${item.id}`)}
                         src={image}
-                        alt={name}
-                        className="w-24 h-24 sm:w-28 sm:h-28 max-sm:w-20 max-sm:h-20 hover:cursor-pointer rounded-lg object-cover border"
+                        alt={item.name}
+                        className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border hover:cursor-pointer object-cover"
                       />
                       <div>
-                        <h3 className="font-semibold text-lg max-sm:text-base line-clamp-2">
-                          {name}
-                        </h3>
-                        <p className="text-sm max-sm:text-xs text-gray-500 mt-1">
-                          Category: {category}
+                        <h3 className="font-semibold text-lg">{item.name}</h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Category: {item.category}
                         </p>
-                        <p className="text-xs text-gray-400 italic mt-0.5">
-                          Variant ID: {variantId}
-                        </p>
-                        <p className="font-semibold text-lg max-sm:text-base mt-1 text-primary">
-                          ₹{price.toLocaleString()}
+                        <p className="font-semibold text-lg mt-1 text-primary">
+                          ₹{item.sellingprice}
+                          <span className="text-gray-400 line-through ml-2 text-sm">
+                            ₹{item.mrp}
+                          </span>
                         </p>
                       </div>
                     </div>
 
                     {/* Quantity + Delete */}
-                    <div className="flex items-center max-md:w-full justify-end max-md:justify-between gap-5">
-                      {/* Quantity Control */}
-                      <div className="flex items-center border rounded-full px-4 py-1 max-sm:px-3 max-sm:py-0.5">
+                    <div className="flex items-center gap-5 max-md:w-full justify-end">
+                      <div className="flex items-center border rounded-full px-4 py-1">
                         <button
-                          onClick={() =>
-                            updateQuantity(item.id, variantId, -1)
-                          }
-                          className="text-lg font-bold text-gray-600 max-sm:text-base"
+                          onClick={() => updateQuantity(item.id, variantId, -1)}
+                          className="text-lg font-bold text-gray-600"
                         >
                           -
                         </button>
-                        <span className="px-4 text-lg max-sm:px-2 max-sm:text-base">
+                        <span className="px-4 text-lg">
                           {item.quantity || 1}
                         </span>
                         <button
-                          onClick={() =>
-                            updateQuantity(item.id, variantId, 1)
-                          }
-                          className="text-lg font-bold text-gray-600 max-sm:text-base"
+                          onClick={() => updateQuantity(item.id, variantId, 1)}
+                          className="text-lg font-bold text-gray-600"
                         >
                           +
                         </button>
                       </div>
 
-                      {/* Delete */}
                       <button
                         onClick={() => removeItem(item.id, variantId)}
                         className="text-red-500 hover:text-red-600"
                       >
-                        <FaTrashAlt
-                          size={16}
-                          className="max-sm:w-4 max-sm:h-4"
-                        />
+                        <FaTrashAlt size={16} />
                       </button>
                     </div>
                   </div>
 
-                  {/* Divider */}
                   {index < cart.length - 1 && (
-                    <div className="border-t border-gray-200 my-4 max-sm:my-3"></div>
+                    <div className="border-t border-gray-200 my-4"></div>
                   )}
                 </div>
               );
@@ -177,52 +158,37 @@ const CartPage = () => {
         </div>
 
         {/* 💰 Order Summary */}
-        <div className="w-full lg:w-1/3 bg-white p-6 max-sm:p-4 rounded-2xl shadow-sm border border-gray-100 h-fit lg:sticky lg:top-5">
-          <h2 className="font-semibold text-lg mb-4 max-sm:text-base">
-            Order Summary
-          </h2>
+        <div className="w-full lg:w-1/3 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit lg:sticky lg:top-5">
+          <h2 className="font-semibold text-lg mb-4">Order Summary</h2>
 
-          <div className="space-y-3 text-sm max-sm:text-xs">
+          <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span className="font-semibold">
-                ₹{subtotal.toLocaleString()}
-              </span>
+              <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between text-red-500">
-              <span>Discount (-{discountPercent}%)</span>
-              <span>-₹{discount.toLocaleString()}</span>
-            </div>
+            {savings > 0 && (
+              <div className="flex justify-between text-green-600 font-medium">
+                <span>You Saved</span>
+                <span>-₹{savings.toLocaleString()}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Delivery Fee</span>
               <span>₹{deliveryFee}</span>
             </div>
             <hr className="my-2 border-gray-200" />
-            <div className="flex justify-between text-base font-semibold max-sm:text-sm">
-              <span>Total</span>
+            <div className="flex justify-between text-base font-semibold">
+              <span>Total Payable</span>
               <span>₹{total.toLocaleString()}</span>
             </div>
-          </div>
-
-          {/* Promo Code */}
-          <div className="mt-6 flex items-center gap-3 bg-gray-50 rounded-full px-4 py-2 border max-sm:px-3 max-sm:py-1.5">
-            <FaTag className="text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Add promo code"
-              className="bg-transparent outline-none flex-1 text-sm max-sm:text-xs"
-            />
-            <button className="bg-theme hover:opacity-80 text-sm max-sm:text-xs text-white font-medium px-5 py-2 max-sm:px-3 max-sm:py-1 rounded-full">
-              Apply
-            </button>
           </div>
 
           {/* Checkout Button */}
           <button
             onClick={() => navigate("/checkout")}
-            className="w-full mt-6 bg-primary text-white py-3 max-sm:py-2.5 rounded-full font-medium flex items-center justify-center gap-2 hover:opacity-80 text-sm sm:text-base"
+            className="w-full mt-6 bg-primary text-white py-3 rounded-full font-medium hover:opacity-90"
           >
-            Go to Checkout →
+            Proceed to Checkout →
           </button>
         </div>
       </div>

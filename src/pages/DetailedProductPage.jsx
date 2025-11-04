@@ -7,7 +7,7 @@ import { Navigation, Thumbs } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import { fetchProductById } from "../api/userApi";
+import { fetchProductById, fetchProducts } from "../api/userApi";
 import RecommendedProducts from "../components/product/RecommendedProducts";
 
 const DetailedProductPage = () => {
@@ -28,12 +28,28 @@ const DetailedProductPage = () => {
 
   const product = data;
 
+  const {
+    data: allProducts,
+    isLoading: isLoadingProducts,
+    isError: isErrorProducts,
+  } = useQuery({
+    queryKey: ["allProducts"],
+    queryFn: fetchProducts,
+  });
+
+  // ✅ Filter only featured products
+  const featuredProducts =
+    allProducts?.filter((p) => p.isfeatured === true) || [];
+
   // ✅ Initialize selected variant (first one)
+  // ✅ Reset Swiper + Variant when product changes
   useEffect(() => {
-    if (product?.stocktable?.length > 0 && !selectedVariant) {
+    if (product?.stocktable?.length > 0) {
       setSelectedVariant(product.stocktable[0]);
     }
-  }, [product, selectedVariant]);
+    setMainSwiper(null);
+    setThumbsSwiper(null);
+  }, [id, product]); // runs every time you navigate to a new product
 
   // ✅ Wishlist / Cart status
   useEffect(() => {
@@ -172,16 +188,48 @@ const DetailedProductPage = () => {
       <div className="flex flex-col pt-24 lg:flex-row gap-8 px-5 sm:px-8 md:px-10 lg:px-6 lg:pt-32 bg-mute min-h-screen">
         {/* LEFT AD SECTION */}
         <aside className="hidden lg:flex flex-col gap-6 w-1/4">
-          <div className="relative w-full overflow-hidden rounded-lg">
+          <article className="relative w-full overflow-hidden rounded-lg">
             <img
               src="https://images.unsplash.com/photo-1693841114632-bc1c2760bbfd?ixlib=rb-4.1.0&auto=format&fit=crop&w=774&q=80"
               alt="Ad Banner"
-              className="rounded-md w-full h-64 object-cover"
+              className="rounded-md w-full h-[34vh] object-cover"
             />
             <div className="absolute bottom-3 left-3 text-white text-sm">
               <h3 className="font-semibold">More than water</h3>
               <p>It’s a rejuvenating downpour for your senses</p>
             </div>
+          </article>
+          <div className="relative h-[43vh] w-full">
+            {/* Scrollable content */}
+            <article className="overflow-y-scroll space-y-2 no-scrollbar h-full pb-8">
+              {isLoadingProducts && (
+                <div className="w-full h-full flex justify-center items-center"></div>
+              )}
+              {featuredProducts.map((item, index) => (
+                <div
+                  onClick={() => navigate(`/products/${item.id}`)}
+                  key={index}
+                  className="w-full bg-white/80 shadow-sm hover:cursor-pointer rounded-lg p-2 flex gap-2 items-center"
+                >
+                  <img
+                    src={item.thumbnailimage}
+                    className="h-16 min-w-16 max-w-16 rounded-lg"
+                    alt={item.name}
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-primary">
+                      {item.name}
+                    </p>
+                    <p className="text-xs font-semibold text-theme mt-1">
+                      ₹{item.sellingprice}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </article>
+
+            {/* Fixed gradient overlay (does NOT scroll) */}
+            <div className="pointer-events-none absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-mute to-mute/0" />
           </div>
         </aside>
 
