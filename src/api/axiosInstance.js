@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://4.247.21.119:4798/api/",
+  baseURL: "https://api.unimacc.com/api/",
   headers: {
     "Content-Type": "application/json",
   },
