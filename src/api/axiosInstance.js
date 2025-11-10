@@ -7,17 +7,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// Optional: Add interceptors
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     // attach token if needed
-//     const token = localStorage.getItem("authToken");
-//     if (token) config.headers.Authorization = `Bearer ${token}`;
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
-
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {

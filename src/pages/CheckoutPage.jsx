@@ -300,7 +300,7 @@ const CheckoutPage = () => {
                     placeholder="Enter OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
-                    className={`w-full border text-sm border-gray-300 rounded-md px-4 py-2 ${otp?"":"hidden"}`}
+                    className={`w-full border text-sm border-gray-300 rounded-md px-4 py-2 ${otp?"":"hidden "}`}
                   />
                   <div className="flex gap-2">
                     <button
@@ -528,7 +528,7 @@ const CheckoutPage = () => {
               </div>
               {verified && (
                 <button
-                  onClick={startPayment}
+                  // onClick={startPayment}
                   disabled={loading}
                   className="w-full mt-6 bg-primary text-white py-3 rounded-md font-medium hover:bg-theme transition-all"
                 >
