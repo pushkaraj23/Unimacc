@@ -19,6 +19,7 @@ const HomePage = () => {
       <HeroSection />
       <SalesSection />
       <Banner />
+      <VideoSection />
       <TrendingSection />
       <AwardsSection />
       <ServiceBanner />
@@ -27,7 +28,6 @@ const HomePage = () => {
       <AdBanners />
       <CategoryOne />
       {/* <Bestsellers /> */}
-      <VideoSection />
       <CategoryTwo />
       <CategoryListing />
       <BlogsSection />
