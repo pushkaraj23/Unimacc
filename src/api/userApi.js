@@ -274,8 +274,9 @@ export const fetchBlogs = async () => {
   try {
     const res = await axiosInstance.get("/blogs");
     if (res.status !== 200) throw new Error("Failed to fetch blogs");
-
-    return res.data.body || [];
+    const blogs = res.data.body || [];
+    // ✅ Return only active blogs
+    return blogs.filter((blog) => blog.isactive === true);
   } catch (error) {
     console.error(
       "❌ fetchBlogs error:",

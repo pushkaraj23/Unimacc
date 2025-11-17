@@ -64,6 +64,7 @@ const HeroSection = () => {
 
   return (
     <div className="w-full mt-5 flex items-center justify-center">
+      <div className="absolute bottom-5 max-sm:bottom-52 rounded-full bg-black/20 blur-3xl w-[80vw] h-[30vh]" />
       <Swiper
         effect="coverflow"
         grabCursor={true}
@@ -72,19 +73,19 @@ const HeroSection = () => {
         loop={true}
         slidesPerView={1.2}
         autoplay={{
-          delay: 3000,
+          delay: 4000,
           disableOnInteraction: false,
         }}
         coverflowEffect={{
           rotate: 0,
           stretch: 0,
-          depth: 100,
+          depth: 200,
           modifier: 2.5,
         }}
         pagination={{ clickable: true }}
         navigation={true}
         modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
-        className="h-[75vh] max-sm:h-[60vh]"
+        className="h-[77vh] max-sm:h-[60vh]"
       >
         {adjustedSlides.map((slide, index) => {
           const imageSrc = isMobile
@@ -94,27 +95,14 @@ const HeroSection = () => {
           return (
             <SwiperSlide
               key={`${slide.id}-${index}`}
-              className="relative overflow-hidden rounded-3xl shadow-2xl"
+              className="relative overflow-hidden rounded-3xl"
+              onClick={() => navigate(`/offers/${slide.offer_id}`)}
             >
               <img
                 src={imageSrc}
                 alt={slide.title}
                 className="w-full h-[80vh] object-cover"
               />
-              <div className="absolute inset-0 flex flex-col justify-center px-16 max-sm:px-10 text-white">
-                <h2 className="text-5xl font-bold mb-3 drop-shadow-md max-sm:text-3xl">
-                  {slide.title}
-                </h2>
-
-                {slide.offer_id && (
-                  <button
-                    onClick={() => navigate(`/offers/${slide.offer_id}`)}
-                    className="bg-[#FF7A00] hover:bg-[#e56e00] text-primary font-semibold px-7 py-3 rounded-full shadow-md transition duration-300 w-fit"
-                  >
-                    Shop Now →
-                  </button>
-                )}
-              </div>
             </SwiperSlide>
           );
         })}

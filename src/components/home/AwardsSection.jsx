@@ -7,7 +7,7 @@ const AwardsSection = () => {
       title: "Start-up of the Year 2022 – TiE Con Chennai",
     },
     {
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Inc42_logo.svg/2560px-Inc42_logo.svg.png",
+      img: "https://as2.ftcdn.net/jpg/02/16/49/31/1000_F_216493141_QHuucjqKyNOW2ZDZHhWHNIMzT5kjUo2l.jpg",
       title: "India’s Top 10 Fastest Growing D2C Brands",
     },
     {
@@ -35,7 +35,7 @@ const AwardsSection = () => {
       </div>
 
       {/* Awards Grid */}
-      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="relative z-10 grid grid-cols-2 max-sm:gap-4 sm:grid-cols-2 md:grid-cols-4 gap-8">
         {awards.map((award, index) => (
           <div
             key={index}
