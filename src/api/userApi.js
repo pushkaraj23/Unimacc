@@ -326,3 +326,20 @@ export const fetchCategoryNameById = async (id) => {
     return null;
   }
 };
+
+export const fetchOrderById = async (id) => {
+  try {
+    if (!id) throw new Error("Order ID is required");
+    const res = await axiosInstance.get(`/orders/fetchby/customer/${id}`);
+    if (res.status !== 200) {
+      throw new Error(`Failed to fetch order with ID ${id}`);
+    }
+    return res.data.body || null; // Return the order details
+  } catch (error) {
+    console.error(
+      "❌ fetchOrderById error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { generateOtp, verifyOtp } from "../api/userApi";
+import OrdersSection from "../components/shared/OrdersSection";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -10,6 +12,7 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [profileData, setProfileData] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const navigate = useNavigate();
 
   // 🧠 Load user data from localStorage
   useEffect(() => {
@@ -55,12 +58,21 @@ const ProfilePage = () => {
       return await verifyOtp(payload);
     },
     onSuccess: (res) => {
-      setIsVerified(true);
-      setIsOtpSent(false); // hide OTP input
-      setProfileData(res.body); // full profile response
-      alert("✅ OTP verified successfully!");
+      console.log("OTP Verify Response:", res);
+
+      if (res?.verified) {
+        setIsVerified(true);
+        setIsOtpSent(false);
+        setProfileData(res);
+        alert("✅ OTP verified successfully!");
+      } else {
+        alert("❌ Wrong OTP!");
+      }
     },
-    onError: () => alert("❌ Error verifying OTP."),
+    onError: (err) => {
+      console.error(err);
+      alert("Something went wrong, try again.");
+    },
   });
 
   // 📝 Save Profile (after OTP verified)
@@ -73,7 +85,6 @@ const ProfilePage = () => {
       phone: formData.phone,
       userid: profileData?.user?.userid,
       usertoken: profileData?.usertoken,
-      orders: profileData?.orders || [],
     };
 
     localStorage.setItem("user", JSON.stringify(newUser));
@@ -85,11 +96,22 @@ const ProfilePage = () => {
   if (user) {
     return (
       <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
-        <h1 className="text-3xl font-semibold mb-6 max-sm:mt-1">Profile</h1>
+        <div className="font-normal py-1 text-sm mb-2">
+          <button className="text-primary" onClick={() => navigate("/")}>
+            Home
+          </button>{" "}
+          /{" "}
+          <button
+            className="text-theme"
+          >
+            Profile
+          </button>
+        </div>
+        <h1 className="text-3xl font-semibold mb-6 max-sm:mt-1">Profile Page</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* LEFT — Profile Info */}
-          <div className="bg-theme/10 rounded-2xl shadow-sm border border-theme p-6">
+          <div className="bg-theme/10 rounded-2xl shadow-sm border backdrop-blur-md sticky h-fit top-7 border-theme p-6">
             <h2 className="text-xl font-semibold mb-4">Personal Details</h2>
             <div className="space-y-4">
               <div>
@@ -104,49 +126,7 @@ const ProfilePage = () => {
           </div>
 
           {/* RIGHT — Orders */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-xl text-theme font-semibold mb-4">My Orders</h2>
-            {user.orders?.length ? (
-              <div className="space-y-4">
-                {user.orders.map((order) => (
-                  <div
-                    key={order.id}
-                    onClick={() => setSelectedOrder(order)}
-                    className="p-4 border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-all duration-200"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-semibold text-primary">
-                          Order #{order.id}
-                        </p>
-                        <p className="text-gray-500 text-sm">
-                          Date: {order.date}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-lg">
-                          ₹{order.total?.toLocaleString()}
-                        </p>
-                        <p
-                          className={`text-sm font-medium ${
-                            order.status === "Delivered"
-                              ? "text-green-600"
-                              : order.status === "Shipped"
-                              ? "text-blue-500"
-                              : "text-gray-600"
-                          }`}
-                        >
-                          {order.status}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500">No orders yet.</p>
-            )}
-          </div>
+          <OrdersSection userid={user.userid} />
         </div>
 
         {/* Order Details Modal */}
@@ -191,7 +171,6 @@ const ProfilePage = () => {
   return (
     <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
       <h1 className="text-3xl font-semibold mb-6 max-sm:mt-1">Profile</h1>
-
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8">
         <h2 className="text-2xl font-medium mb-8 text-primary">
           Complete Your Profile
