@@ -18,6 +18,7 @@ const CheckoutPage = () => {
   const [otp, setOtp] = useState("");
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [tempMessage, setTempMessage] = useState("");
 
   const deliveryCharge = 50;
 
@@ -48,14 +49,19 @@ const CheckoutPage = () => {
     setCartItems(storedCart);
   }, []);
 
+  const showTempMessage = (msg) => {
+    setTempMessage(msg);
+    setTimeout(() => setTempMessage(""), 3000);
+  };
+
   // ✅ Generate OTP
   const otpMutation = useMutation({
     mutationFn: generateOtp,
     onSuccess: (data) => {
-      alert(`✅ OTP sent successfully to ${userData.phone}!`);
+      showTempMessage(`✅ OTP sent successfully to ${userData.phone}!`);
       setOtp(data.code);
     },
-    onError: () => alert("❌ Failed to send OTP. Please try again."),
+    onError: () => showTempMessage("❌ Failed to send OTP. Please try again."),
   });
 
   // ✅ Verify OTP
@@ -63,7 +69,7 @@ const CheckoutPage = () => {
     mutationFn: verifyOtp,
     onSuccess: (data) => {
       if (data.verified) {
-        alert("✅ OTP verified successfully!");
+        showTempMessage("✅ OTP verified successfully!");
         if (data.usertoken) localStorage.setItem("authToken", data.usertoken);
 
         setUserData({
@@ -73,16 +79,16 @@ const CheckoutPage = () => {
         });
         setAddresses(data.customerAddress || []);
         setVerified(true);
-      } else alert("❌ Invalid OTP");
+      } else showTempMessage("❌ Invalid OTP");
     },
-    onError: () => alert("❌ Verification failed"),
+    onError: () => showTempMessage("❌ Verification failed"),
   });
 
   // ✅ Add Address
   const addAddressMutation = useMutation({
     mutationFn: addCustomerAddress,
     onSuccess: (data) => {
-      alert("✅ Address added successfully!");
+      showTempMessage("✅ Address added successfully!");
       setAddresses((prev) => [...prev, data]);
       setNewAddress({
         deliveredtopersonname: "",
@@ -97,24 +103,36 @@ const CheckoutPage = () => {
         isdefault: false,
       });
     },
-    onError: () => alert("❌ Failed to add address."),
+    onError: () => showTempMessage("❌ Failed to add address."),
   });
 
   const handleAddAddress = () => {
-    const requiredFields = [
-      "deliveredtopersonname",
-      "deliveredtopersonmobileno",
-      "addresslineone",
-      "city",
-      "state",
-      "postalcode",
-    ];
-    const missing = requiredFields.filter((f) => !newAddress[f]);
-    if (missing.length) {
-      alert("⚠️ Please fill all required fields.");
-      return;
-    }
+    const {
+      deliveredtopersonname,
+      deliveredtopersonmobileno,
+      addresslineone,
+      city,
+      state,
+      postalcode,
+    } = newAddress;
 
+    if (!isValidName(deliveredtopersonname))
+      return showTempMessage("⚠️ Enter a valid full name");
+
+    if (!isValidPhone(deliveredtopersonmobileno))
+      return showTempMessage("⚠️ Enter valid 10-digit mobile number");
+
+    if (!addresslineone.trim())
+      return showTempMessage("⚠️ Address Line 1 cannot be empty");
+
+    if (!city.trim()) return showTempMessage("⚠️ Enter city");
+
+    if (!state.trim()) return showTempMessage("⚠️ Enter state");
+
+    if (!isValidPincode(postalcode))
+      return showTempMessage("⚠️ Enter valid 6-digit PIN code");
+
+    // If all good — proceed
     addAddressMutation.mutate({
       ...newAddress,
       userid: userData.userid,
@@ -146,17 +164,23 @@ const CheckoutPage = () => {
       document.body.appendChild(script);
     });
 
-  // ✅ Start Payment
   // ✅ Start Payment (with proper /orders integration)
   async function startPayment() {
-    if (!verified) return alert("⚠️ Please verify your contact details first!");
+    if (!verified) return showTempMessage("⚠️ Please verify your contact!");
+
+    if (!isValidName(userData.name))
+      return showTempMessage("⚠️ Invalid name format");
+
+    if (!isValidPhone(userData.phone))
+      return showTempMessage("⚠️ Invalid phone number");
+
     if (selectedAddress === null)
-      return alert("⚠️ Please select a delivery address before proceeding!");
+      return showTempMessage("⚠️ Select a delivery address");
 
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
-    if (!res) return alert("❌ Razorpay SDK failed to load.");
+    if (!res) return showTempMessage("❌ Razorpay SDK failed to load.");
 
     setLoading(true);
 
@@ -204,7 +228,7 @@ const CheckoutPage = () => {
         order_id: razorpay_order_id, // from backend order
         handler: async function (response) {
           console.log("✅ Razorpay Payment Success:", response);
-          alert("✅ Payment Successful!");
+          showTempMessage("✅ Payment Successful!");
 
           // ✅ (Optional) confirm payment to backend here
           await confirmPayment({
@@ -236,14 +260,21 @@ const CheckoutPage = () => {
 
       rzp.on("payment.failed", (response) => {
         console.error("❌ Payment Failed:", response);
-        alert("❌ Payment Failed: " + response.error.description);
+        showTempMessage("❌ Payment Failed: " + response.error.description);
       });
     } catch (error) {
       console.error("❌ Error creating order or starting payment:", error);
       setLoading(false);
-      alert("Something went wrong while creating order or payment.");
+      showTempMessage("Something went wrong while creating order or payment.");
     }
   }
+
+  // -------------------- VALIDATION HELPERS --------------------
+  const isValidPhone = (phone) => /^[6-9]\d{9}$/.test(phone); // 10 digits, starts 6-9
+  const isValidPincode = (pin) => /^[1-9]\d{5}$/.test(pin); // 6 digits, no leading zero
+  const isValidName = (name) => /^[A-Za-z ]{3,}$/.test(name.trim());
+  const isValidOTP = (code) => /^\d{4,6}$/.test(code); // 4–6 digits
+  // ------------------------------------------------------------
 
   return (
     <div className="w-full min-h-screen pt-28 max-sm:pt-24 max-sm:px-6 p-10">
@@ -300,24 +331,45 @@ const CheckoutPage = () => {
                     placeholder="Enter OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
-                    className={`w-full border text-sm border-gray-300 rounded-md px-4 py-2 ${otp?"":"hidden "}`}
+                    className={`w-full border text-sm border-gray-300 rounded-md px-4 py-2 ${
+                      otp ? "" : "hidden "
+                    }`}
                   />
                   <div className="flex gap-2">
                     <button
-                      onClick={() =>
-                        otp
-                          ? verifyMutation.mutate({
-                              channel: "phone",
-                              identifier: userData.phone,
-                              purpose: "login",
-                              code: otp,
-                            })
-                          : otpMutation.mutate({
-                              channel: "phone",
-                              identifier: userData.phone,
-                              purpose: "login",
-                            })
-                      }
+                      onClick={() => {
+                        if (!otp) {
+                          // Before sending OTP
+                          if (!isValidName(userData.name))
+                            return showTempMessage(
+                              "⚠️ Enter a valid name (min 3 letters)"
+                            );
+
+                          if (!isValidPhone(userData.phone))
+                            return showTempMessage(
+                              "⚠️ Enter valid 10-digit phone number"
+                            );
+
+                          otpMutation.mutate({
+                            channel: "phone",
+                            identifier: userData.phone,
+                            purpose: "login",
+                          });
+                        } else {
+                          // Before verifying OTP
+                          if (!isValidOTP(otp))
+                            return showTempMessage(
+                              "⚠️ Enter a valid 4–6 digit OTP"
+                            );
+
+                          verifyMutation.mutate({
+                            channel: "phone",
+                            identifier: userData.phone,
+                            purpose: "login",
+                            code: otp,
+                          });
+                        }
+                      }}
                       className="bg-theme text-white px-6 py-2 rounded-md text-sm font-medium"
                     >
                       {otp ? "Verify OTP" : "Get OTP"}
@@ -538,6 +590,11 @@ const CheckoutPage = () => {
             </>
           )}
         </div>
+        {tempMessage && (
+          <div className="fixed top-32 right-5 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg animate-fade z-50">
+            {tempMessage}
+          </div>
+        )}
       </div>
     </div>
   );

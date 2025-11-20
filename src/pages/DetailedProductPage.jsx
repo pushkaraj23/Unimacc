@@ -26,6 +26,12 @@ const DetailedProductPage = () => {
     enabled: !!id,
   });
 
+  const [tempMessage, setTempMessage] = useState("");
+  const showTempMessage = (msg) => {
+    setTempMessage(msg);
+    setTimeout(() => setTempMessage(""), 3000);
+  };
+
   const product = data;
 
   const {
@@ -103,7 +109,7 @@ const DetailedProductPage = () => {
               item.stocktable?.[0]?.id === selectedVariant.id
             )
         );
-        alert("🗑️ Variant removed from cart!");
+        showTempMessage("🗑️ Variant removed from cart");
         setIsAdded(false);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         window.dispatchEvent(new Event("localStorageUpdated"));
@@ -111,7 +117,7 @@ const DetailedProductPage = () => {
     } else {
       // Add new variant
       updatedCart = [...existingCart, productToStore];
-      alert("🛒 Variant added to cart!");
+      showTempMessage("🛒 Variant added to cart!");
       setIsAdded(true);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       window.dispatchEvent(new Event("localStorageUpdated"));
@@ -149,13 +155,13 @@ const DetailedProductPage = () => {
       );
       localStorage.setItem("wishlist", JSON.stringify(updated));
       setIsWishlisted(false);
-      alert("💔 Removed from wishlist!");
+      showTempMessage("💔 Removed from wishlist!");
     } else {
       // Add that specific variant
       existingWishlist.push(productToStore);
       localStorage.setItem("wishlist", JSON.stringify(existingWishlist));
       setIsWishlisted(true);
-      alert("💖 Added to wishlist!");
+      showTempMessage("💖 Added to wishlist!");
     }
 
     window.dispatchEvent(new Event("localStorageUpdated"));
@@ -185,9 +191,9 @@ const DetailedProductPage = () => {
 
   return (
     <>
-      <div className="flex flex-col pt-24 lg:flex-row gap-8 px-5 sm:px-8 md:px-10 lg:px-6 lg:pt-32 bg-mute min-h-screen">
+      <div className="grid grid-cols-4 items-start pt-24 max-sm:grid-cols-1 gap-8 px-5 sm:px-8 md:px-10 lg:px-6 lg:pt-32 bg-mute ">
         {/* LEFT AD SECTION */}
-        <aside className="hidden lg:flex flex-col gap-6 w-1/4">
+        <aside className="hidden lg:flex sticky top-5 flex-col gap-6 col-span-1">
           <article className="relative w-full overflow-hidden rounded-lg">
             <img
               src="https://images.unsplash.com/photo-1693841114632-bc1c2760bbfd?ixlib=rb-4.1.0&auto=format&fit=crop&w=774&q=80"
@@ -234,9 +240,9 @@ const DetailedProductPage = () => {
         </aside>
 
         {/* MAIN SECTION */}
-        <main className="flex flex-col lg:flex-row gap-8 w-full lg:w-3/4">
+        <main className="flex flex-col sticky top-5 col-span-2 lg:flex-row gap-8 w-full">
           {/* PRODUCT IMAGES */}
-          <div className="w-full lg:w-2/3">
+          <div className="w-full">
             {/* --- Main Image Slider --- */}
             <Swiper
               onSwiper={setMainSwiper}
@@ -284,103 +290,108 @@ const DetailedProductPage = () => {
           </div>
 
           {/* PRODUCT DETAILS */}
-          <div className="flex flex-col gap-3 lg:w-1/3">
-            <p className="text-sm text-primary/70 font-medium">
-              {product.category}
-              {product.subcategory && (
-                <>
-                  {" / "}
-                  <span className="text-theme">{product.subcategory}</span>
-                </>
-              )}
+        </main>
+
+        {/* RIGHT SECTION */}
+        <div className="flex flex-col gap-3 col-span-1 sticky top-5">
+          <p className="text-sm text-primary/70 font-medium">
+            {product.category}
+            {product.subcategory && (
+              <>
+                {" / "}
+                <span className="text-theme">{product.subcategory}</span>
+              </>
+            )}
+          </p>
+
+          <h2 className="text-xl sm:text-2xl font-semibold">{product.name}</h2>
+
+          <div className="flex items-center gap-3 mt-1">
+            <p className="text-2xl font-bold text-black">
+              ₹{product.sellingprice}
             </p>
+            <p className="text-gray-400 line-through text-lg">₹{product.mrp}</p>
+            {parseFloat(product.mrp) > parseFloat(product.sellingprice) && (
+              <span className="bg-theme text-white px-2 py-1 rounded-md text-sm font-medium">
+                {Math.round(
+                  ((product.mrp - product.sellingprice) / product.mrp) * 100
+                )}
+                % off
+              </span>
+            )}
+          </div>
 
-            <h2 className="text-xl sm:text-2xl font-semibold">
-              {product.name}
-            </h2>
-
-            <div className="flex items-center gap-3 mt-1">
-              <p className="text-2xl font-bold text-black">
-                ₹{product.sellingprice}
-              </p>
-              <p className="text-gray-400 line-through text-lg">
-                ₹{product.mrp}
-              </p>
-              {parseFloat(product.mrp) > parseFloat(product.sellingprice) && (
-                <span className="bg-theme text-white px-2 py-1 rounded-md text-sm font-medium">
-                  {Math.round(
-                    ((product.mrp - product.sellingprice) / product.mrp) * 100
-                  )}
-                  % off
-                </span>
-              )}
-            </div>
-
-            {/* VARIANT COLORS */}
-            {product.stocktable?.length > 0 && (
-              <div className="mt-3">
-                <p className="text-sm font-medium mb-2">Available Colors</p>
-                <div className="flex gap-2 flex-wrap">
-                  {product.stocktable.map((variant, i) => (
-                    <img
-                      key={i}
-                      src={variant.color}
-                      alt={`color-${i}`}
-                      className={`w-10 sm:w-12 h-10 sm:h-12 object-cover border-2 rounded-md cursor-pointer transition 
+          {/* VARIANT COLORS */}
+          {product.stocktable?.length > 0 && (
+            <div className="mt-3">
+              <p className="text-sm font-medium mb-2">Available Colors</p>
+              <div className="flex gap-2 flex-wrap">
+                {product.stocktable.map((variant, i) => (
+                  <img
+                    key={i}
+                    src={variant.color}
+                    alt={`color-${i}`}
+                    className={`w-10 sm:w-12 h-10 sm:h-12 object-cover border-2 rounded-md cursor-pointer transition 
                         ${
                           selectedVariant?.id === variant.id
                             ? "border-theme scale-110"
                             : "border-gray-300 hover:border-theme/70"
                         }`}
-                      onClick={() => handleVariantSelect(variant)}
-                    />
-                  ))}
-                </div>
+                    onClick={() => handleVariantSelect(variant)}
+                  />
+                ))}
               </div>
-            )}
-
-            {/* DESCRIPTION */}
-            <div className="mt-4">
-              <p className="text-sm font-semibold mb-1">Description</p>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {product.description}
-              </p>
             </div>
+          )}
 
-            {/* BUTTONS */}
-            <div className="flex flex-wrap gap-2 mt-5">
+          {/* DESCRIPTION */}
+          <div className="mt-4">
+            <p className="text-sm font-semibold mb-1">Description</p>
+
+            <div
+              className="prose prose-sm max-w-none text-gray-700"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
+          </div>
+
+          {/* BUTTONS */}
+          <div className="flex flex-wrap gap-2 mt-5">
+            <button
+              onClick={() => handleAddToCart(true)}
+              className="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
+            >
+              Place Order
+            </button>
+            <div className="w-full flex justify-between gap-2">
               <button
-                onClick={() => handleAddToCart(true)}
-                className="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
+                onClick={handleAddToWishlist}
+                className={`flex items-center w-2/5 justify-center gap-2 border font-medium border-primary/75 px-4 py-3 rounded-md text-sm transition-all ${
+                  isWishlisted
+                    ? "bg-theme text-white shadow-md"
+                    : "hover:text-theme hover:shadow-md"
+                }`}
               >
-                Place Order
+                <FaHeart /> {isWishlisted ? "Wishlisted" : "Save"}
               </button>
-              <div className="w-full flex justify-between gap-2">
-                <button
-                  onClick={handleAddToWishlist}
-                  className={`flex items-center w-2/5 justify-center gap-2 border font-medium border-primary/75 px-4 py-3 rounded-md text-sm transition-all ${
-                    isWishlisted
-                      ? "bg-theme text-white shadow-md"
-                      : "hover:text-theme hover:shadow-md"
-                  }`}
-                >
-                  <FaHeart /> {isWishlisted ? "Wishlisted" : "Save"}
-                </button>
 
-                <button
-                  onClick={() => handleAddToCart(false)}
-                  className={`flex items-center justify-center gap-2 border w-3/5 border-primary/75 font-medium px-4 py-3 rounded-md text-sm transition-all ${
-                    isAdded
-                      ? "text-theme shadow-lg"
-                      : "hover:text-theme hover:shadow-md"
-                  }`}
-                >
-                  <FaShoppingCart /> {isAdded ? "Already Added" : "Add to Cart"}
-                </button>
-              </div>
+              <button
+                onClick={() => handleAddToCart(false)}
+                className={`flex items-center justify-center gap-2 border w-3/5 border-primary/75 font-medium px-4 py-3 rounded-md text-sm transition-all ${
+                  isAdded
+                    ? "text-theme shadow-lg"
+                    : "hover:text-theme hover:shadow-md"
+                }`}
+              >
+                <FaShoppingCart /> {isAdded ? "Already Added" : "Add to Cart"}
+              </button>
             </div>
           </div>
-        </main>
+        </div>
+        {tempMessage && (
+          <div className="fixed top-28 right-5 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-90 animate-fade z-50">
+            {tempMessage}
+          </div>
+        )}
       </div>
 
       {/* Recommended Products */}

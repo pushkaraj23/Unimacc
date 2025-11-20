@@ -248,3 +248,14 @@
 :root {
   --theme: #dd7427; /* fallback; your Tailwind 'theme' color can set this via a utility on <body> */
 }
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(6px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(6px); }
+}
+
+.animate-fade {
+  animation: fadeInOut 3s ease-in-out;
+}

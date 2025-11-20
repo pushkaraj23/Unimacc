@@ -82,7 +82,7 @@ const SalesSection = () => {
       </section>
 
       {/* --- Mobile Buttons --- */}
-      <div className="flex gap-2 justify-center flex-wrap md:hidden mb-4">
+      <div className="grid grid-cols-3 gap-2 md:hidden mb-4">
         {isDiscountsLoading ? (
           <p className="text-primary/50 italic">Loading...</p>
         ) : isDiscountsError ? (

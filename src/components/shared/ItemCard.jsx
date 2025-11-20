@@ -6,33 +6,35 @@ const ItemCard = ({ product }) => {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isCompared, setIsCompared] = useState(false);
-  const [isInCart, setIsInCart] = useState(false); // ✅ new state for cart icon
+  const [isInCart, setIsInCart] = useState(false);
+  const [tempMessage, setTempMessage] = useState(""); // ⬅️ For message display
 
-  // ✅ Safely extract product fields
+  // ⬅️ Helper: show message for 3 seconds
+  const showTempMessage = (msg) => {
+    setTempMessage(msg);
+    setTimeout(() => setTempMessage(""), 3000);
+  };
+
+  // Extract product fields safely
   const {
     id,
     name,
-    description,
     category,
-    subcategory,
     imagepath = [],
     mrp,
     sellingprice,
-    discount,
     discountpercent,
   } = product || {};
 
-  // ✅ Compute prices & discounts
   const originalPrice = mrp ? parseFloat(mrp) : 0;
   const price = sellingprice ? parseFloat(sellingprice) : 0;
 
-  // ✅ Image fallback
+  // Select correct images
   const images =
     product?.stocktable?.[0]?.images?.length > 0
       ? product.stocktable[0].images
       : imagepath;
 
-  // ✅ Load wishlist, compare, and cart states
   useEffect(() => {
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
     setIsWishlisted(wishlist.some((item) => item.id === id));
@@ -44,7 +46,7 @@ const ItemCard = ({ product }) => {
     setIsInCart(cart.some((item) => item.id === id));
   }, [id]);
 
-  // ✅ Add / Remove from Cart
+  // Cart
   const handleAddToCart = (e) => {
     e.stopPropagation();
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -52,22 +54,20 @@ const ItemCard = ({ product }) => {
 
     let updatedCart;
     if (existingIndex !== -1) {
-      // ❌ Remove if exists
       updatedCart = existingCart.filter((item) => item.id !== id);
       setIsInCart(false);
-      alert("🗑️ Product removed from cart!");
+      showTempMessage("🗑️ Removed from Cart");
     } else {
-      // ✅ Add if not exists
       updatedCart = [...existingCart, { ...product, quantity: 1 }];
       setIsInCart(true);
-      alert("🛒 Product added to cart!");
+      showTempMessage("🛒 Added to Cart");
     }
 
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // 💖 Wishlist Add / Remove
+  // Wishlist
   const handleWishlist = (e) => {
     e.stopPropagation();
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
@@ -77,18 +77,18 @@ const ItemCard = ({ product }) => {
     if (existingIndex !== -1) {
       updatedWishlist = wishlist.filter((item) => item.id !== id);
       setIsWishlisted(false);
-      alert("💔 Removed from wishlist!");
+      showTempMessage("💔 Removed from Wishlist");
     } else {
       updatedWishlist = [...wishlist, product];
       setIsWishlisted(true);
-      alert("💖 Added to wishlist!");
+      showTempMessage("💖 Added to Wishlist");
     }
 
     localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // 🔁 Compare Add / Remove
+  // Compare
   const handleCompare = (e) => {
     e.stopPropagation();
     const compareList = JSON.parse(localStorage.getItem("compare")) || [];
@@ -98,11 +98,11 @@ const ItemCard = ({ product }) => {
     if (existingIndex !== -1) {
       updatedCompare = compareList.filter((item) => item.id !== id);
       setIsCompared(false);
-      alert("❌ Removed from compare list!");
+      showTempMessage("❌ Removed from Compare");
     } else {
       updatedCompare = [...compareList, product];
       setIsCompared(true);
-      alert("🔁 Added to compare list!");
+      showTempMessage("🔁 Added to Compare");
     }
 
     localStorage.setItem("compare", JSON.stringify(updatedCompare));
@@ -130,7 +130,6 @@ const ItemCard = ({ product }) => {
           />
         )}
 
-        {/* Offer Badge */}
         {discountpercent !== 0 && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-[85%] flex justify-between items-center bg-theme text-white text-[2.2vw] md:text-[.9vw] font-semibold px-2 sm:px-3 py-1 rounded-md">
             <span>Limited Time Deal</span>
@@ -142,6 +141,7 @@ const ItemCard = ({ product }) => {
       {/* Product Info */}
       <div className="px-3 py-2 text-left">
         <p className="text-gray-400 text-xs sm:text-sm">{category || "—"}</p>
+
         <h3
           className="font-semibold text-primary text-sm sm:text-base leading-snug truncate"
           title={name}
@@ -149,18 +149,20 @@ const ItemCard = ({ product }) => {
           {name?.length > 50 ? `${name.slice(0, 50)}…` : name}
         </h3>
 
-        {/* Price Section */}
+        {/* Price */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-primary font-bold text-base sm:text-lg">
               ₹{price.toLocaleString()}
             </span>
+
             {originalPrice > 0 && discountpercent !== 0 && (
               <span className="text-gray-400 line-through text-xs sm:text-sm">
                 ₹{originalPrice.toLocaleString()}
               </span>
             )}
           </div>
+
           {discountpercent !== 0 && (
             <span className="text-theme text-xs sm:text-sm font-semibold">
               {discountpercent}% OFF
@@ -170,7 +172,6 @@ const ItemCard = ({ product }) => {
 
         {/* Action Buttons */}
         <div className="flex my-2 gap-2">
-          {/* Cart Icon */}
           <div className="transition-opacity duration-300">
             <div
               onClick={handleAddToCart}
@@ -184,7 +185,6 @@ const ItemCard = ({ product }) => {
             </div>
           </div>
 
-          {/* Wishlist Icon */}
           <div className="transition-opacity duration-300">
             <div
               onClick={handleWishlist}
@@ -198,7 +198,6 @@ const ItemCard = ({ product }) => {
             </div>
           </div>
 
-          {/* Compare Button */}
           <button
             onClick={handleCompare}
             className={`border rounded-md p-2 sm:p-2.5 transition-colors ${
@@ -211,6 +210,15 @@ const ItemCard = ({ product }) => {
           </button>
         </div>
       </div>
+
+      {/* ✅ Temporary Message */}
+      {tempMessage && (
+        <div className="absolute bottom-16 left-2">
+          <div className="bg-black text-white shadow-2xl text-xs px-3 py-1 rounded-md opacity-90 animate-fade">
+            {tempMessage}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
