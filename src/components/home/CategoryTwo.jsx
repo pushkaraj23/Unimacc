@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const CategoryTwo = () => {
   const {
-    data: bathroomProducts = [],
+    data: kitchenproducts = [],
     isLoading,
     isError,
   } = useQuery({
@@ -13,14 +13,14 @@ const CategoryTwo = () => {
   });
 
   if (isLoading)
-    return <p className="text-center py-10">Loading Bathroom products...</p>;
+    return <p className="text-center py-10">Loading Kitchen products...</p>;
   if (isError)
     return <p className="text-center text-red-500">Failed to load products.</p>;
   return (
     <section className="py-8">
       <ProductCarousel
         title="Kitchen"
-        items={bathroomProducts}
+        items={kitchenproducts}
         viewAllRoute="products?category=Kitchen"
       />
     </section>

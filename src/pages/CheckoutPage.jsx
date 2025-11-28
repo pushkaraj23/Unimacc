@@ -19,6 +19,7 @@ const CheckoutPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tempMessage, setTempMessage] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const deliveryCharge = 50;
 
@@ -168,8 +169,8 @@ const CheckoutPage = () => {
   async function startPayment() {
     if (!verified) return showTempMessage("⚠️ Please verify your contact!");
 
-    if (!isValidName(userData.name))
-      return showTempMessage("⚠️ Invalid name format");
+    // if (!isValidName(userData.name))
+    //   return showTempMessage("⚠️ Invalid name format");
 
     if (!isValidPhone(userData.phone))
       return showTempMessage("⚠️ Invalid phone number");
@@ -220,7 +221,7 @@ const CheckoutPage = () => {
 
       // ✅ Step 3: Initialize Razorpay
       const options = {
-        key: "rzp_live_R9XgKMnP3LxCam", // 🔑 Use your live/test key
+        key: "rzp_live_RckkLSIH4ZE3bp", // 🔑 Use your live/test key
         amount: amount, // e.g. 149900 = ₹1499.00
         currency: currency || "INR",
         name: "Unimacc",
@@ -405,7 +406,10 @@ const CheckoutPage = () => {
               {addresses.map((addr, i) => (
                 <div
                   key={addr.id || i}
-                  onClick={() => setSelectedAddress(i)}
+                  onClick={() => {
+                    setSelectedAddress(i);
+                    setIsAuthenticated(true);
+                  }}
                   className={`border p-4 rounded-lg mb-3 cursor-pointer ${
                     selectedAddress === i
                       ? "border-theme bg-theme/10"
@@ -578,9 +582,9 @@ const CheckoutPage = () => {
                   <span>₹{payableAmount.toLocaleString()}</span>
                 </p>
               </div>
-              {verified && (
+              {verified && isAuthenticated && (
                 <button
-                  // onClick={startPayment}
+                  onClick={startPayment}
                   disabled={loading}
                   className="w-full mt-6 bg-primary text-white py-3 rounded-md font-medium hover:bg-theme transition-all"
                 >

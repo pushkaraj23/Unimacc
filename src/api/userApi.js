@@ -25,9 +25,12 @@ export const fetchCategories = async () => {
     const res = await axiosInstance.get("/categories");
     if (res.status !== 200) throw new Error("Failed to fetch categories");
 
-    const allCategories = res.data.body || [];
+    let allCategories = res.data.body || [];
 
-    // ✅ Separate parent and child categories
+    // Keep only active categories
+    allCategories = allCategories.filter((cat) => cat.isactive === true);
+
+    // Separate active parents and children
     const parentCategories = allCategories.filter(
       (cat) => cat.parentid === null
     );
@@ -35,17 +38,21 @@ export const fetchCategories = async () => {
       (cat) => cat.parentid !== null
     );
 
-    // ✅ Build dictionary structure
+    // Build parent → children mapping with parent ID included
     const categoryMap = {};
 
     parentCategories.forEach((parent) => {
-      categoryMap[parent.name] = []; // start with empty array
-
       const children = childCategories
         .filter((child) => child.parentid === parent.id)
-        .map((child) => child.name);
+        .map((child) => ({
+          id: child.id,
+          name: child.name,
+        }));
 
-      categoryMap[parent.name] = children;
+      categoryMap[parent.name] = {
+        id: parent.id,
+        children: children,
+      };
     });
 
     return categoryMap;

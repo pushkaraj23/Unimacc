@@ -72,10 +72,14 @@ const HeroSection = () => {
         spaceBetween={15}
         loop={true}
         slidesPerView={1.2}
-        autoplay={{
-          delay: 4000,
-          disableOnInteraction: false,
-        }}
+        autoplay={
+          isMobile
+            ? false
+            : {
+                delay: 5000,
+                disableOnInteraction: false,
+              }
+        }
         coverflowEffect={{
           rotate: 0,
           stretch: 0,

@@ -2,22 +2,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Thumbs } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/thumbs";
 import { fetchProductById, fetchProducts } from "../api/userApi";
 import RecommendedProducts from "../components/product/RecommendedProducts";
 
 const DetailedProductPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [thumbsSwiper, setThumbsSwiper] = useState(null);
-  const [mainSwiper, setMainSwiper] = useState(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
-  const [selectedVariant, setSelectedVariant] = useState(null); // ✅ store selected stock variant
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   // ✅ Fetch product
   const { data, isLoading, isError } = useQuery({
@@ -53,8 +47,6 @@ const DetailedProductPage = () => {
     if (product?.stocktable?.length > 0) {
       setSelectedVariant(product.stocktable[0]);
     }
-    setMainSwiper(null);
-    setThumbsSwiper(null);
   }, [id, product]); // runs every time you navigate to a new product
 
   // ✅ Wishlist / Cart status
@@ -191,9 +183,9 @@ const DetailedProductPage = () => {
 
   return (
     <>
-      <div className="grid grid-cols-4 items-start pt-24 max-sm:grid-cols-1 gap-8 px-5 sm:px-8 md:px-10 lg:px-6 lg:pt-32 bg-mute ">
+      <div className="grid grid-cols-7 items-start pt-24 max-sm:grid-cols-1 gap-5 px-5 sm:px-8 md:px-10 lg:px-6 lg:pt-32 bg-mute ">
         {/* LEFT AD SECTION */}
-        <aside className="hidden lg:flex sticky top-5 flex-col gap-6 col-span-1">
+        <aside className="hidden lg:flex sticky top-5 flex-col gap-6 col-span-2">
           <article className="relative w-full overflow-hidden rounded-lg">
             <img
               src="https://images.unsplash.com/photo-1693841114632-bc1c2760bbfd?ixlib=rb-4.1.0&auto=format&fit=crop&w=774&q=80"
@@ -240,60 +232,70 @@ const DetailedProductPage = () => {
         </aside>
 
         {/* MAIN SECTION */}
-        <main className="flex flex-col sticky top-5 col-span-2 lg:flex-row gap-8 w-full">
+        <main className="flex flex-col items-center lg:sticky top-5 col-span-3 lg:flex-row gap-4 w-full">
           {/* PRODUCT IMAGES */}
-          <div className="w-full">
-            {/* --- Main Image Slider --- */}
-            <Swiper
-              onSwiper={setMainSwiper}
-              spaceBetween={10}
-              navigation
-              thumbs={{
-                swiper:
-                  thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
-              }}
-              modules={[Navigation, Thumbs]}
-              className="rounded-lg overflow-hidden"
-              loop={false} // 🔹 important fix — must be false for proper syncing
-            >
-              {allImages.map((img, index) => (
-                <SwiperSlide key={index}>
-                  <img
-                    src={img}
-                    alt={`${product.name}-${index}`}
-                    className="w-full h-[45vh] sm:h-[60vh] md:h-[65vh] object-cover rounded-lg"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          <div className="relative w-full h-auto rounded-lg flex items-center justify-center overflow-hidden border">
+            <img
+              src={allImages[activeImageIndex]}
+              alt="product"
+              className="w-full h-full object-contain object-top transition-all duration-300"
+            />
 
-            {/* --- Thumbnails --- */}
-            <Swiper
-              onSwiper={setThumbsSwiper}
-              spaceBetween={8}
-              slidesPerView={5}
-              freeMode={true}
-              watchSlidesProgress={true}
-              modules={[Thumbs]}
-              className="mt-3"
-            >
-              {allImages.map((img, index) => (
-                <SwiperSlide key={index} className="!w-auto">
-                  <img
-                    src={img}
-                    alt={`thumb-${index}`}
-                    className="w-14 sm:w-16 h-14 sm:h-16 object-cover rounded-md border border-gray-200 hover:border-theme cursor-pointer"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            {/* Prev Button */}
+            {allImages.length > 1 && (
+              <button
+                onClick={() =>
+                  setActiveImageIndex(
+                    activeImageIndex === 0
+                      ? allImages.length - 1
+                      : activeImageIndex - 1
+                  )
+                }
+                className="absolute left-3 top-1/2 w-10 h-10 -translate-y-1/2 bg-black/50 text-white text-2xl rounded-full"
+              >
+                ‹
+              </button>
+            )}
+
+            {/* Next Button */}
+            {allImages.length > 1 && (
+              <button
+                onClick={() =>
+                  setActiveImageIndex(
+                    activeImageIndex === allImages.length - 1
+                      ? 0
+                      : activeImageIndex + 1
+                  )
+                }
+                className="absolute right-3 top-1/2 w-10 h-10 -translate-y-1/2 bg-black/50 text-white text-2xl rounded-full"
+              >
+                ›
+              </button>
+            )}
           </div>
-
-          {/* PRODUCT DETAILS */}
+          {/* THUMBNAIL IMAGES */}
+          <div className="flex md:flex-col gap-2 mt-3 overflow-x-auto no-scrollbar">
+            {allImages.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                onClick={() => setActiveImageIndex(index)}
+                className={`
+        w-14 sm:w-16 h-14 sm:h-16 object-cover rounded-md cursor-pointer border-2 transition-all duration-300 
+        ${
+          activeImageIndex === index
+            ? "border-theme brightness-100" // selected
+            : "border-gray-300 brightness-50 hover:brightness-75 hover:border-theme" // unselected
+        }
+      `}
+                alt={`thumb-${index}`}
+              />
+            ))}
+          </div>
         </main>
 
         {/* RIGHT SECTION */}
-        <div className="flex flex-col gap-3 col-span-1 sticky top-5">
+        <div className="flex flex-col gap-3 col-span-2 sticky top-5">
           <p className="text-sm text-primary/70 font-medium">
             {product.category}
             {product.subcategory && (

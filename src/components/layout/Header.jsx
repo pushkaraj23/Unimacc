@@ -33,17 +33,10 @@ const Header = () => {
   });
 
   // ✅ Updated navigation to handle category & subcategory
-  const handleCategoryClick = (parent, child) => {
+  const handleCategoryClick = (id) => {
     setMenuOpen(false);
-    if (child) {
-      navigate(
-        `/products?category=${encodeURIComponent(
-          parent
-        )}&subcategory=${encodeURIComponent(child)}`
-      );
-    } else {
-      navigate(`/products?category=${encodeURIComponent(parent)}`);
-    }
+    navigate(`/products?category=${encodeURIComponent(id)}`);
+    console.log(id);
   };
 
   // ✅ Scroll hide/show header
@@ -149,17 +142,21 @@ const Header = () => {
                 ) : (
                   Object.entries(categories).map(([parent, children]) => (
                     <li key={parent} className="px-4 py-2 hover:bg-gray-50">
-                      <span className="font-semibold text-primary cursor-pointer hover:text-theme">
+                      <span
+                        onClick={() => handleCategoryClick(children.id)}
+                        className="font-semibold text-primary cursor-pointer hover:text-theme"
+                      >
                         {parent}
                       </span>
+
                       <ul className="pl-3 mt-1">
-                        {children.map((child, index) => (
+                        {children.children.map((child) => (
                           <li
-                            key={index}
-                            onClick={() => handleCategoryClick(child)}
-                            className="py-1 px-2 hover:bg-gray-100 rounded cursor-pointer text-primary/70"
+                            key={child.id}
+                            onClick={() => handleCategoryClick(child.id)}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                           >
-                            {child}
+                            {child.name}
                           </li>
                         ))}
                       </ul>
@@ -251,23 +248,25 @@ const Header = () => {
           ) : !categories || Object.keys(categories).length === 0 ? (
             <p>No categories</p>
           ) : (
-            Object.entries(categories).map(([parent, children]) => (
-              <div key={parent} className="group relative py-2">
-                {/* --- Parent Category --- */}
-                <p className="hover:text-orange-400 transition-colors duration-200 cursor-pointer">
+            Object.entries(categories).map(([parent, info]) => (
+              <div key={info.id} className="group relative py-2">
+                <p
+                  onClick={() => handleCategoryClick(info.id)}
+                  className="hover:text-orange-400 cursor-pointer"
+                >
                   {parent}
                 </p>
 
                 {/* --- Dropdown (Subcategories) --- */}
                 <div className="absolute hidden group-hover:block -translate-y- bg-white text-primary shadow-md mt-2 rounded w-48 z-50">
                   <ul className="text-sm py-2 font-medium">
-                    {children.map((child, index) => (
+                    {info.children.map((child) => (
                       <li
-                        key={index}
-                        onClick={() => handleCategoryClick(child)}
+                        key={child.id}
+                        onClick={() => handleCategoryClick(child.id)}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       >
-                        {child}
+                        {child.name}
                       </li>
                     ))}
                   </ul>
@@ -302,13 +301,13 @@ const Header = () => {
 
                 {/* --- Child Categories --- */}
                 <ul>
-                  {children.map((child, index) => (
+                  {children.children.map((child) => (
                     <li
-                      key={index}
-                      onClick={() => handleCategoryClick(child)}
-                      className="px-8 py-2 hover:bg-gray-100 cursor-pointer text-gray-600"
+                      key={child.id}
+                      onClick={() => handleCategoryClick(child.id)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >
-                      {child}
+                      {child.name}
                     </li>
                   ))}
                 </ul>

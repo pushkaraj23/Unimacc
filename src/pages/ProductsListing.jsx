@@ -15,29 +15,24 @@ const ProductsListing = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // ✅ Extract routing params
-  const categoryParam = searchParams.get("category");
-  const subcategoryParam = searchParams.get("subcategory");
+  // ---------- URL PARAMS ----------
+  const categoryParam = searchParams.get("category"); // single category id
   const searchQuery = searchParams.get("search");
 
-  // ✅ States
   const [category, setCategory] = useState(categoryParam || "All");
-  const [subcategory, setSubcategory] = useState(subcategoryParam || "All");
 
-  // ✅ Fetch products
+  // ---------- FETCH PRODUCTS ----------
   const {
     data: products = [],
     isLoading: isProductsLoading,
     isError: isProductsError,
   } = useQuery({
-    queryKey: searchQuery
-      ? ["searchProducts", searchQuery]
-      : ["products"],
+    queryKey: searchQuery ? ["searchProducts", searchQuery] : ["products"],
     queryFn: () =>
       searchQuery ? fetchProductsBySearch(searchQuery) : fetchProducts(),
   });
 
-  // ✅ Fetch categories (parent → subcategories mapping)
+  // ---------- FETCH CATEGORIES ----------
   const {
     data: categories = {},
     isLoading: isCategoriesLoading,
@@ -47,7 +42,7 @@ const ProductsListing = () => {
     queryFn: fetchCategories,
   });
 
-  // ✅ Price filter setup
+  // ---------- PRICE RANGE ----------
   const [price, setPrice] = useState(0);
   const maxPrice = useMemo(
     () =>
@@ -61,44 +56,39 @@ const ProductsListing = () => {
     if (products.length > 0) setPrice(maxPrice);
   }, [maxPrice, products]);
 
-  // ✅ Sync state with query params
+  // ---------- SYNC CATEGORY WITH PARAM ----------
   useEffect(() => {
     setCategory(categoryParam || "All");
-    setSubcategory(subcategoryParam || "All");
-  }, [categoryParam, subcategoryParam]);
+  }, [categoryParam]);
 
-  // ✅ Auto-detect parent if only subcategory is given
-  useEffect(() => {
-    if (subcategoryParam && !categoryParam && categories) {
-      const foundParent = Object.entries(categories).find(([parent, subs]) =>
-        subs.some(
-          (child) =>
-            child.toLowerCase() === subcategoryParam.toLowerCase()
-        )
-      );
-      if (foundParent) setCategory(foundParent[0]);
+  // ---------- FIND CATEGORY/SUBCATEGORY NAME ----------
+  const getCategoryNameById = (id) => {
+    if (!id || id === "All") return "";
+
+    for (const [parent, info] of Object.entries(categories)) {
+      if (String(info.id) === String(id)) return parent; // parent found
+      const child = info.children.find((c) => String(c.id) === String(id));
+      if (child) return child.name; // child found
     }
-  }, [subcategoryParam, categoryParam, categories]);
 
-  // ✅ Filter logic
+    return id;
+  };
+
+  // ---------- FILTER PRODUCTS ----------
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       const matchesCategory =
         category === "All" ||
-        p.parentcategory?.toLowerCase() === category.toLowerCase() ||
-        p.category?.toLowerCase() === category.toLowerCase();
-
-      const matchesSubcategory =
-        subcategory === "All" ||
-        p.category?.toLowerCase() === subcategory.toLowerCase();
+        String(p.categoryid) === String(category) ||
+        String(p.subcategoryid) === String(category);
 
       const matchesPrice = p.sellingprice <= price;
 
-      return matchesCategory && matchesSubcategory && matchesPrice;
+      return matchesCategory && matchesPrice;
     });
-  }, [products, category, subcategory, price]);
+  }, [products, category, price]);
 
-  // ✅ Loading / Error
+  // ---------- LOADING / ERROR ----------
   if (isProductsLoading || isCategoriesLoading)
     return (
       <div className="flex items-center justify-center h-screen text-primary">
@@ -113,25 +103,20 @@ const ProductsListing = () => {
       </div>
     );
 
-  // ✅ Handlers for dropdowns
-  const handleCategoryChange = (selectedCategory) => {
-    setCategory(selectedCategory);
-    setSubcategory("All");
-    navigate(`/products?category=${encodeURIComponent(selectedCategory)}`);
+  // ---------- HANDLERS ----------
+  const handleCategoryChange = (id) => {
+    setCategory(id);
+    navigate(`/products?category=${id}`);
   };
 
-  const handleSubcategoryChange = (selectedSub) => {
-    setSubcategory(selectedSub);
-    navigate(
-      `/products?category=${encodeURIComponent(
-        category
-      )}&subcategory=${encodeURIComponent(selectedSub)}`
-    );
+  const handleSubcategoryClick = (id) => {
+    // Only pass ONE ID in params
+    navigate(`/products?category=${id}`);
   };
 
   return (
     <div className="w-full pt-28 max-sm:pt-20 flex flex-col lg:flex-row relative min-h-screen">
-      {/* --- Sidebar --- */}
+      {/* ====================== SIDEBAR ====================== */}
       <aside
         className={`${
           toggleSidebar
@@ -139,7 +124,7 @@ const ProductsListing = () => {
             : "w-[4vw] max-sm:hidden"
         } bg-gradient-to-b from-mute to-primary/40 transition-all duration-300 lg:h-[100vh] px-4`}
       >
-        {/* --- Header --- */}
+        {/* Sidebar Header */}
         <div
           className={`flex pb-2 border-b-2 mb-5 border-primary/75 ${
             toggleSidebar ? "justify-between" : "justify-center"
@@ -158,15 +143,16 @@ const ProductsListing = () => {
           </div>
         </div>
 
-        {/* --- Filters --- */}
+        {/* ====================== FILTER BODY ====================== */}
         {toggleSidebar && (
           <div className="space-y-6 overflow-y-auto h-[80vh] pb-6">
-            {/* ✅ Price Range */}
+            {/* Price Filter */}
             <div>
               <h2 className="font-bold mb-2 text-primary/75 flex justify-between items-center">
                 <span>Price Range</span>
                 <span className="text-[#DD7427] font-semibold">{price} Rs</span>
               </h2>
+
               <input
                 type="range"
                 min="0"
@@ -176,55 +162,66 @@ const ProductsListing = () => {
                 onChange={(e) => setPrice(Number(e.target.value))}
                 className="w-full accent-theme"
               />
+
               <div className="flex justify-between text-sm mt-1 text-primary/60">
                 <span>0 Rs</span>
                 <span>{maxPrice} Rs</span>
               </div>
             </div>
 
-            {/* ✅ Category Dropdown */}
+            {/* Parent Category Dropdown */}
             <div>
               <h2 className="text-primary/75 font-bold mb-2">Category</h2>
               <div className="relative">
                 <select
                   value={category}
                   onChange={(e) => handleCategoryChange(e.target.value)}
-                  className="w-full bg-transparent border-2 border-primary/40 font-medium rounded-lg py-3 px-4 pr-10 text-primary/75 focus:outline-none appearance-none"
+                  className="w-full bg-transparent border-2 border-primary/40 font-medium rounded-lg py-3 px-4 pr-10 text-primary/75"
                 >
                   <option value="All">All</option>
-                  {Object.keys(categories).map((parent) => (
-                    <option key={parent} value={parent}>
+
+                  {Object.entries(categories).map(([parent, info]) => (
+                    <option key={info.id} value={info.id}>
                       {parent}
                     </option>
                   ))}
                 </select>
+
                 <FaPlay
                   size={10}
-                  className="absolute rotate-90 right-3 top-1/2 transform -translate-y-1/2 text-[#DD7427]"
+                  className="absolute rotate-90 right-3 top-1/2 -translate-y-1/2 text-[#DD7427]"
                 />
               </div>
             </div>
 
-            {/* ✅ Subcategory Dropdown */}
-            {category !== "All" && Array.isArray(categories[category]) && (
+            {/* Subcategories */}
+            {category !== "All" && (
               <div>
                 <h2 className="text-primary/75 font-bold mb-2">Subcategory</h2>
                 <div className="relative">
                   <select
-                    value={subcategory}
-                    onChange={(e) => handleSubcategoryChange(e.target.value)}
-                    className="w-full bg-transparent border-2 border-primary/40 font-medium rounded-lg py-3 px-4 pr-10 text-primary/75 focus:outline-none appearance-none"
+                    value="All" // Always show default
+                    onChange={(e) => handleSubcategoryClick(e.target.value)}
+                    className="w-full bg-transparent border-2 border-primary/40 font-medium rounded-lg py-3 px-4 pr-10 text-primary/75"
                   >
-                    <option value="All">All</option>
-                    {categories[category].map((child, index) => (
-                      <option key={index} value={child}>
-                        {child}
-                      </option>
-                    ))}
+                    <option value="All" disabled>
+                      Select Subcategory
+                    </option>
+
+                    {Object.entries(categories).map(([parent, info]) =>
+                      String(info.id) === String(category)
+                        ? info.children.map((child) => (
+                            <option key={child.id} value={child.id}>
+                              {child.name}
+                            </option>
+                          ))
+                        : null
+                    )}
                   </select>
+
                   <FaPlay
                     size={10}
-                    className="absolute rotate-90 right-3 top-1/2 transform -translate-y-1/2 text-[#DD7427]"
+                    className="absolute rotate-90 right-3 top-1/2 -translate-y-1/2 text-[#DD7427]"
                   />
                 </div>
               </div>
@@ -233,9 +230,9 @@ const ProductsListing = () => {
         )}
       </aside>
 
-      {/* --- Product Section --- */}
+      {/* ====================== PRODUCT SECTION ====================== */}
       <section className="flex-1 relative overflow-y-auto pb-4 no-scrollbar w-full h-[100vh]">
-        {/* --- Breadcrumb --- */}
+        {/* Breadcrumb */}
         <div className="bg-mute sticky top-0 px-5 z-20 flex justify-between items-center text-primary/75 text-sm font-medium max-sm:mt-2">
           <div className="font-normal py-1">
             <button className="text-primary" onClick={() => navigate("/")}>
@@ -251,13 +248,10 @@ const ProductsListing = () => {
             {category !== "All" && (
               <>
                 {" "}
-                / <span className="text-theme">{category}</span>
-              </>
-            )}
-            {subcategory !== "All" && (
-              <>
-                {" "}
-                / <span className="text-theme">{subcategory}</span>
+                /{" "}
+                <span className="text-theme">
+                  {getCategoryNameById(category)}
+                </span>
               </>
             )}
             {searchQuery && (
@@ -276,7 +270,7 @@ const ProductsListing = () => {
           </button>
         </div>
 
-        {/* --- Product Grid --- */}
+        {/* PRODUCT GRID */}
         <div
           className={`w-full gap-3 grid px-4 py-4 ${
             toggleSidebar ? "lg:grid-cols-4" : "lg:grid-cols-5"
@@ -291,8 +285,7 @@ const ProductsListing = () => {
               />
               <h2 className="text-xl font-semibold mb-2">No Products Found</h2>
               <p className="text-sm text-primary/50 max-w-md">
-                We couldn’t find any products in this category, subcategory, or
-                range.
+                We couldn’t find any products matching your selected filters.
               </p>
             </div>
           ) : (

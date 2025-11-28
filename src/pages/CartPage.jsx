@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaTrashAlt, FaTag } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 
 const CartPage = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
   const [savings, setSavings] = useState(0);
-  const [deliveryFee, setDeliveryFee] = useState(15);
+  const [deliveryFee, setDeliveryFee] = useState(50);
   const [total, setTotal] = useState(0);
 
   // ✅ Load cart
@@ -35,32 +35,42 @@ const CartPage = () => {
     setTotal(sub + deliveryFee);
   }, [cart]);
 
-  // ✅ Update quantity
+  // ==========================================================
+  // ✅ Update quantity with stock limit
+  // ==========================================================
   const updateQuantity = (productId, variantId, delta) => {
-    const updatedCart = cart
-      .map((item) => {
-        if (item.id === productId && item.stocktable?.[0]?.id === variantId) {
-          const newQty = Math.max(0, (item.quantity || 1) + delta);
-          return { ...item, quantity: newQty };
-        }
-        return item;
-      })
-      .filter((item) => item.quantity > 0);
+    const updatedCart = cart.map((item) => {
+      if (item.id === productId && item.stocktable?.[0]?.id === variantId) {
+        const maxStock = item.stocktable?.[0]?.quantity || 1;
+        const currentQty = item.quantity || 1;
+
+        let newQty = currentQty + delta;
+
+        // ❌ Prevent less than 1
+        if (newQty < 1) newQty = 1;
+
+        // ❌ Prevent exceeding max stock
+        if (newQty > maxStock) newQty = maxStock;
+
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    });
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // ✅ Remove item
+  // ==========================================================
+  // ❌ Remove item
+  // ==========================================================
   const removeItem = (productId, variantId) => {
     const updatedCart = cart.filter(
       (item) =>
-        !(
-          item.id === productId &&
-          item.stocktable?.[0]?.id === variantId
-        )
+        !(item.id === productId && item.stocktable?.[0]?.id === variantId)
     );
+
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("localStorageUpdated"));
@@ -90,6 +100,8 @@ const CartPage = () => {
                 item.thumbnailimage ||
                 "https://cdn-icons-png.flaticon.com/512/679/679821.png";
 
+              const maxStock = item.stocktable?.[0]?.quantity || 1;
+
               return (
                 <div key={`${item.id}-${variantId}`}>
                   <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
@@ -111,6 +123,9 @@ const CartPage = () => {
                           <span className="text-gray-400 line-through ml-2 text-sm">
                             ₹{item.mrp}
                           </span>
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          In Stock: {maxStock}
                         </p>
                       </div>
                     </div>
@@ -158,39 +173,43 @@ const CartPage = () => {
         </div>
 
         {/* 💰 Order Summary */}
-        <div className="w-full lg:w-1/3 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit lg:sticky lg:top-5">
-          <h2 className="font-semibold text-lg mb-4">Order Summary</h2>
+        {cart.length !== 0 && (
+          <div className="w-full lg:w-1/3 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit lg:sticky lg:top-5">
+            <h2 className="font-semibold text-lg mb-4">Order Summary</h2>
 
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
-            </div>
-            {savings > 0 && (
-              <div className="flex justify-between text-green-600 font-medium">
-                <span>You Saved</span>
-                <span>-₹{savings.toLocaleString()}</span>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="font-semibold">
+                  ₹{subtotal.toLocaleString()}
+                </span>
               </div>
-            )}
-            <div className="flex justify-between">
-              <span>Delivery Fee</span>
-              <span>₹{deliveryFee}</span>
+              {savings > 0 && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>You Saved</span>
+                  <span>-₹{savings.toLocaleString()}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span>Delivery Fee</span>
+                <span>₹{deliveryFee}</span>
+              </div>
+              <hr className="my-2 border-gray-200" />
+              <div className="flex justify-between text-base font-semibold">
+                <span>Total Payable</span>
+                <span>₹{total.toLocaleString()}</span>
+              </div>
             </div>
-            <hr className="my-2 border-gray-200" />
-            <div className="flex justify-between text-base font-semibold">
-              <span>Total Payable</span>
-              <span>₹{total.toLocaleString()}</span>
-            </div>
-          </div>
 
-          {/* Checkout Button */}
-          <button
-            onClick={() => navigate("/checkout")}
-            className="w-full mt-6 bg-primary text-white py-3 rounded-full font-medium hover:opacity-90"
-          >
-            Proceed to Checkout →
-          </button>
-        </div>
+            {/* Checkout Button */}
+            <button
+              onClick={() => navigate("/checkout")}
+              className="w-full mt-6 bg-primary text-white py-3 rounded-full font-medium hover:opacity-90"
+            >
+              Proceed to Checkout →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
