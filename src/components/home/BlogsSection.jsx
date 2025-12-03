@@ -1,9 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { fetchBlogs } from "../../api/userApi";
 
 const BlogsSection = () => {
   const navigate = useNavigate();
+  const [showAll, setShowAll] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // ✅ Detect screen size for responsive limit
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // ✅ Fetch blogs dynamically using React Query
   const {
@@ -15,7 +25,7 @@ const BlogsSection = () => {
     queryFn: fetchBlogs,
   });
 
-  // ✅ Loading and error handling
+  // ✅ Loading state
   if (isLoading) {
     return (
       <section className="bg-mute py-24 text-center text-primary">
@@ -24,6 +34,7 @@ const BlogsSection = () => {
     );
   }
 
+  // ✅ Error state
   if (isError) {
     return (
       <section className="bg-mute py-24 text-center text-red-600">
@@ -31,6 +42,11 @@ const BlogsSection = () => {
       </section>
     );
   }
+
+  // ✅ Determine how many blogs to show
+  const limit = isMobile ? 3 : 6;
+  const visibleBlogs = showAll ? blogs : blogs.slice(0, limit);
+  const shouldShowButton = blogs.length > limit;
 
   return (
     <section className="relative w-full bg-mute text-primary py-20 px-6 sm:px-10 md:px-10">
@@ -47,8 +63,8 @@ const BlogsSection = () => {
       </div>
 
       {/* --- Blog Grid --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 relative z-10">
-        {blogs.map((blog) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 relative z-10 transition-all duration-500">
+        {visibleBlogs.map((blog) => {
           const images =
             blog.imageurl && blog.imageurl.startsWith("[")
               ? JSON.parse(blog.imageurl)
@@ -99,12 +115,23 @@ const BlogsSection = () => {
         })}
       </div>
 
+      {/* --- View More / View Less Button --- */}
+      {shouldShowButton && (
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={() => setShowAll((prev) => !prev)}
+            className="bg-theme text-white px-8 py-3 rounded-full font-medium shadow-md hover:bg-theme/90 transition-all"
+          >
+            {showAll ? "View Less" : "View More"}
+          </button>
+        </div>
+      )}
+
       {/* --- Animated Shine Overlay --- */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-[-150%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform rotate-12 animate-[shine_6s_infinite]"></div>
       </div>
 
-      {/* --- Animation Keyframes --- */}
       <style>{`
         @keyframes shine {
           0% { left: -150%; }

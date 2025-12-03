@@ -7,10 +7,6 @@ const ServiceBanner = () => {
       text: "Free COD Available",
     },
     {
-      icon: <FaTruck className="text-white text-2xl sm:text-3xl" />,
-      text: "Free Shipping Above ₹1198",
-    },
-    {
       icon: <FaBoxOpen className="text-white text-2xl sm:text-3xl" />,
       text: "Easy 7-Day Return",
     },
@@ -46,8 +42,8 @@ const ServiceBanner = () => {
       </div>
 
       {/* Gradient Fade on sides */}
-      <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-mute via-mute/80 to-transparent pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-mute via-mute/80 to-transparent pointer-events-none"></div>
+      <div className="absolute top-0 left-0 w-32 max-sm:w-16 h-full bg-gradient-to-r from-mute via-mute/80 to-transparent pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-32 max-sm:w-16 h-full bg-gradient-to-l from-mute via-mute/80 to-transparent pointer-events-none"></div>
 
       {/* Animation Styles */}
       <style>{`

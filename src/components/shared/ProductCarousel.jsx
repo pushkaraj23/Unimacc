@@ -19,7 +19,7 @@ const ProductCarousel = ({
   return (
     <div className="px-4 sm:px-6 md:px-10">
       {/* --- Header --- */}
-      {items.length !== 0 ? (
+      {items.length !== 0 && (
         <section className="border-b-2 border-primary/60 py-2 mb-5 flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl text-primary font-medium">
             {title}
@@ -35,22 +35,23 @@ const ProductCarousel = ({
             </button>
           )}
         </section>
-      ) : (
-        <></>
       )}
 
       {/* --- Swiper Section --- */}
       <section className="py-2 relative">
-        {/* Left Fade (for symmetry on desktop) */}
+        {/* Fades for visual symmetry */}
         <div className="hidden md:block pointer-events-none absolute left-0 top-0 h-full w-12 bg-gradient-to-r from-mute/70 to-transparent z-10" />
-        {/* Right Fade */}
         <div className="hidden md:block pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-mute/70 to-transparent z-10" />
+
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={15}
           slidesPerView={slidesMobile}
           navigation
-          pagination={{ clickable: true }}
+          pagination={{
+            clickable: true,
+            el: ".custom-pagination", // 👈 Use custom pagination container
+          }}
           grabCursor={true}
           loop={true}
           autoplay={{
@@ -73,6 +74,9 @@ const ProductCarousel = ({
               </div>
             </SwiperSlide>
           ))}
+
+          {/* 👇 Custom pagination container */}
+          <div className="custom-pagination no-scrollbar px-10 max-sm:px-6" />
         </Swiper>
       </section>
     </div>

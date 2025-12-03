@@ -56,7 +56,7 @@ const CategoryListing = () => {
   }
 
   return (
-    <div className="px-10 max-sm:px-6 grid grid-cols-2 max-sm:grid-cols-1 my-10 gap-3">
+    <div className="px-10 max-sm:px-6 grid grid-cols-2 max-sm:grid-cols-1 mt-10 gap-3">
       {collections.slice(0, 4).map((item, idx) => {
         const categoryName = categoryNames[item.subcategoryid] || "Products";
         const even = idx % 2 === 0;

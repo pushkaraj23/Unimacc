@@ -32,7 +32,7 @@ const AwardsSection = () => {
       {/* Section Title */}
       <div className="text-center mb-16 relative z-10">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-primary">
-          Awards & Accolades
+          Awards & Recognition
         </h2>
         <div className="w-24 h-1 bg-theme mx-auto mt-4 rounded-full"></div>
         <p className="text-primary/70 mt-4 text-base sm:text-lg max-w-2xl mx-auto">
@@ -42,46 +42,48 @@ const AwardsSection = () => {
       </div>
 
       {/* Swiper Carousel */}
-      <Swiper
-        modules={[Autoplay]}
-        spaceBetween={25}
-        loop={true}
-        autoplay={{
-          delay: 2500,
-          disableOnInteraction: false,
-        }}
-        breakpoints={{
-          0: { slidesPerView: 2 },
-          640: { slidesPerView: 2 },
-          768: { slidesPerView: 3 },
-          1024: { slidesPerView: 4 },
-        }}
-        className="relative z-10"
-      >
-        {awards.map((award, index) => (
-          <SwiperSlide key={index}>
-            <div className="group bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-2xl hover:shadow-theme/20 transition-all duration-500 relative overflow-hidden">
-              {/* Animated Glow Line */}
-              <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-theme/70 transition-all duration-500"></div>
+      <div className="h-auto">
+        <Swiper
+          modules={[Autoplay]}
+          spaceBetween={20}
+          loop={true}
+          autoplay={{
+            delay: 2500,
+            disableOnInteraction: false,
+          }}
+          breakpoints={{
+            0: { slidesPerView: 2 },
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 },
+          }}
+          className="relative z-10"
+        >
+          {awards.map((award, index) => (
+            <SwiperSlide key={index} className="h-full">
+              <div className="group h-64 bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-2xl hover:shadow-theme/20 transition-all duration-500 relative overflow-hidden flex flex-col items-center justify-center w-full">
+                {/* Animated Glow Line */}
+                <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-theme/70 transition-all duration-500"></div>
 
-              {/* Award Icon */}
-              <div className="w-20 h-20 mx-auto flex items-center justify-center bg-theme/10 rounded-full mb-6 relative">
-                <img
-                  src={award.img}
-                  alt={award.title}
-                  className="w-10 h-10 object-contain transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-theme/10 to-transparent opacity-0 group-hover:opacity-100 blur-lg transition-all"></div>
+                {/* Award Icon */}
+                <div className="w-20 h-20 flex items-center justify-center bg-theme/10 rounded-full mb-3 relative shrink-0">
+                  <img
+                    src={award.img}
+                    alt={award.title}
+                    className="w-10 h-10 object-contain transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-theme/10 to-transparent opacity-0 group-hover:opacity-100 blur-lg transition-all"></div>
+                </div>
+
+                {/* Title */}
+                <p className="text-center text-primary font-semibold text-base sm:text-lg leading-snug tracking-wide group-hover:text-theme transition-colors mt-auto">
+                  {award.title}
+                </p>
               </div>
-
-              {/* Title */}
-              <p className="text-center text-primary font-semibold text-base sm:text-lg leading-snug tracking-wide group-hover:text-theme transition-colors">
-                {award.title}
-              </p>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
       {/* Shine Animation Overlay */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">

@@ -22,15 +22,23 @@ const WishlistPage = () => {
   // ✅ Quantity change (check product + variant)
   const handleQuantityChange = (productId, variantId, delta) => {
     const updatedList = wishlist.map((item) => {
-      if (
-        item.id === productId &&
-        item.stocktable?.[0]?.id === variantId
-      ) {
-        const newQty = Math.max(1, (item.quantity || 1) + delta);
+      if (item.id === productId && item.stocktable?.[0]?.id === variantId) {
+        const maxStock = item.stocktable?.[0]?.quantity || 1;
+        const currentQty = item.quantity || 1;
+
+        let newQty = currentQty + delta;
+
+        // ❌ Prevent below 1
+        if (newQty < 1) newQty = 1;
+
+        // ❌ Prevent exceeding max stock
+        if (newQty > maxStock) newQty = maxStock;
+
         return { ...item, quantity: newQty };
       }
       return item;
     });
+
     updateLocalStorage(updatedList);
   };
 
@@ -38,10 +46,7 @@ const WishlistPage = () => {
   const handleRemove = (productId, variantId) => {
     const updatedList = wishlist.filter(
       (item) =>
-        !(
-          item.id === productId &&
-          item.stocktable?.[0]?.id === variantId
-        )
+        !(item.id === productId && item.stocktable?.[0]?.id === variantId)
     );
     updateLocalStorage(updatedList);
   };
@@ -54,15 +59,20 @@ const WishlistPage = () => {
 
     // Check if the same product variant already exists
     const existingIndex = cart.findIndex(
-      (c) =>
-        c.id === item.id &&
-        c.stocktable?.[0]?.id === variantId
+      (c) => c.id === item.id && c.stocktable?.[0]?.id === variantId
     );
 
     if (existingIndex !== -1) {
-      cart[existingIndex].quantity += item.quantity || 1;
+      const maxStock = item.stocktable?.[0]?.quantity || 1;
+      const newQty = cart[existingIndex].quantity + item.quantity;
+
+      cart[existingIndex].quantity = Math.min(newQty, maxStock);
     } else {
-      cart.push({ ...item, quantity: item.quantity || 1 });
+      const maxStock = item.stocktable?.[0]?.quantity || 1;
+      cart.push({
+        ...item,
+        quantity: Math.min(item.quantity || 1, maxStock),
+      });
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));

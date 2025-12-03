@@ -50,7 +50,7 @@ const PopularSection = () => {
 
   // ✅ Main Section
   return (
-    <section className="py-8">
+    <section className="pt-8">
       <ProductCarousel
         title="Popular Products"
         items={premiumProducts}

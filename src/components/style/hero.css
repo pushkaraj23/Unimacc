@@ -1,58 +1,122 @@
-.hero-swiper {
-  overflow: visible !important; /* let side slides show */
-  padding: 0 2rem;
+/* Container with perspective (like Swiper coverflow) */
+.hero-swiper-wrapper {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1600px;
+  overflow: visible;
 }
 
-.swiper-slide {
-  opacity: 0.5;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+/* Each slide is absolutely centered; we move via transforms */
+.hero-slide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  width: auto;
+  pointer-events: auto;
 }
 
-.swiper-slide-active {
-  transform: scale(1.05);
-  opacity: 1;
+/* Slide image styling */
+.hero-slide-image {
+  width: 90vw;
+  max-width: 1400px;
+  height: 80vh;
+  max-height: 800px;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.5s ease;
 }
 
-.swiper-slide-prev,
-.swiper-slide-next {
-  opacity: 0.7;
+/* Arrows */
+.hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: 120;
 }
 
-/* 🟠 Navigation Arrows */
-.swiper-button-next,
-.swiper-button-prev {
-  color: #ff7a00 !important; /* Your brand color */
-  transition: color 0.3s ease;
+.hero-nav-left {
+  left: 6%;
 }
 
-.swiper-button-next:hover,
-.swiper-button-prev:hover {
-  color: #e56e00 !important;
+.hero-nav-right {
+  right: 6%;
 }
 
-.swiper-button-next::after,
-.swiper-button-prev::after {
-  font-size: 28px; /* Adjust arrow size */
-  font-weight: bold;
+.hero-nav:hover {
+  background: rgba(0, 0, 0, 0.75);
+  transform: translateY(-50%) scale(1.05);
 }
 
-/* ⚪ Pagination Dots (Bullets) */
-.swiper-pagination-bullet {
-  background-color: #d1d1d1 !important; /* Inactive dot color */
-  opacity: 1;
-  width: 12px;
-  height: 12px;
-  margin: 0 5px !important;
-  transition: background-color 0.3s ease;
+/* Pagination bullets */
+.hero-pagination {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 130;
 }
 
-.swiper-pagination-bullet-active {
-  background-color: #ff7a00 !important; /* Active dot color */
+.hero-bullet {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease, opacity 0.2s ease;
 }
 
-/* Optional: make dots into small lines (modern style) */
-.swiper-pagination-bullet {
-  border-radius: 6px; /* for rounded rectangle look */
+.hero-bullet-active {
   width: 20px;
-  height: 6px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .hero-swiper-wrapper {
+    height: fit;
+  }
+
+  .hero-slide-image {
+    width: 85vw;
+    height: auto;
+  }
+
+  .hero-nav {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .hero-nav-left {
+    left: 4%;
+  }
+
+  .hero-nav-right {
+    right: 4%;
+  }
 }

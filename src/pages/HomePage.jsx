@@ -20,15 +20,15 @@ const HomePage = () => {
       <SalesSection />
       <Banner />
       <VideoSection />
+      <AdBanners />
       <TrendingSection />
       <AwardsSection />
       <ServiceBanner />
       <div className="h-10" />
       <PopularSection />
-      <AdBanners />
-      <CategoryOne />
+      {/* <CategoryOne /> */}
       {/* <Bestsellers /> */}
-      <CategoryTwo />
+      {/* <CategoryTwo /> */}
       <CategoryListing />
       <BlogsSection />
     </div>

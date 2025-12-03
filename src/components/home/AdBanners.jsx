@@ -44,47 +44,48 @@ const AdBanners = () => {
   const getBanner = (index) => banners[index] || {};
 
   return (
-    <div className="px-10 grid grid-cols-5 my-10 gap-3 max-sm:gap-0 max-sm:grid-cols-1 max-sm:px-6">
+    <div className="grid grid-cols-3 gap-5 px-5 max-sm:grid-cols-1 my-12">
       {/* --- Card 1 (Main Banner) --- */}
       <div
-        className="col-span-3 bg-gradient-to-br group from-primary/20 to-primary/70 p-12 max-sm:p-8 rounded-xl min-h-[80vh] flex flex-col justify-evenly max-sm:mb-4 relative overflow-hidden cursor-pointer"
-        onClick={() => navigate(`/offers/${getBanner(0).offer_id}`)}
+        className="col-span-2 max-sm:col-span-1 flex flex-col justify-center"
+        // onClick={() => navigate(`/offers/${getBanner(0).offer_id}`)}
+        onClick={() => navigate("/products")}
       >
         {getBanner(0).image && (
           <img
             src={getBanner(0).image}
             alt={getBanner(0).title}
-            className="absolute inset-0 w-full group-hover:brightness-75 transition-all duration-300 h-full object-cover rounded-xl"
+            className="rounded-3xl"
           />
         )}
       </div>
-
       {/* --- Right Section --- */}
-      <section className="col-span-2 h-full max-sm:h-fit flex flex-col gap-3 max-sm:gap-4">
+      <section className="flex flex-col justify-center gap-5 col-span-1">
         {/* --- Card 2 --- */}
         <div
-          className="w-full relative h-3/5 bg-gradient-to-br group from-primary/20 to-primary/70 p-10 max-sm:p-8 max-sm:h-[30vh] rounded-xl overflow-hidden cursor-pointer"
-          onClick={() => navigate(`/offers/${getBanner(1).offer_id}`)}
+          className=""
+          onClick={() => navigate(`/products`)}
         >
           {getBanner(1).image && (
             <img
               src={getBanner(1).image}
               alt={getBanner(1).title}
-              className="absolute inset-0 w-full group-hover:brightness-75 transition-all duration-300 h-full object-cover rounded-xl"
+              className="rounded-3xl"
             />
           )}
         </div>
 
         {/* --- Card 3 --- */}
         <div
-          className="w-full relative group h-2/5 bg-gradient-to-br from-primary/20 to-primary/70 px-8 max-sm:px-6 max-sm:h-[20vh] pt-6 rounded-xl overflow-hidden cursor-pointer"
-          onClick={() => navigate(`/offers/${getBanner(2).offer_id}`)}
+          className=""
+          // onClick={() => navigate(`/offers/${getBanner(2).offer_id}`)}
+          onClick={() => navigate("/products")}
         >
           {getBanner(2).image && (
             <img
               src={getBanner(2).image}
               alt={getBanner(2).title}
-              className="absolute group-hover:brightness-75 transition-all duration-300 inset-0 w-full h-full object-cover rounded-xl"
+              className="rounded-3xl"
             />
           )}
         </div>

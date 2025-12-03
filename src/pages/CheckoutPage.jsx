@@ -352,7 +352,7 @@ const CheckoutPage = () => {
                             );
 
                           otpMutation.mutate({
-                            channel: "phone",
+                            channel: "whatsapp",
                             identifier: userData.phone,
                             purpose: "login",
                           });
@@ -364,7 +364,7 @@ const CheckoutPage = () => {
                             );
 
                           verifyMutation.mutate({
-                            channel: "phone",
+                            channel: "whatsapp",
                             identifier: userData.phone,
                             purpose: "login",
                             code: otp,
@@ -379,7 +379,7 @@ const CheckoutPage = () => {
                       <button
                         onClick={() =>
                           otpMutation.mutate({
-                            channel: "phone",
+                            channel: "whatsapp",
                             identifier: userData.phone,
                             purpose: "login",
                           })

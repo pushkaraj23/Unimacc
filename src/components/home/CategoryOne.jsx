@@ -17,7 +17,7 @@ const CategoryOne = () => {
   if (isError)
     return <p className="text-center text-red-500">Failed to load products.</p>;
   return (
-    <section className="py-8">
+    <section className="">
       <ProductCarousel
         title="Bathroom"
         items={bathroomProducts}
