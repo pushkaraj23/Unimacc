@@ -12,6 +12,10 @@ const HeroSection = () => {
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -40,8 +44,6 @@ const HeroSection = () => {
     const duplicateCount = 4 - heroSlides.length;
     return [...heroSlides, ...heroSlides.slice(0, duplicateCount)];
   }, [heroSlides]);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   // Make sure currentIndex resets if slides change length
   useEffect(() => {
@@ -98,9 +100,6 @@ const HeroSection = () => {
         Failed to load hero section.
       </div>
     );
-
-  const [touchStartX, setTouchStartX] = useState(null);
-  const [touchEndX, setTouchEndX] = useState(null);
 
   const handleTouchStart = (e) => {
     setTouchStartX(e.touches[0].clientX);
