@@ -134,7 +134,7 @@ const VideoSection = () => {
             {/* Title Overlay */}
             <div className="p-4 text-left w-full absolute bg-gradient-to-b from-black/0 pt-20 to-black h-fit bottom-0">
               <h3 className="text-lg font-semibold text-white leading-snug line-clamp-2">
-                {video.title}
+                {/* {video.title} */}
               </h3>
               <p className="text-sm text-white/80 mt-1">{video.subtitle}</p>
             </div>

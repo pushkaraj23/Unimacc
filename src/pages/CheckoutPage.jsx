@@ -60,7 +60,6 @@ const CheckoutPage = () => {
     mutationFn: generateOtp,
     onSuccess: (data) => {
       showTempMessage(`✅ OTP sent successfully to ${userData.phone}!`);
-      setOtp(data.code);
     },
     onError: () => showTempMessage("❌ Failed to send OTP. Please try again."),
   });
@@ -332,9 +331,7 @@ const CheckoutPage = () => {
                     placeholder="Enter OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
-                    className={`w-full border text-sm border-gray-300 rounded-md px-4 py-2 ${
-                      otp ? "" : "hidden "
-                    }`}
+                    className={`w-full border text-sm border-gray-300 rounded-md px-4 py-2`}
                   />
                   <div className="flex gap-2">
                     <button
@@ -375,20 +372,19 @@ const CheckoutPage = () => {
                     >
                       {otp ? "Verify OTP" : "Get OTP"}
                     </button>
-                    {otp && (
-                      <button
-                        onClick={() =>
-                          otpMutation.mutate({
-                            channel: "whatsapp",
-                            identifier: userData.phone,
-                            purpose: "login",
-                          })
-                        }
-                        className="bg-primary text-white px-6 py-2 rounded-md text-sm font-medium"
-                      >
-                        Resend OTP
-                      </button>
-                    )}
+
+                    <button
+                      onClick={() =>
+                        otpMutation.mutate({
+                          channel: "whatsapp",
+                          identifier: userData.phone,
+                          purpose: "login",
+                        })
+                      }
+                      className="bg-primary text-white px-6 py-2 rounded-md text-sm font-medium"
+                    >
+                      Resend OTP
+                    </button>
                   </div>
                 </>
               )}

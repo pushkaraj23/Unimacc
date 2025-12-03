@@ -309,7 +309,6 @@ export const fetchBlogById = async (id) => {
   }
 };
 
-// ✅ Fetch category name by ID (Axios version)
 export const fetchCategoryNameById = async (id) => {
   try {
     const response = await axiosInstance.get(`/categories/${id}`);
@@ -345,6 +344,119 @@ export const fetchOrderById = async (id) => {
   } catch (error) {
     console.error(
       "❌ fetchOrderById error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const fetchUserById = async (id) => {
+  try {
+    if (!id) throw new Error("User ID is required");
+
+    const res = await axiosInstance.get(`/users/${id}`);
+
+    if (res.status !== 200) {
+      throw new Error(`Failed to fetch user with ID ${id}`);
+    }
+
+    return res.data?.body || res.data;
+  } catch (error) {
+    console.error(
+      "❌ fetchUserById error:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+};
+
+export const addUser = async (payload) => {
+  try {
+    const res = await axiosInstance.post(`/users`, payload);
+
+    if (res.status !== 200) {
+      throw new Error("Failed to add user");
+    }
+
+    return res.data?.body || res.data;
+  } catch (error) {
+    console.error("❌ addUser error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const editUser = async (id, payload) => {
+  try {
+    const res = await axiosInstance.put(`/users/update/${id}`, payload);
+
+    if (res.status !== 200) {
+      throw new Error("Failed to edit user");
+    }
+
+    return res.data?.body || res.data;
+  } catch (error) {
+    console.error("❌ editUser error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const fetchUserAddresses = async (userId) => {
+  try {
+    if (!userId) throw new Error("User ID is required");
+
+    const res = await axiosInstance.get(
+      `/customeraddresses/fetchByUser/${userId}`
+    );
+
+    if (res.status !== 200) {
+      throw new Error(`Failed to fetch addresses for user ${userId}`);
+    }
+
+    return res.data?.body || res.data;
+  } catch (error) {
+    console.error(
+      "❌ fetchUserAddresses error:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+};
+
+export const editCustomerAddress = async (id, payload) => {
+  try {
+    const res = await axiosInstance.put(
+      `/customeraddresses/update/${id}`,
+      payload
+    );
+
+    if (res.status !== 200) {
+      throw new Error("Failed to edit address");
+    }
+
+    return res.data?.body || res.data;
+  } catch (error) {
+    console.error(
+      "❌ editCustomerAddress error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const deleteCustomerAddress = async (id) => {
+  try {
+    if (!id) throw new Error("Address ID is required");
+
+    const res = await axiosInstance.delete(`/customeraddresses/${id}`);
+
+    if (res.status !== 200) {
+      throw new Error(`Failed to delete address with ID ${id}`);
+    }
+
+    return res.data?.body || res.data;
+  } catch (error) {
+    console.error(
+      "❌ deleteCustomerAddress error:",
       error.response?.data || error.message
     );
     throw error;
