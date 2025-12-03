@@ -170,11 +170,13 @@ const HeroSection = () => {
               }}
               // onClick={() => navigate(`/offers/${slide.offer_id}`)}
             >
-              <img
-                src={imageSrc}
-                alt={slide.title}
-                className="hero-slide-image"
-              />
+              <div className="overflow-hidden rounded-3xl">
+                <img
+                  src={imageSrc}
+                  alt={slide.title}
+                  className="hero-slide-image"
+                />
+              </div>
             </div>
           );
         })}

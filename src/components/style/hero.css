@@ -25,10 +25,8 @@
 
 /* Slide image styling */
 .hero-slide-image {
-  width: 90vw;
-  max-width: 1400px;
-  height: 80vh;
-  max-height: 800px;
+  min-width: 90vw;
+  height: fit-content;
   object-fit: contain;
   object-position: center;
   transition: transform 0.5s ease;
