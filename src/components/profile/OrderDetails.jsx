@@ -82,11 +82,11 @@ const OrderDetails = () => {
 
       {/* Order Items */}
       <h3 className="text-xl font-semibold mb-3 text-theme">Items</h3>
-      <div className="bg-white p-6 rounded-xl shadow-sm border space-y-4">
+      <div className="bg-white p-5 rounded-xl shadow-sm border space-y-4">
         {order.items.map((item) => (
           <div
             key={item.id}
-            className="flex justify-between items-center border-b pb-3"
+            className="flex justify-between items-center border-b pb-3 last:pb-0 last:border-none"
           >
             <div className="flex items-center gap-4">
               {item.color && (

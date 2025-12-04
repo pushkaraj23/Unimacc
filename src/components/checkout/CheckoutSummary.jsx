@@ -116,7 +116,7 @@ const CheckoutSummary = ({
           }
 
           localStorage.removeItem("cart");
-          navigate(`/orders/${orderData.id}`);
+          navigate(`/order/${orderData.id}`);
         },
         prefill: {
           name: selectedAddress.deliveredtopersonname || "Customer",
