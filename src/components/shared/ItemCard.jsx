@@ -131,7 +131,7 @@ const ItemCard = ({ product }) => {
         )}
 
         {discountpercent !== 0 && (
-          <div className="absolute top-2 -right-3 -translate-x-1/2  flex justify-between items-center bg-theme text-white text-xs md:text-[.9vw] font-semibold px-3 py-1.5 rounded-full">
+          <div className="absolute top-2 left-8 -translate-x-1/2  flex justify-between items-center bg-theme text-white text-xs md:text-[.9vw] font-semibold px-3 py-1.5 rounded-full">
             <span className="text-end">
               {discountpercent}%<br /> OFF
             </span>
