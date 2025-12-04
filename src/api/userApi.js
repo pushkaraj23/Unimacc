@@ -462,3 +462,17 @@ export const deleteCustomerAddress = async (id) => {
     throw error;
   }
 };
+
+export const fetchOrder = async (orderId) => {
+  try {
+    const res = await axiosInstance.get(`/orders/${orderId}`);
+    if (res.status !== 200) throw new Error("Failed to fetch order details");
+    return res.data.body;
+  } catch (error) {
+    console.error(
+      "❌ fetchOrder error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};

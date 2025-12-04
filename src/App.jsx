@@ -16,6 +16,7 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import ReturnRefundPolicy from "./pages/ReturnRefundPolicy";
 import BlogsDetailed from "./pages/BlogsDetailed";
+import OrderDetails from "./components/profile/OrderDetails";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/compare" element={<CompareProducts />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/order/:id" element={<OrderDetails />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/offers/:id" element={<OffersPage />} />
         <Route path="/blogs/:id" element={<BlogsDetailed />} />

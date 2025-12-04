@@ -7,7 +7,7 @@ const CartPage = () => {
   const [cart, setCart] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
   const [savings, setSavings] = useState(0);
-  const [deliveryFee, setDeliveryFee] = useState(50);
+  const [deliveryFee, setDeliveryFee] = useState(0);
   const [total, setTotal] = useState(0);
 
   // ✅ Load cart

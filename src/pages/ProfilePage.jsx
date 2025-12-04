@@ -12,8 +12,8 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
+
   const [signupData, setSignupData] = useState({
     firstname: "",
     lastname: "",
@@ -24,13 +24,13 @@ const ProfilePage = () => {
 
   const [formData, setFormData] = useState({ phone: "" });
 
-  // Load user ID
+  // Load stored user
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("user"));
     if (stored?.userid) setUser(stored);
   }, []);
 
-  // Fetch user details if ID is stored
+  // Fetch user details
   const { data: fetchedUser, refetch: refetchUser } = useQuery({
     queryKey: ["userDetails", user?.userid],
     queryFn: () => fetchUserById(user.userid),
@@ -46,11 +46,21 @@ const ProfilePage = () => {
     },
   });
 
-  // Handle input changes
+  // Logout Function
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
+    window.dispatchEvent(new Event("localStorageUpdated"));
+    setUser(null);
+    window.location.reload(); // Refresh component
+  };
+
+  // Input Handlers
   const handleSignupChange = (e) => {
     const { name, value } = e.target;
     setSignupData((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -60,24 +70,24 @@ const ProfilePage = () => {
   const generateOtpMutation = useMutation({
     mutationFn: async () => {
       const payload = {
-        channel: "phone",
+        channel: "whatsapp",
         identifier: formData.phone,
         purpose: "login",
       };
       return await generateOtp(payload);
     },
-    onSuccess: (res) => {
-      setOtp(res.code);
+    onSuccess: () => {
       setIsOtpSent(true);
-      alert(`✅ OTP sent successfully! (Dev Mode: ${res.code})`);
+      setOtp("");
+      alert("✅ OTP sent successfully on WhatsApp!");
     },
   });
 
-  // Verify OTP (Signin)
+  // Verify OTP
   const verifyOtpMutation = useMutation({
     mutationFn: async () => {
       const payload = {
-        channel: "phone",
+        channel: "whatsapp",
         identifier: formData.phone,
         purpose: "login",
         code: otp,
@@ -92,12 +102,12 @@ const ProfilePage = () => {
         refetchUser();
         alert("✅ OTP verified successfully!");
       } else {
-        alert("❌ Wrong OTP!");
+        alert("❌ Incorrect OTP!");
       }
     },
   });
 
-  // Signup mutation
+  // Signup Mutation
   const signupMutation = useMutation({
     mutationFn: async () => {
       const payload = {
@@ -113,38 +123,55 @@ const ProfilePage = () => {
         localStorage.setItem("user", JSON.stringify(newUser));
         setUser(newUser);
         refetchUser();
-        alert("✅ Signup successful!");
+        alert("✅ Account created successfully!");
       }
     },
   });
 
-  // ✅ If logged in
+  // ---------------------------
+  // If Logged In → Show Profile
+  // ---------------------------
   if (user && fetchedUser) {
     return (
       <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
-        <div className="font-normal py-1 text-sm mb-2">
-          <button className="text-primary" onClick={() => navigate("/")}>
-            Home
-          </button>{" "}
-          / <button className="text-theme">Profile</button>
+        <div className="font-normal py-1 text-sm mb-2 flex justify-between items-center">
+          <div>
+            <button className="text-primary" onClick={() => navigate("/")}>
+              Home
+            </button>{" "}
+            / <button className="text-theme">Profile</button>
+          </div>
+
+          {/* ✅ LOGOUT BUTTON */}
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600"
+          >
+            Logout
+          </button>
         </div>
+
         <h1 className="text-3xl font-semibold mb-6">Profile Page</h1>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <ProfileDetails user={fetchedUser} refetch={refetchUser} />
           <ProfileAddresses userid={user.userid} />
         </div>
+
         <ProfileOrders userid={user.userid} />
       </div>
     );
   }
 
-  // 🧾 If not logged in
+  // ---------------------------
+  // Not Logged In (Sign-in + OTP)
+  // ---------------------------
   return (
     <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
       {!isSignup ? (
-        // ---- Sign In ----
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8">
+        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8 mt-4 md:mb-10 md:mt-12">
           <h1 className="text-3xl font-semibold mb-6">Sign In</h1>
+
           <form className="space-y-6">
             <input
               type="text"
@@ -155,16 +182,18 @@ const ProfilePage = () => {
               className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
               required
             />
+
             {isOtpSent && (
               <input
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter OTP"
+                placeholder="Enter OTP received on WhatsApp"
                 className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
               />
             )}
-            {!isOtpSent && (
+
+            {!isOtpSent ? (
               <button
                 type="button"
                 onClick={() => generateOtpMutation.mutate()}
@@ -172,28 +201,32 @@ const ProfilePage = () => {
               >
                 Get OTP
               </button>
-            )}
-            {isOtpSent && (
+            ) : (
               <button
                 type="button"
                 onClick={() => verifyOtpMutation.mutate()}
-                className="bg-primary text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-theme"
+                className="bg-primary text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-primary/80"
               >
                 Verify OTP
               </button>
             )}
+
             <p
-              onClick={() => setIsSignup(true)}
-              className="text-sm text-center text-primary mt-4 cursor-pointer hover:underline"
+              onClick={() => {
+                setIsSignup(true);
+                setIsOtpSent(false);
+                setOtp("");
+              }}
+              className="text-sm text-center text-primary cursor-pointer group"
             >
-              Don’t have an account? Sign up
+              Don’t have an account? <span className="text-theme group-hover:underline">Sign up</span>
             </p>
           </form>
         </div>
       ) : (
-        // ---- Sign Up ----
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8">
+        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8 mt-4 md:mb-10 md:mt-12">
           <h1 className="text-3xl font-semibold mb-6">Create Account</h1>
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -209,8 +242,9 @@ const ProfilePage = () => {
                 onChange={handleSignupChange}
                 placeholder="First Name"
                 required
-                className="border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
+                className="border border-gray-300 rounded-md px-4 py-3 text-sm"
               />
+
               <input
                 type="text"
                 name="lastname"
@@ -218,17 +252,19 @@ const ProfilePage = () => {
                 onChange={handleSignupChange}
                 placeholder="Last Name"
                 required
-                className="border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
+                className="border border-gray-300 rounded-md px-4 py-3 text-sm"
               />
             </div>
+
             <input
               type="date"
               name="dob"
               value={signupData.dob}
               onChange={handleSignupChange}
               required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full focus:ring-2 focus:ring-theme"
+              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
             />
+
             <input
               type="email"
               name="email"
@@ -236,8 +272,9 @@ const ProfilePage = () => {
               onChange={handleSignupChange}
               placeholder="Email"
               required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full focus:ring-2 focus:ring-theme"
+              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
             />
+
             <input
               type="text"
               name="mobile"
@@ -245,19 +282,25 @@ const ProfilePage = () => {
               onChange={handleSignupChange}
               placeholder="Mobile Number"
               required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full focus:ring-2 focus:ring-theme"
+              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
             />
+
             <button
               type="submit"
               className="bg-theme text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-theme/80"
             >
               Create Account
             </button>
+
             <p
-              onClick={() => setIsSignup(false)}
-              className="text-sm text-center text-primary mt-4 cursor-pointer hover:underline"
+              onClick={() => {
+                setIsSignup(false);
+                setIsOtpSent(false);
+                setOtp("");
+              }}
+              className="text-sm text-center text-primary mt-4 cursor-pointer group"
             >
-              Already have an account? Sign in
+              Already have an account? <span className="text-theme group-hover:underline">Sign in</span>
             </p>
           </form>
         </div>
