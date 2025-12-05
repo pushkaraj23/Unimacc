@@ -3,7 +3,22 @@ import axiosInstance from "./axiosInstance";
 export const fetchProducts = async () => {
   const res = await axiosInstance.get("/products");
   if (res.status !== 200) throw new Error("Failed to fetch products");
-  return res.data.body || [];
+
+  const products = res.data.body || [];
+
+  // 🔍 Filter out products whose total stock quantity is 0
+  return products.filter((product) => {
+    // If stocktable is missing or empty → treat as 0
+    if (!product.stocktable || product.stocktable.length === 0) return false;
+
+    // Calculate total quantity across all variants
+    const totalQty = product.stocktable.reduce(
+      (sum, variant) => sum + (parseInt(variant.quantity) || 0),
+      0
+    );
+
+    return totalQty > 0; // keep only products with quantity > 0
+  });
 };
 
 export const fetchProductsByCategory = async (categoryName) => {

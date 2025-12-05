@@ -58,15 +58,12 @@ const CategoryListing = () => {
   return (
     <div className="px-10 max-sm:px-6 grid grid-cols-2 max-sm:grid-cols-1 mt-10 gap-3">
       {collections.slice(0, 4).map((item, idx) => {
-        const categoryName = categoryNames[item.subcategoryid] || "Products";
-        const even = idx % 2 === 0;
+        const categoryId = item.categoryid || item.subcategoryid;
 
         return (
           <div
             key={item.id}
-            onClick={() =>
-              navigate(`/products?category=${encodeURIComponent(categoryName)}`)
-            }
+            onClick={() => navigate(`/products?category=${categoryId}`)}
             className={`relative rounded-xl overflow-hidden 
               hover:shadow-lg hover:scale-[1.01] hover:cursor-pointer transition-all duration-300`}
           >

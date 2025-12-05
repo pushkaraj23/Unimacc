@@ -188,14 +188,10 @@ const DetailedProductPage = () => {
         <aside className="hidden lg:flex sticky top-5 flex-col gap-6 col-span-2">
           <article className="relative w-full overflow-hidden rounded-lg">
             <img
-              src="https://images.unsplash.com/photo-1693841114632-bc1c2760bbfd?ixlib=rb-4.1.0&auto=format&fit=crop&w=774&q=80"
+              src="/sample/products_banner.png"
               alt="Ad Banner"
-              className="rounded-md w-full h-[34vh] object-cover"
+              className="rounded-md w-full h-auto"
             />
-            <div className="absolute bottom-3 left-3 text-white text-sm">
-              <h3 className="font-semibold">More than water</h3>
-              <p>It’s a rejuvenating downpour for your senses</p>
-            </div>
           </article>
           <div className="relative h-[43vh] w-full">
             {/* Scrollable content */}

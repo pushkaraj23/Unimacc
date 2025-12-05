@@ -36,11 +36,13 @@ const OrdersSection = ({ userid }) => {
           return (
             <div
               key={order.id}
-              onClick={() => navigate(`/order/${order.id}`)}
-              className={`p-4 border border-gray-200 rounded-lg cursor-pointer hover:shadow-lg hover:border-theme transition-all duration-200 ${
+              onClick={() => {
+                if (order.status !== "Pending") navigate(`/order/${order.id}`);
+              }}
+              className={`p-4 border border-gray-200 rounded-lg transition-all duration-200 ${
                 order.status === "Delivered" || order.status === "Confirmed"
-                  ? "bg-green-50"
-                  : ""
+                  ? "bg-green-50 cursor-pointer hover:shadow-lg hover:border-theme"
+                  : "cursor-not-allowed opacity-50"
               }`}
             >
               <div className="flex justify-between items-center">

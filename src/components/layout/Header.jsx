@@ -295,7 +295,12 @@ const Header = () => {
             Object.entries(categories).map(([parent, children]) => (
               <li key={parent} className="border-b last:border-b-0">
                 {/* --- Parent Name --- */}
-                <div className="px-6 py-3 font-semibold text-primary bg-gray-50 cursor-pointer">
+                <div
+                  onClick={() => {
+                    handleCategoryClick(children.id);
+                  }}
+                  className="px-6 py-3 font-semibold text-primary bg-gray-50 cursor-pointer"
+                >
                   {parent}
                 </div>
 
