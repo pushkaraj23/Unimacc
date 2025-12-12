@@ -40,8 +40,8 @@ const ProductCarousel = ({
       {/* --- Swiper Section --- */}
       <section className="py-2 relative">
         {/* Fades for visual symmetry */}
-        <div className="hidden md:block pointer-events-none absolute left-0 top-0 h-full w-12 bg-gradient-to-r from-mute/70 to-transparent z-10" />
-        <div className="hidden md:block pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-mute/70 to-transparent z-10" />
+        <div className="hidden md:block pointer-events-none absolute left-0 top-0 h-full w-12 bg-gradient-to-r from-white/70 to-transparent z-10" />
+        <div className="hidden md:block pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-white/70 to-transparent z-10" />
 
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}

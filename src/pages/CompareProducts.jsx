@@ -45,7 +45,7 @@ const CompareProducts = () => {
   };
 
   return (
-    <div className="w-full pt-28 max-sm:pt-24 px-5 sm:px-10 pb-16 min-h-screen">
+    <div className="w-full pt-20 max-sm:pt-24 px-5 sm:px-10 pb-16 min-h-screen">
       {/* Breadcrumb */}
       <div className="flex gap-1 font-medium my-3 max-sm:my-0 text-sm">
         <span

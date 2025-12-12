@@ -20,7 +20,7 @@ import OrderDetails from "./components/profile/OrderDetails";
 
 function App() {
   return (
-    <div className="bg-mute">
+    <div className="bg-white">
       <Header />
       <ScrollToTop />
       <Routes>

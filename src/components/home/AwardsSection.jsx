@@ -28,7 +28,7 @@ const AwardsSection = () => {
   ];
 
   return (
-    <section className="relative w-full overflow-hidden pb-20 pt-8 px-6 sm:px-10 md:px-20">
+    <section className="relative w-full overflow-hidden pb-10 pt-8 px-6 sm:px-10 md:px-20">
       {/* Section Title */}
       <div className="text-center mb-16 relative z-10">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-primary">
@@ -61,7 +61,7 @@ const AwardsSection = () => {
         >
           {awards.map((award, index) => (
             <SwiperSlide key={index} className="h-full">
-              <div className="group h-64 bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-2xl hover:shadow-theme/20 transition-all duration-500 relative overflow-hidden flex flex-col items-center justify-center w-full">
+              <div className="group h-64 mb-12 bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-2xl hover:shadow-theme/20 transition-all duration-500 relative overflow-hidden flex flex-col items-center justify-center w-full">
                 {/* Animated Glow Line */}
                 <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-theme/70 transition-all duration-500"></div>
 

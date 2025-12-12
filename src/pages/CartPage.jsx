@@ -77,7 +77,7 @@ const CartPage = () => {
   };
 
   return (
-    <div className="w-full pt-28 max-sm:pt-24 px-10 max-lg:px-6 max-sm:px-4 min-h-screen">
+    <div className="w-full pt-20 max-sm:pt-24 px-10 max-lg:px-6 max-sm:px-4 min-h-screen">
       {/* Breadcrumb */}
       <div className="flex gap-1 font-medium my-3 text-sm flex-wrap">
         <button onClick={() => navigate("/")} className="text-primary">

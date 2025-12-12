@@ -3,7 +3,7 @@ import { FaShieldAlt, FaEnvelope, FaPhoneAlt } from "react-icons/fa";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-mute text-primary pt-32 pb-16 px-6 sm:px-10 md:px-16">
+    <div className="min-h-screen bg-white text-primary pt-24 pb-16 px-6 sm:px-10 md:px-16">
       {/* --- Header Section --- */}
       <div className="text-center mb-10">
         <h1 className="text-4xl font-semibold text-primary mb-3">

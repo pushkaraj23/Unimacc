@@ -28,7 +28,7 @@ const BlogsSection = () => {
   // ✅ Loading state
   if (isLoading) {
     return (
-      <section className="bg-mute py-24 text-center text-primary">
+      <section className="py-24 text-center text-primary">
         <p className="text-lg animate-pulse">Loading blogs...</p>
       </section>
     );
@@ -37,7 +37,7 @@ const BlogsSection = () => {
   // ✅ Error state
   if (isError) {
     return (
-      <section className="bg-mute py-24 text-center text-red-600">
+      <section className="py-24 text-center text-red-600">
         <p>Failed to load blogs. Please try again later.</p>
       </section>
     );
@@ -49,7 +49,7 @@ const BlogsSection = () => {
   const shouldShowButton = blogs.length > limit;
 
   return (
-    <section className="relative w-full bg-mute text-primary py-20 px-6 sm:px-10 md:px-10">
+    <section className="relative w-full text-primary py-20 px-6 sm:px-10 md:px-10">
       {/* --- Header --- */}
       <div className="text-center mb-16 relative z-10">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-primary">
@@ -76,14 +76,14 @@ const BlogsSection = () => {
           return (
             <div
               key={blog.id}
-              className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-theme/20 transition-all duration-500 hover:-translate-y-1"
+              className="group rounded-2xl overflow-hidden border border-gray-200 hover:shadow-2xl hover:shadow-theme/20 transition-all duration-500 hover:-translate-y-1"
             >
               {/* --- Image --- */}
               <div className="relative w-full h-56 sm:h-64 overflow-hidden">
                 <img
                   src={image}
                   alt={blog.image_alt_text || blog.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-60 group-hover:opacity-70 transition-all"></div>
                 <div className="absolute bottom-3 left-4 text-white text-xs sm:text-sm font-medium">

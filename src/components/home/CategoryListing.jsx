@@ -55,7 +55,7 @@ const CategoryListing = () => {
     );
 
   return (
-    <section className="relative md:px-10 mb-2 bg-mute rounded-2xl">
+    <section className="relative md:px-10 mb-2 rounded-2xl">
 
       {/* Centered Categories */}
       <div
@@ -75,13 +75,7 @@ const CategoryListing = () => {
               transition-all duration-300 hover:-translate-y-2
             "
           >
-            <div
-              className="
-                relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden
-                shadow-md hover:shadow-[0_0_25px_rgba(239,121,11,0.5)]
-                border border-[#e8e4de] hover:border-theme transition-all duration-300
-              "
-            >
+            <div className="relative">
               <img
                 src={cat.imagepath || FALLBACK_IMAGE}
                 onError={(e) => {
@@ -91,10 +85,11 @@ const CategoryListing = () => {
                 alt={cat.name}
                 loading="lazy"
                 className="
-                  w-full h-full object-cover rounded-xl
-                  transition-transform duration-700 group-hover:scale-110
+                  w-20 h-20 md:w-24 md:h-24 object-contain rounded-xl
+                  transition-transform duration-700 group-hover:scale-110 z-10 relative
                 "
               />
+              <div className="w-20 h-12 hover:w-28 hover:h-16 bg-black/30 blur-lg rounded-full absolute bottom-1 group-hover:bg-black/15 transition-all duration-500 z-0" />
             </div>
 
             <h2
@@ -107,27 +102,9 @@ const CategoryListing = () => {
             </h2>
           </div>
         ))}
-        <div className="h-full w-12 bg-gradient-to-r from-mute to-mute/0 absolute left-0 top-0" />
-        <div className="h-full w-12 bg-gradient-to-l from-mute to-mute/0 absolute right-0 top-0" />
+        <div className="h-full w-12 bg-gradient-to-r from-white to-white/0 absolute left-0 top-0" />
+        <div className="h-full w-12 bg-gradient-to-l from-white to-white/0 absolute right-0 top-0" />
       </div>
-
-      {/* Floating hover name label */}
-      {hoverData.visible && (
-        <div
-          className="
-            fixed z-50 pointer-events-none bg-[#263243] text-white text-xs sm:text-sm
-            font-medium px-3 py-1.5 rounded-lg shadow-lg border border-theme/40
-            transition-opacity duration-150
-          "
-          style={{
-            top: hoverData.y,
-            left: hoverData.x,
-            transform: "translate(-50%, -150%)",
-          }}
-        >
-          {hoverData.text}
-        </div>
-      )}
     </section>
   );
 };

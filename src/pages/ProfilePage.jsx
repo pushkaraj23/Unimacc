@@ -133,7 +133,7 @@ const ProfilePage = () => {
   // ---------------------------
   if (user && fetchedUser) {
     return (
-      <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
+      <div className="pt-20 p-10 max-sm:pt-24 max-sm:px-6">
         <div className="font-normal py-1 text-sm mb-2 flex justify-between items-center">
           <div>
             <button className="text-primary" onClick={() => navigate("/")}>
@@ -167,7 +167,7 @@ const ProfilePage = () => {
   // Not Logged In (Sign-in + OTP)
   // ---------------------------
   return (
-    <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
+    <div className="pt-20 p-10  max-sm:px-6">
       {!isSignup ? (
         <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8 mt-4 md:mb-10 md:mt-12">
           <h1 className="text-3xl font-semibold mb-6">Sign In</h1>

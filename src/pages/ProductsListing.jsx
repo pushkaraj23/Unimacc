@@ -125,14 +125,14 @@ const ProductsListing = () => {
   };
 
   return (
-    <div className="w-full pt-28 max-sm:pt-20 flex flex-col lg:flex-row relative min-h-screen">
+    <div className="w-full pt-20 max-sm:pt-20 flex flex-col lg:flex-row relative min-h-screen">
       {/* ====================== SIDEBAR ====================== */}
       <aside
         className={`${
           toggleSidebar
             ? "absolute lg:static left-0 h-full z-30 bg-white shadow-lg w-[75vw] sm:w-[50vw] lg:w-[20vw] px-5 pt-2"
             : "w-[4vw] max-sm:hidden"
-        } bg-gradient-to-b from-mute to-primary/40 transition-all duration-300 lg:h-[100vh] px-4`}
+        } bg-gradient-to-b from-white to-primary/40 transition-all duration-300 lg:h-[100vh] px-4`}
       >
         {/* Sidebar Header */}
         <div
@@ -233,7 +233,7 @@ const ProductsListing = () => {
       {/* ====================== PRODUCT SECTION ====================== */}
       <section className="flex-1 relative overflow-y-auto pb-4 no-scrollbar w-full h-[100vh]">
         {/* Breadcrumb */}
-        <div className="bg-mute sticky top-0 px-5 z-20 flex justify-between items-center text-primary/75 text-sm font-medium max-sm:mt-2">
+        <div className="bg-white sticky top-0 px-5 z-20 flex justify-between items-center text-primary/75 text-sm font-medium max-sm:mt-2">
           <div className="font-normal py-1">
             <button className="text-primary" onClick={() => navigate("/")}>
               Home
@@ -275,10 +275,9 @@ const ProductsListing = () => {
           !isCategoryLoading &&
           !isCategoryError &&
           categoryDetails && (
-            <div className="flex flex-col md:flex-row items-center gap-6 bg-white/80 relative shadow-md rounded-2xl p-6 mx-3.5 my-3  border border-theme/20">
+            <div className="flex flex-col md:flex-row items-center gap-6 bg-white/80 relative shadow-md overflow-hidden rounded-2xl p-6 mx-3.5 my-3  border border-theme/20">
               <img
                 src={
-                  categoryDetails.imagepath ||
                   "https://images.unsplash.com/photo-1754211568488-f8481375d6fb?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 }
                 alt={categoryDetails.name}
@@ -287,13 +286,13 @@ const ProductsListing = () => {
                   e.target.src =
                     "https://images.unsplash.com/photo-1754211568488-f8481375d6fb?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
                 }}
-                className="w-full h-full absolute brightness-50 object-cover rounded-2xl top-0 left-0"
+                className="w-full h-full blur absolute brightness-50 object-cover rounded-2xl top-0 left-0"
               />
               <div className="z-10 w-full flex flex-col items-center">
-                <h2 className="text-5xl font-bold text-mute mx-auto mb-1">
+                <h2 className="text-5xl font-bold text-white mx-auto mb-1">
                   {categoryDetails.name}
                 </h2>
-                <p className="text-mute/70 leading-relaxed">
+                <p className="text-white/70 leading-relaxed">
                   {categoryDetails.description}
                 </p>
               </div>

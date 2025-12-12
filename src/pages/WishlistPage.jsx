@@ -81,7 +81,7 @@ const WishlistPage = () => {
   };
 
   return (
-    <div className="w-full py-28 px-10 max-lg:px-6 max-sm:px-4 max-sm:py-24">
+    <div className="w-full py-20 px-10 max-lg:px-6 max-sm:px-4 max-sm:py-24">
       {/* Breadcrumb */}
       <div className="flex gap-1 font-medium my-3 max-sm:my-0 text-sm flex-wrap">
         <button onClick={() => navigate("/")} className="text-primary">

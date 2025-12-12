@@ -23,7 +23,6 @@ const HomePage = () => {
       <Banner />
       <TrendingSection />
       <AdBanners />
-      <VideoSection />
       <AwardsSection />
       <ServiceBanner />
       <div className="h-10" />
