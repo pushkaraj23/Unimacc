@@ -234,47 +234,7 @@ const Header = () => {
         </div>
 
         {/* Desktop Bottom Nav */}
-        <nav className="hidden md:flex bg-primary text-white text-sm justify-center space-x-8">
-          <p
-            onClick={() => navigate("/products")}
-            className="py-2 hover:text-orange-400 transition-colors duration-200 cursor-pointer"
-          >
-            All
-          </p>
-          {isCategoriesLoading ? (
-            <p>Loading...</p>
-          ) : isCategoriesError ? (
-            <p>Error loading categories</p>
-          ) : !categories || Object.keys(categories).length === 0 ? (
-            <p>No categories</p>
-          ) : (
-            Object.entries(categories).map(([parent, info]) => (
-              <div key={info.id} className="group relative py-2">
-                <p
-                  onClick={() => handleCategoryClick(info.id)}
-                  className="hover:text-orange-400 cursor-pointer"
-                >
-                  {parent}
-                </p>
-
-                {/* --- Dropdown (Subcategories) --- */}
-                <div className="absolute hidden group-hover:block -translate-y- bg-white text-primary shadow-md mt-2 rounded w-48 z-50">
-                  <ul className="text-sm py-2 font-medium">
-                    {info.children.map((child) => (
-                      <li
-                        key={child.id}
-                        onClick={() => handleCategoryClick(child.id)}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      >
-                        {child.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))
-          )}
-        </nav>
+        <div className="bg-primary h-1" />
       </header>
 
       {/* Mobile Drawer */}

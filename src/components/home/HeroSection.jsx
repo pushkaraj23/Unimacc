@@ -131,7 +131,7 @@ const HeroSection = () => {
       <div className="absolute bottom-5 max-sm:bottom-52 rounded-full bg-black/20 blur-3xl w-[80vw] h-[30vh]" />
 
       <div
-        className="hero-swiper-wrapper"
+        className="hero-swiper-wrapper w-full h-[60vh] max-sm:h-[56vh]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -155,7 +155,7 @@ const HeroSection = () => {
           return (
             <div
               key={`${slide.id}-${index}`}
-              className="hero-slide"
+              className="hero-slide h-full w-[80vw]"
               style={{
                 transform: `
     translate(-50%, -50%)
@@ -170,13 +170,11 @@ const HeroSection = () => {
               }}
               // onClick={() => navigate(`/offers/${slide.offer_id}`)}
             >
-              <div className="overflow-hidden rounded-3xl">
-                <img
-                  src={imageSrc}
-                  alt={slide.title}
-                  className="hero-slide-image"
-                />
-              </div>
+              <img
+                src={imageSrc}
+                alt={slide.title}
+                className="object-contain h-full w-full"
+              />
             </div>
           );
         })}

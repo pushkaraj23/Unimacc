@@ -16,14 +16,14 @@ import CategoryListing from "../components/home/CategoryListing";
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen pt-28 max-sm:pt-24 w-full overflow-x-hidden">
-      <HeroSection />
+    <div className="min-h-screen pt-20 max-sm:pt-24 w-full overflow-x-hidden">
       <CategoryListing />
+      <HeroSection />
       <SalesSection />
       <Banner />
-      <VideoSection />
-      <AdBanners />
       <TrendingSection />
+      <AdBanners />
+      <VideoSection />
       <AwardsSection />
       <ServiceBanner />
       <div className="h-10" />

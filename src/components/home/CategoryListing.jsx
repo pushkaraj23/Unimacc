@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategoriesRaw } from "../../api/userApi";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ const FALLBACK_IMAGE =
 const CategoryListing = () => {
   const navigate = useNavigate();
 
+  // Fetch categories
   const {
     data: categories = [],
     isLoading,
@@ -18,44 +19,69 @@ const CategoryListing = () => {
     queryFn: fetchCategoriesRaw,
   });
 
-  if (isLoading) {
+  // Floating tooltip state
+  const [hoverData, setHoverData] = useState({
+    visible: false,
+    text: "",
+    x: 0,
+    y: 0,
+  });
+
+  const handleMouseMove = (e, name) => {
+    setHoverData({
+      visible: true,
+      text: name,
+      x: e.clientX + 15,
+      y: e.clientY + 15,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setHoverData({ visible: false, text: "", x: 0, y: 0 });
+  };
+
+  if (isLoading)
     return (
       <div className="flex justify-center items-center h-64">
         <div className="w-10 h-10 border-4 border-theme border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
-  }
 
-  if (isError) {
+  if (isError)
     return (
       <p className="text-center text-red-600 py-10">
         ⚠️ Failed to load categories. Please try again later.
       </p>
     );
-  }
 
   return (
-    <section className="relative py-16 px-6 md:px-10 lg:px-16 bg-gradient-to-b from-transparent via-theme/30 to-mute min-h-[70vh] overflow-hidden">
-      {/* Section Heading */}
-      <h2 className="text-3xl md:text-4xl font-extrabold text-center text-primary mb-4 relative z-10">
-        Explore Categories
-      </h2>
-      <div className="w-24 h-[3px] bg-theme mx-auto mb-10 rounded-full"></div>
+    <section className="relative md:px-10 mb-2 bg-mute rounded-2xl">
 
-      {/* Category Cards */}
-      <div className="flex flex-wrap justify-center gap-8 max-sm:gap-5 relative z-10">
+      {/* Centered Categories */}
+      <div
+        className="
+          flex justify-center max-sm:justify-start
+          gap-6 no-scrollbar max-sm:gap-0 py-2 px-2 overflow-x-scroll
+        "
+      >
         {categories.map((cat) => (
           <div
             key={cat.id}
             onClick={() => navigate(`/products?category=${cat.id}`)}
-            className="group cursor-pointer relative transition-all duration-300 hover:-translate-y-2 flex flex-col items-center text-center w-[40vw] sm:w-[200px] md:w-[220px]"
+            onMouseMove={(e) => handleMouseMove(e, cat.name)}
+            onMouseLeave={handleMouseLeave}
+            className="
+              group cursor-pointer flex flex-col items-center text-center
+              transition-all duration-300 hover:-translate-y-2
+            "
           >
-            {/* Animated orange ring on hover */}
-            {/* <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-[#ef790b] transition-all duration-300 shadow-[0_0_0px_rgba(239,121,11,0)] group-hover:shadow-[0_0_20px_rgba(239,121,11,0.35)] pointer-events-none"></div> */}
-
-            {/* Image container with soft shimmer */}
-            <div className="relative w-full h-[40vh] max-sm:h-[25vh] rounded-xl overflow-hidden group mb-4 transition-all duration-300 shadow-md hover:shadow-xl">
-              {/* Category Image */}
+            <div
+              className="
+                relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden
+                shadow-md hover:shadow-[0_0_25px_rgba(239,121,11,0.5)]
+                border border-[#e8e4de] hover:border-theme transition-all duration-300
+              "
+            >
               <img
                 src={cat.imagepath || FALLBACK_IMAGE}
                 onError={(e) => {
@@ -64,29 +90,44 @@ const CategoryListing = () => {
                 }}
                 alt={cat.name}
                 loading="lazy"
-                className="w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-110"
+                className="
+                  w-full h-full object-cover rounded-xl
+                  transition-transform duration-700 group-hover:scale-110
+                "
               />
-
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center text-center p-4">
-                <p className="text-mute text-sm sm:text-base leading-snug max-w-[90%]">
-                  {cat.description || "Explore our collection"}
-                </p>
-              </div>
             </div>
 
-            {/* Text Content */}
-            <h3 className="text-base sm:text-lg font-semibold text-primary">
+            <h2
+              className="
+                text-primary text-xs mt-2 w-24 text-center font-medium
+                group-hover:text-theme transition-colors duration-300
+              "
+            >
               {cat.name}
-            </h3>
-
-            {/* Hover CTA */}
-            <span className="text-[#ef790b] font-medium text-sm opacity-50 group-hover:opacity-100 transition-all duration-300">
-              View Products →
-            </span>
+            </h2>
           </div>
         ))}
+        <div className="h-full w-12 bg-gradient-to-r from-mute to-mute/0 absolute left-0 top-0" />
+        <div className="h-full w-12 bg-gradient-to-l from-mute to-mute/0 absolute right-0 top-0" />
       </div>
+
+      {/* Floating hover name label */}
+      {hoverData.visible && (
+        <div
+          className="
+            fixed z-50 pointer-events-none bg-[#263243] text-white text-xs sm:text-sm
+            font-medium px-3 py-1.5 rounded-lg shadow-lg border border-theme/40
+            transition-opacity duration-150
+          "
+          style={{
+            top: hoverData.y,
+            left: hoverData.x,
+            transform: "translate(-50%, -150%)",
+          }}
+        >
+          {hoverData.text}
+        </div>
+      )}
     </section>
   );
 };
