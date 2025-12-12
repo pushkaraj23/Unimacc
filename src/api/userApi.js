@@ -35,6 +35,35 @@ export const fetchProductsByCategory = async (categoryName) => {
   }
 };
 
+export const fetchCategoriesRaw = async () => {
+  try {
+    const res = await axiosInstance.get("/categories");
+    if (res.status !== 200) {
+      throw new Error("Failed to fetch categories");
+    }
+    return res.data.body || [];
+  } catch (err) {
+    console.error("❌ FETCH CATEGORY ERROR:", err);
+    throw err;
+  }
+};
+
+export const fetchCategoryById = async (id) => {
+  try {
+    if (!id) throw new Error("Category ID is required");
+
+    const res = await axiosInstance.get(`/categories/${id}`);
+    if (res.status !== 200) {
+      throw new Error(`Failed to fetch category with ID ${id}`);
+    }
+
+    return res.data.body || res.data;
+  } catch (err) {
+    console.error(`❌ FETCH CATEGORY ${id} ERROR:`, err.response?.data || err.message);
+    throw err;
+  }
+};
+
 export const fetchCategories = async () => {
   try {
     const res = await axiosInstance.get("/categories");

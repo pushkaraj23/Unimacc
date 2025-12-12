@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
-import { FaPlay } from "react-icons/fa";
 import ItemCard from "../components/shared/ItemCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +7,7 @@ import {
   fetchProducts,
   fetchCategories,
   fetchProductsBySearch,
+  fetchCategoryById,
 } from "../api/userApi";
 
 const ProductsListing = () => {
@@ -40,6 +40,17 @@ const ProductsListing = () => {
   } = useQuery({
     queryKey: ["categories"],
     queryFn: fetchCategories,
+  });
+
+  // ✅ FETCH SINGLE CATEGORY DETAILS (if ID present)
+  const {
+    data: categoryDetails,
+    isLoading: isCategoryLoading,
+    isError: isCategoryError,
+  } = useQuery({
+    queryKey: ["categoryDetails", categoryParam],
+    queryFn: () => fetchCategoryById(categoryParam),
+    enabled: !!categoryParam,
   });
 
   // ---------- PRICE RANGE ----------
@@ -110,7 +121,6 @@ const ProductsListing = () => {
   };
 
   const handleSubcategoryClick = (id) => {
-    // Only pass ONE ID in params
     navigate(`/products?category=${id}`);
   };
 
@@ -186,11 +196,6 @@ const ProductsListing = () => {
                     </option>
                   ))}
                 </select>
-
-                <FaPlay
-                  size={10}
-                  className="absolute rotate-90 right-3 top-1/2 -translate-y-1/2 text-[#DD7427]"
-                />
               </div>
             </div>
 
@@ -200,7 +205,7 @@ const ProductsListing = () => {
                 <h2 className="text-primary/75 font-bold mb-2">Subcategory</h2>
                 <div className="relative">
                   <select
-                    value="All" // Always show default
+                    value="All"
                     onChange={(e) => handleSubcategoryClick(e.target.value)}
                     className="w-full bg-transparent border-2 border-primary/40 font-medium rounded-lg py-3 px-4 pr-10 text-primary/75"
                   >
@@ -218,11 +223,6 @@ const ProductsListing = () => {
                         : null
                     )}
                   </select>
-
-                  <FaPlay
-                    size={10}
-                    className="absolute rotate-90 right-3 top-1/2 -translate-y-1/2 text-[#DD7427]"
-                  />
                 </div>
               </div>
             )}
@@ -269,6 +269,36 @@ const ProductsListing = () => {
             <HiMenu size={16} /> Menu
           </button>
         </div>
+
+        {/* ✅ CATEGORY DETAILS (if category ID present) */}
+        {categoryParam &&
+          !isCategoryLoading &&
+          !isCategoryError &&
+          categoryDetails && (
+            <div className="flex flex-col md:flex-row items-center gap-6 bg-white/80 relative shadow-md rounded-2xl p-6 mx-3.5 my-3  border border-theme/20">
+              <img
+                src={
+                  categoryDetails.imagepath ||
+                  "https://images.unsplash.com/photo-1754211568488-f8481375d6fb?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                }
+                alt={categoryDetails.name}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://images.unsplash.com/photo-1754211568488-f8481375d6fb?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+                }}
+                className="w-full h-full absolute brightness-50 object-cover rounded-2xl top-0 left-0"
+              />
+              <div className="z-10 w-full flex flex-col items-center">
+                <h2 className="text-5xl font-bold text-mute mx-auto mb-1">
+                  {categoryDetails.name}
+                </h2>
+                <p className="text-mute/70 leading-relaxed">
+                  {categoryDetails.description}
+                </p>
+              </div>
+            </div>
+          )}
 
         {/* PRODUCT GRID */}
         <div

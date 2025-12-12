@@ -2,7 +2,7 @@ import AdBanners from "../components/home/AdBanners";
 import AwardsSection from "../components/home/AwardsSection";
 import Banner from "../components/home/Banner";
 import Bestsellers from "../components/home/Bestsellers";
-import CategoryListing from "../components/home/CategoryListing";
+import CategoryBanners from "../components/home/CategoryBanners";
 import CategoryOne from "../components/home/CategoryOne";
 import CategoryTwo from "../components/home/CategoryTwo";
 import HeroSection from "../components/home/HeroSection";
@@ -12,11 +12,13 @@ import TrendingSection from "../components/home/TrendingSection";
 import ServiceBanner from "../components/shared/ServiceBanner";
 import VideoSection from "../components/home/VideoSection";
 import BlogsSection from "../components/home/BlogsSection";
+import CategoryListing from "../components/home/CategoryListing";
 
 const HomePage = () => {
   return (
     <div className="min-h-screen pt-28 max-sm:pt-24 w-full overflow-x-hidden">
       <HeroSection />
+      <CategoryListing />
       <SalesSection />
       <Banner />
       <VideoSection />
@@ -29,7 +31,7 @@ const HomePage = () => {
       {/* <CategoryOne /> */}
       {/* <Bestsellers /> */}
       {/* <CategoryTwo /> */}
-      <CategoryListing />
+      <CategoryBanners />
       <BlogsSection />
     </div>
   );
