@@ -17,12 +17,14 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import ReturnRefundPolicy from "./pages/ReturnRefundPolicy";
 import BlogsDetailed from "./pages/BlogsDetailed";
 import OrderDetails from "./components/profile/OrderDetails";
+import HotjarRouteTracker from "./utils/HotJarRouteTracker";
 
 function App() {
   return (
     <div className="bg-white">
       <Header />
       <ScrollToTop />
+      <HotjarRouteTracker />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsListing />} />
