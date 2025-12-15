@@ -178,10 +178,10 @@ const CartPage = () => {
             <h2 className="font-semibold text-lg mb-4">Order Summary</h2>
 
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
+              <div className="flex justify-between opacity-50 font-semibold">
+                <span>Items Total</span>
                 <span className="font-semibold">
-                  ₹{subtotal.toLocaleString()}
+                  ₹{(subtotal + savings).toLocaleString()}
                 </span>
               </div>
               {savings > 0 && (
@@ -190,6 +190,12 @@ const CartPage = () => {
                   <span>-₹{savings.toLocaleString()}</span>
                 </div>
               )}
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="font-semibold">
+                  ₹{subtotal.toLocaleString()}
+                </span>
+              </div>
               <div className="flex justify-between">
                 <span>Delivery Fee</span>
                 <span>₹{deliveryFee}</span>
@@ -206,7 +212,7 @@ const CartPage = () => {
               onClick={() => navigate("/checkout")}
               className="w-full mt-6 bg-primary text-white py-3 rounded-full font-medium hover:opacity-90"
             >
-              Proceed to Checkout →
+              Proceed to Buy →
             </button>
           </div>
         )}

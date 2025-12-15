@@ -182,18 +182,20 @@ const CheckoutSummary = ({
           </div>
 
           <div className="space-y-2 text-sm bg-theme/10 border border-theme/60 rounded-md p-5">
-            <p className="flex justify-between">
+            <p className="flex justify-between opacity-50">
               <span>Item Total</span>
-              <span>₹{subTotal.toLocaleString()}</span>
+              <span>₹{(subTotal + savings).toLocaleString()}</span>
             </p>
-
             {savings > 0 && (
               <p className="flex justify-between text-green-600 font-medium">
                 <span>You Saved</span>
                 <span>-₹{savings.toLocaleString()}</span>
               </p>
             )}
-
+            <p className="flex justify-between font-semibold">
+              <span>Sub Total</span>
+              <span>₹{subTotal.toLocaleString()}</span>
+            </p>
             <p className="flex justify-between">
               <span>Delivery Charges</span>
               <span>₹{deliveryCharge}</span>
@@ -216,7 +218,7 @@ const CheckoutSummary = ({
               disabled={loading}
               className="w-full mt-6 bg-primary text-white py-3 rounded-md font-medium hover:bg-theme transition-all"
             >
-              {loading ? "Processing..." : "Proceed to Payment →"}
+              {loading ? "Processing..." : "Proceed to Buy →"}
             </button>
           )}
         </>

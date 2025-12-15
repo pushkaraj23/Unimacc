@@ -7,15 +7,14 @@ const ItemCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isCompared, setIsCompared] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const [tempMessage, setTempMessage] = useState(""); // ⬅️ For message display
+  const [tempMessage, setTempMessage] = useState("");
+  const [hoveredButton, setHoveredButton] = useState(null); // 👈 NEW
 
-  // ⬅️ Helper: show message for 3 seconds
   const showTempMessage = (msg) => {
     setTempMessage(msg);
     setTimeout(() => setTempMessage(""), 3000);
   };
 
-  // Extract product fields safely
   const {
     id,
     name,
@@ -28,8 +27,6 @@ const ItemCard = ({ product }) => {
 
   const originalPrice = mrp ? parseFloat(mrp) : 0;
   const price = sellingprice ? parseFloat(sellingprice) : 0;
-
-  // Select correct images
   const images =
     product?.stocktable?.[0]?.images?.length > 0
       ? product.stocktable[0].images
@@ -46,7 +43,7 @@ const ItemCard = ({ product }) => {
     setIsInCart(cart.some((item) => item.id === id));
   }, [id]);
 
-  // Cart
+  // 🛒 CART
   const handleAddToCart = (e) => {
     e.stopPropagation();
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -67,7 +64,7 @@ const ItemCard = ({ product }) => {
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // Wishlist
+  // 💖 WISHLIST
   const handleWishlist = (e) => {
     e.stopPropagation();
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
@@ -88,7 +85,7 @@ const ItemCard = ({ product }) => {
     window.dispatchEvent(new Event("localStorageUpdated"));
   };
 
-  // Compare
+  // 🔁 COMPARE
   const handleCompare = (e) => {
     e.stopPropagation();
     const compareList = JSON.parse(localStorage.getItem("compare")) || [];
@@ -121,7 +118,6 @@ const ItemCard = ({ product }) => {
           alt={name}
           className="w-full h-full object-cover rounded-t-xl transition-opacity duration-500 group-hover:opacity-0"
         />
-
         {images[1] && (
           <img
             src={images[1]}
@@ -129,9 +125,8 @@ const ItemCard = ({ product }) => {
             className="absolute top-0 left-0 w-full h-full object-cover rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           />
         )}
-
         {discountpercent !== 0 && (
-          <div className="absolute top-2 left-8 -translate-x-1/2  flex justify-between items-center bg-theme text-white text-xs md:text-[.9vw] font-semibold px-3 py-1.5 rounded-full">
+          <div className="absolute top-2 left-8 -translate-x-1/2 flex justify-between items-center bg-theme text-white text-xs md:text-[.9vw] font-semibold px-3 py-1.5 rounded-full">
             <span className="text-end">
               {discountpercent}%<br /> OFF
             </span>
@@ -142,7 +137,6 @@ const ItemCard = ({ product }) => {
       {/* Product Info */}
       <div className="px-3 py-2 text-left">
         <p className="text-gray-400 text-xs sm:text-sm">{category || "—"}</p>
-
         <h3
           className="font-semibold text-primary text-sm sm:text-base leading-snug truncate"
           title={name}
@@ -156,14 +150,12 @@ const ItemCard = ({ product }) => {
             <span className="text-primary font-bold text-base sm:text-lg">
               ₹{price.toLocaleString()}
             </span>
-
             {originalPrice > 0 && discountpercent !== 0 && (
               <span className="text-gray-400 line-through text-xs sm:text-sm">
                 ₹{originalPrice.toLocaleString()}
               </span>
             )}
           </div>
-
           {discountpercent !== 0 && (
             <span className="text-theme text-xs sm:text-sm font-semibold">
               {discountpercent}% OFF
@@ -172,43 +164,80 @@ const ItemCard = ({ product }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex my-2 gap-2">
-          <div className="transition-opacity duration-300">
+        <div className="flex items-center my-2 gap-2 relative">
+          {/* 🛒 Add to Cart */}
+          <div
+            onMouseEnter={() => setHoveredButton("cart")}
+            onMouseLeave={() => setHoveredButton(null)}
+            className="transition-opacity duration-300 relative"
+          >
+            {hoveredButton === "cart" && (
+              <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#263243] text-white text-xs px-2 py-1 rounded-md shadow-md opacity-90 whitespace-nowrap">
+                Add to Cart
+              </div>
+            )}
             <div
               onClick={handleAddToCart}
-              className={`p-2 sm:p-2.5 rounded-full border cursor-pointer transition-colors ${
+              className={`p-1.5 sm:p-2.5 rounded-full border cursor-pointer flex items-center gap-2 transition-colors ${
                 isInCart
                   ? "bg-theme text-white border-theme shadow-md"
                   : "bg-white text-primary hover:bg-theme hover:text-white border-gray-300 hover:border-white"
               }`}
             >
-              <FaShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
+              <p className="text-xs max-sm:text-[2.3vw]">
+                {isInCart ? "Added" : "Add"} to Cart
+              </p>
+              {!isInCart && (
+                <FaShoppingCart className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
+              )}
             </div>
           </div>
 
-          <div className="transition-opacity duration-300">
+          {/* 💖 Wishlist */}
+          <div
+            onMouseEnter={() => setHoveredButton("wishlist")}
+            onMouseLeave={() => setHoveredButton(null)}
+            className="relative transition-opacity duration-300"
+          >
+            {hoveredButton === "wishlist" && (
+              <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#263243] text-white text-xs px-2 py-1 rounded-md shadow-md opacity-90 whitespace-nowrap">
+                Wishlist
+              </div>
+            )}
             <div
               onClick={handleWishlist}
-              className={`p-2 sm:p-2.5 rounded-full cursor-pointer border transition-colors ${
+              className={`p-1.5 sm:p-2.5 rounded-full cursor-pointer border transition-colors ${
                 isWishlisted
                   ? "bg-theme text-white border-theme shadow-md"
                   : "bg-white hover:bg-theme hover:text-white border-gray-300 hover:border-white"
               }`}
             >
-              <FaHeart className="w-3 h-3 sm:w-4 sm:h-4" />
+              <FaHeart className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
             </div>
           </div>
 
-          <button
-            onClick={handleCompare}
-            className={`border rounded-md p-2 sm:p-2.5 transition-colors ${
-              isCompared
-                ? "bg-theme text-white border-theme"
-                : "border-gray-300 hover:bg-theme hover:text-white"
-            }`}
+          {/* 🔁 Compare */}
+          <div
+            onMouseEnter={() => setHoveredButton("compare")}
+            onMouseLeave={() => setHoveredButton(null)}
+            className="relative transition-opacity duration-300"
           >
-            <FaExchangeAlt className="w-3 h-3 sm:w-4 sm:h-4" />
-          </button>
+            {hoveredButton === "compare" && (
+              <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#263243] text-white text-xs px-2 py-1 rounded-md shadow-md opacity-90 whitespace-nowrap">
+                Compare
+              </div>
+            )}
+            <button
+              onClick={handleCompare}
+              className={`border rounded-md p-1.5 sm:p-2.5 transition-colors ${
+                isCompared
+                  ? "bg-theme text-white border-theme"
+                  : "border-gray-300 hover:bg-theme hover:text-white"
+              }`}
+            >
+              <FaExchangeAlt className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
+            </button>
+          </div>
         </div>
       </div>
 

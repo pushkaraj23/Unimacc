@@ -161,7 +161,7 @@ const CheckoutPage = () => {
   // ---------------------------
   if (user && fetchedUser && isAuthenticated) {
     return (
-      <div className="w-full min-h-screen pt-28 max-sm:pt-24 max-sm:px-6 p-10">
+      <div className="w-full min-h-screen pt-20 max-sm:pt-24 max-sm:px-6 p-10">
         {/* Breadcrumb */}
         <div className="flex gap-1 font-medium my-3 text-sm">
           <button onClick={() => navigate("/")} className="text-primary">

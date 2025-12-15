@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategories } from "../../api/userApi";
@@ -10,6 +10,11 @@ import {
   FaBars,
   FaTimes,
   FaHome,
+  FaSignOutAlt,
+  FaHandsHelping,
+  FaShareAlt,
+  FaBoxOpen,
+  FaUser,
 } from "react-icons/fa";
 import { MdCompareArrows } from "react-icons/md";
 
@@ -21,7 +26,9 @@ const Header = () => {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
   const [query, setQuery] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false); // 👈 profile dropdown
   const navigate = useNavigate();
+  const profileRef = useRef(null);
 
   const {
     data: categories = [],
@@ -32,11 +39,10 @@ const Header = () => {
     queryFn: fetchCategories,
   });
 
-  // ✅ Updated navigation to handle category & subcategory
+  // ✅ Handle category click
   const handleCategoryClick = (id) => {
     setMenuOpen(false);
     navigate(`/products?category=${encodeURIComponent(id)}`);
-    console.log(id);
   };
 
   // ✅ Scroll hide/show header
@@ -74,6 +80,17 @@ const Header = () => {
     };
   }, []);
 
+  // ✅ Close profile menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -84,11 +101,76 @@ const Header = () => {
     }
   };
 
+  // ✅ Handle profile actions
+  const handleProfileAction = async (action) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user?.userid) {
+      navigate("/profile");
+      setProfileOpen(false);
+      return;
+    }
+
+    switch (action) {
+      case "profile":
+        navigate("/profile");
+        break;
+
+      case "orders":
+        navigate("/profile");
+        setTimeout(() => {
+          window.scrollTo({
+            top: window.innerHeight * 0.5,
+            behavior: "smooth",
+          });
+        }, 500);
+        break;
+
+      case "wishlist":
+        navigate("/wishlist");
+        break;
+
+      case "refer":
+        try {
+          if (navigator.share) {
+            await navigator.share({
+              title: "Check out Unimacc!",
+              text: "Explore amazing bathroom fittings and accessories from Unimacc!",
+              url: window.location.origin,
+            });
+          } else {
+            navigator.clipboard.writeText(window.location.origin);
+            alert("🔗 Link copied to clipboard!");
+          }
+        } catch (error) {
+          console.error("Share failed:", error);
+        }
+        break;
+
+      case "support":
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+        break;
+
+      case "signout":
+        localStorage.removeItem("user");
+        alert("👋 Signed out successfully!");
+        navigate("/profile");
+        break;
+
+      default:
+        break;
+    }
+    setProfileOpen(false);
+  };
+
   return (
     <>
       {/* HEADER */}
       <header
-        className={`fixed top-0 left-0 w-full bg-white shadow-sm z-50 transform transition-transform duration-300 ${
+        className={`fixed top-0 left-0 border-b-2 border-primary w-full bg-white shadow-sm z-50 transform transition-transform duration-300 ${
           showHeader ? "translate-y-0" : "-translate-y-full"
         }`}
       >
@@ -169,7 +251,7 @@ const Header = () => {
 
           {/* Search */}
           <div className="flex items-center border border-gray-400 rounded-full px-4 py-2 w-1/2 max-sm:w-1/3 relative">
-            <FaSearch className="text-gray-500 mr-3 max-sm:absolute " />
+            <FaSearch className="text-gray-500 mr-3 max-sm:absolute" />
             <input
               type="text"
               placeholder="Search..."
@@ -224,17 +306,62 @@ const Header = () => {
               )}
             </div>
 
-            {/* Profile */}
-            <FaUserCircle
-              onClick={() => navigate("/profile")}
-              className="text-orange-500 cursor-pointer text-2xl hidden md:block"
-              title="Account"
-            />
+            {/* Profile (Dropdown) */}
+            <div ref={profileRef} className="relative">
+              <FaUserCircle
+                onClick={() => setProfileOpen((prev) => !prev)}
+                className="text-orange-500 cursor-pointer text-2xl"
+                title="Account"
+              />
+
+              {profileOpen && (
+                <div className="absolute -right-2 mt-3 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50 animate-fade-in">
+                  <button
+                    onClick={() => handleProfileAction("profile")}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                  >
+                    <FaUser /> Profile
+                  </button>
+
+                  <button
+                    onClick={() => handleProfileAction("orders")}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                  >
+                    <FaBoxOpen /> Your Orders
+                  </button>
+
+                  <button
+                    onClick={() => handleProfileAction("wishlist")}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                  >
+                    <FaHeart /> Your Wishlist
+                  </button>
+
+                  <button
+                    onClick={() => handleProfileAction("refer")}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                  >
+                    <FaShareAlt /> Refer a Friend
+                  </button>
+
+                  <button
+                    onClick={() => handleProfileAction("support")}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                  >
+                    <FaHandsHelping /> Support
+                  </button>
+
+                  <button
+                    onClick={() => handleProfileAction("signout")}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-red-50 text-sm text-red-600 w-full text-left"
+                  >
+                    <FaSignOutAlt /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
-        {/* Desktop Bottom Nav */}
-        <div className="bg-primary h-1" />
       </header>
 
       {/* Mobile Drawer */}
@@ -254,17 +381,12 @@ const Header = () => {
           ) : (
             Object.entries(categories).map(([parent, children]) => (
               <li key={parent} className="border-b last:border-b-0">
-                {/* --- Parent Name --- */}
                 <div
-                  onClick={() => {
-                    handleCategoryClick(children.id);
-                  }}
+                  onClick={() => handleCategoryClick(children.id)}
                   className="px-6 py-3 font-semibold text-primary bg-gray-50 cursor-pointer"
                 >
                   {parent}
                 </div>
-
-                {/* --- Child Categories --- */}
                 <ul>
                   {children.children.map((child) => (
                     <li
@@ -283,7 +405,7 @@ const Header = () => {
       </div>
 
       {/* Mobile Bottom Nav */}
-      <div className="fixed bottom-0 z-50 left-0 w-full bg-white shadow-t flex justify-around items-center py-3 md:hidden border-t">
+      <div className="fixed bottom-0 z-[60] left-0 w-full bg-white shadow-t flex justify-around items-center py-3 md:hidden border-t h-fit">
         <div
           onClick={() => navigate("/")}
           className="text-center text-gray-700"
@@ -291,39 +413,44 @@ const Header = () => {
           <FaHome className="mx-auto text-lg mb-1" size={22} />
           <p className="text-xs">Home</p>
         </div>
+
         <div
           onClick={() => navigate("/wishlist")}
           className="text-center text-gray-700 relative"
         >
           <FaHeart className="mx-auto text-lg mb-1" size={22} />
           {wishlistCount > 0 && (
-            <span className="absolute top-0 right-4 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
               {wishlistCount}
             </span>
           )}
           <p className="text-xs">Wishlist</p>
         </div>
+
         <div
           onClick={() => navigate("/cart")}
           className="text-center text-gray-700 relative"
         >
           <FaShoppingCart className="mx-auto text-lg mb-1" size={22} />
           {cartCount > 0 && (
-            <span className="absolute top-0 right-4 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
               {cartCount}
             </span>
           )}
           <p className="text-xs">Cart</p>
         </div>
+
         <div
-          onClick={() => navigate("/profile")}
-          className="text-center text-gray-700"
+          onClick={() => navigate("/compare")}
+          className="text-center text-gray-700 relative cursor-pointer"
         >
-          <FaUserCircle
-            className="mx-auto text-lg text-orange-500 mb-1"
-            size={22}
-          />
-          <p className="text-xs">Account</p>
+          <MdCompareArrows className="mx-auto text-lg mb-1" size={22} />
+          {cartCount > 0 && (
+            <span className="absolute -top-2 right-0 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+              {cartCount}
+            </span>
+          )}
+          <p className="text-xs">Compare</p>
         </div>
       </div>
     </>
