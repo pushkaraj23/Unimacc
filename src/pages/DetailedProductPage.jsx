@@ -183,7 +183,7 @@ const DetailedProductPage = () => {
 
   return (
     <>
-      <div className="grid grid-cols-7 items-start pt-24 max-sm:grid-cols-1 gap-5 px-5 sm:px-8 md:px-10 lg:px-6 lg:pt-32 bg-mute ">
+      <div className="grid grid-cols-7 items-start pt-24 md:pt-20 md:mt-2 max-sm:grid-cols-1 gap-5 px-5 lg:px-6 bg-mute pb-8">
         {/* LEFT AD SECTION */}
         <aside className="hidden lg:flex sticky top-5 flex-col gap-6 col-span-2">
           <article className="relative w-full overflow-hidden rounded-lg">
@@ -193,7 +193,7 @@ const DetailedProductPage = () => {
               className="rounded-md w-full h-auto"
             />
           </article>
-          <div className="relative h-[43vh] w-full">
+          <div className="relative h-[53vh] w-full">
             {/* Scrollable content */}
             <article className="overflow-y-scroll space-y-2 no-scrollbar h-full pb-8">
               {isLoadingProducts && (
@@ -291,7 +291,7 @@ const DetailedProductPage = () => {
         </main>
 
         {/* RIGHT SECTION */}
-        <div className="flex flex-col gap-3 col-span-2 sticky top-5">
+        <div className="flex flex-col gap-3 col-span-2 max-sm:col-span-3 sticky top-5">
           <p className="text-sm text-primary/70 font-medium">
             {product.category}
             {product.subcategory && (

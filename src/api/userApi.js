@@ -520,3 +520,16 @@ export const fetchOrder = async (orderId) => {
     throw error;
   }
 };
+
+export const fetchOrderTracking = async (trackingId) => {
+  if (!trackingId) throw new Error("Tracking ID is required");
+
+  const res = await axiosInstance.get(`/ekart/track/${trackingId}`);
+
+  if (res.status !== 200) {
+    throw new Error("Failed to fetch order tracking details");
+  }
+
+  // assuming backend wraps response inside { code, body }
+  return res.data.body;
+};

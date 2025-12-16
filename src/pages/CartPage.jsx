@@ -33,7 +33,7 @@ const CartPage = () => {
     setSubtotal(sub);
     setSavings(totalSavings);
     setTotal(sub + deliveryFee);
-  }, [cart]);
+  }, [cart, deliveryFee]);
 
   // ==========================================================
   // ✅ Update quantity with stock limit
@@ -46,10 +46,7 @@ const CartPage = () => {
 
         let newQty = currentQty + delta;
 
-        // ❌ Prevent less than 1
         if (newQty < 1) newQty = 1;
-
-        // ❌ Prevent exceeding max stock
         if (newQty > maxStock) newQty = maxStock;
 
         return { ...item, quantity: newQty };
@@ -77,9 +74,9 @@ const CartPage = () => {
   };
 
   return (
-    <div className="w-full pt-20 max-sm:pt-24 px-10 max-lg:px-6 max-sm:px-4 min-h-screen">
+    <div className="w-full pt-20 px-10 max-lg:px-6 max-sm:px-4 min-h-screen">
       {/* Breadcrumb */}
-      <div className="flex gap-1 font-medium my-3 text-sm flex-wrap">
+      <div className="flex gap-1 font-medium mt-3 mb-1 text-sm flex-wrap">
         <button onClick={() => navigate("/")} className="text-primary">
           Home
         </button>
@@ -87,7 +84,7 @@ const CartPage = () => {
         <button className="text-theme">Cart</button>
       </div>
 
-      <h1 className="text-3xl font-semibold mb-8 max-sm:mt-1">Your Cart</h1>
+      <h1 className="text-3xl font-semibold mb-4">Your Cart</h1>
 
       <div className="flex flex-col lg:flex-row gap-8 mb-12">
         {/* 🛒 Cart Items */}
@@ -102,6 +99,15 @@ const CartPage = () => {
 
               const maxStock = item.stocktable?.[0]?.quantity || 1;
 
+              // ✅ Per-product savings (UI only)
+              const perItemSavings =
+                Math.max(
+                  0,
+                  (parseFloat(item.mrp || 0) -
+                    parseFloat(item.sellingprice || 0)) *
+                    (item.quantity || 1)
+                ) || 0;
+
               return (
                 <div key={`${item.id}-${variantId}`}>
                   <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
@@ -113,17 +119,31 @@ const CartPage = () => {
                         alt={item.name}
                         className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border hover:cursor-pointer object-cover"
                       />
-                      <div>
-                        <h3 className="font-semibold text-lg">{item.name}</h3>
+
+                      <div className="flex-1 min-w-0">
+                        {/* ✅ Truncated Name */}
+                        <h3 className="font-semibold text-lg truncate max-w-[260px] sm:max-w-[340px]">
+                          {item.name}
+                        </h3>
+
                         <p className="text-sm text-gray-500 mt-1">
                           Category: {item.category}
                         </p>
+
                         <p className="font-semibold text-lg mt-1 text-primary">
                           ₹{item.sellingprice}
                           <span className="text-gray-400 line-through ml-2 text-sm">
                             ₹{item.mrp}
                           </span>
                         </p>
+
+                        {/* ✅ Savings per product */}
+                        {perItemSavings > 0 && (
+                          <p className="text-sm text-green-600 font-medium mt-1">
+                            You saved ₹{perItemSavings.toLocaleString()}
+                          </p>
+                        )}
+
                         <p className="text-xs text-gray-500 mt-1">
                           In Stock: {maxStock}
                         </p>
@@ -180,34 +200,36 @@ const CartPage = () => {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between opacity-50 font-semibold">
                 <span>Items Total</span>
-                <span className="font-semibold">
-                  ₹{(subtotal + savings).toLocaleString()}
-                </span>
+                <span>₹{(subtotal + savings).toLocaleString()}</span>
               </div>
+
               {savings > 0 && (
                 <div className="flex justify-between text-green-600 font-medium">
                   <span>You Saved</span>
                   <span>-₹{savings.toLocaleString()}</span>
                 </div>
               )}
+
               <div className="flex justify-between">
                 <span>Subtotal</span>
                 <span className="font-semibold">
                   ₹{subtotal.toLocaleString()}
                 </span>
               </div>
+
               <div className="flex justify-between">
                 <span>Delivery Fee</span>
                 <span>₹{deliveryFee}</span>
               </div>
+
               <hr className="my-2 border-gray-200" />
+
               <div className="flex justify-between text-base font-semibold">
                 <span>Total Payable</span>
                 <span>₹{total.toLocaleString()}</span>
               </div>
             </div>
 
-            {/* Checkout Button */}
             <button
               onClick={() => navigate("/checkout")}
               className="w-full mt-6 bg-primary text-white py-3 rounded-full font-medium hover:opacity-90"

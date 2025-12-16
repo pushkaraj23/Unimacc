@@ -166,7 +166,6 @@ const CheckoutAddresses = ({
     <div className="bg-white p-6 rounded-2xl shadow-lg border h-fit sticky top-5 border-gray-100">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-primary">Delivery Address</h2>
-        {addresses.length > 0 && (
           <button
             onClick={() => {
               setEditingAddress(null);
@@ -185,7 +184,6 @@ const CheckoutAddresses = ({
               </>
             )}
           </button>
-        )}
       </div>
 
       {/* Existing Addresses */}

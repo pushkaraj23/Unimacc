@@ -61,7 +61,7 @@ const CategoryListing = () => {
       <div
         className="
           flex justify-center max-sm:justify-start
-          gap-6 no-scrollbar max-sm:gap-0 py-2 px-2 overflow-x-scroll
+          gap-14 no-scrollbar max-sm:gap-0 py-2 px-2 overflow-x-scroll
         "
       >
         {categories.map((cat) => (

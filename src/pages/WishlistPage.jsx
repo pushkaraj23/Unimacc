@@ -28,10 +28,7 @@ const WishlistPage = () => {
 
         let newQty = currentQty + delta;
 
-        // ❌ Prevent below 1
         if (newQty < 1) newQty = 1;
-
-        // ❌ Prevent exceeding max stock
         if (newQty > maxStock) newQty = maxStock;
 
         return { ...item, quantity: newQty };
@@ -54,10 +51,8 @@ const WishlistPage = () => {
   // ✅ Move variant to cart
   const moveToCart = (item) => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
     const variantId = item.stocktable?.[0]?.id;
 
-    // Check if the same product variant already exists
     const existingIndex = cart.findIndex(
       (c) => c.id === item.id && c.stocktable?.[0]?.id === variantId
     );
@@ -65,7 +60,6 @@ const WishlistPage = () => {
     if (existingIndex !== -1) {
       const maxStock = item.stocktable?.[0]?.quantity || 1;
       const newQty = cart[existingIndex].quantity + item.quantity;
-
       cart[existingIndex].quantity = Math.min(newQty, maxStock);
     } else {
       const maxStock = item.stocktable?.[0]?.quantity || 1;
@@ -107,37 +101,54 @@ const WishlistPage = () => {
               item.thumbnailimage ||
               "https://cdn-icons-png.flaticon.com/512/679/679821.png";
 
+            // ✅ Per-product savings (UI only)
+            const perItemSavings =
+              Math.max(
+                0,
+                (parseFloat(item.mrp || 0) -
+                  parseFloat(item.sellingprice || 0)) *
+                  (item.quantity || 1)
+              ) || 0;
+
             return (
               <div key={`${item.id}-${variantId}`}>
                 {/* Product Row */}
-                <div className="flex max-lg:flex-col justify-between items-center max-lg:items-start gap-4">
+                <div className="flex flex-col md:flex-row w-full justify-between items-center max-lg:items-start gap-4">
                   {/* Product Info */}
-                  <div className="flex items-center max-lg:items-start gap-4 w-full">
+                  <div className="flex items-start md:items-center gap-4 md:w-3/4">
                     <img
                       onClick={() => navigate(`/products/${item.id}`)}
                       src={image}
                       alt={item.name}
-                      className="w-24 h-24 sm:w-28 sm:h-28 max-sm:w-20 max-sm:h-20 object-cover rounded-lg border hover:cursor-pointer"
+                      className="min-w-24 min-h-24 sm:min-w-28 sm:h-28 max-sm:w-20 max-sm:h-20 object-cover rounded-lg border hover:cursor-pointer"
                     />
+
                     <div className="flex flex-col">
-                      <h3 className="font-semibold text-lg max-sm:text-base line-clamp-2">
+                      {/* ✅ Truncated Name */}
+                      <h3 className="font-semibold text-lg max-sm:text-base line-clamp-1">
                         {item.name || "Unnamed Product"}
                       </h3>
+
                       <p className="text-sm max-sm:text-xs text-gray-500 mt-1">
                         Category: {item.category || "-"} <br />
                         Subcategory: {item.subCategory || "-"}
                       </p>
-                      <p className="text-xs text-gray-400 italic mt-0.5">
-                        Variant ID: {variantId}
-                      </p>
+
                       <p className="font-semibold text-lg max-sm:text-base mt-1 text-primary">
                         ₹{item.sellingprice?.toLocaleString()}
                       </p>
+
+                      {/* ✅ Savings per product */}
+                      {perItemSavings > 0 && (
+                        <p className="text-sm text-green-600 font-medium mt-1">
+                          You saved ₹{perItemSavings.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center flex-wrap justify-end max-lg:justify-start gap-4 w-full">
+                  <div className="flex items-center flex-wrap justify-end gap-4 md:w-1/4">
                     {/* Quantity Control */}
                     <div className="flex items-center border rounded-full px-4 py-1 max-sm:px-3 max-sm:py-0.5">
                       <button

@@ -1,14 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchOrder } from "../../api/userApi";
-import { FaArrowLeft } from "react-icons/fa";
+import { fetchOrder, fetchOrderTracking } from "../../api/userApi";
+import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useState } from "react";
 
 const OrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showTracking, setShowTracking] = useState(false);
 
+  // ===========================
+  // Fetch Order
+  // ===========================
   const {
     data: order,
     isLoading,
@@ -19,81 +24,79 @@ const OrderDetails = () => {
     enabled: !!id,
   });
 
+  // ===========================
+  // Fetch Tracking (lazy)
+  // ===========================
+  const { data: tracking, isLoading: trackingLoading } = useQuery({
+    queryKey: ["orderTracking", order?.tracking_id],
+    queryFn: () => fetchOrderTracking(order.tracking_id),
+    enabled: showTracking && !!order?.tracking_id,
+  });
+
   if (isLoading) {
-    return (
-      <div className="p-10">
-        <p className="text-gray-500">Loading order details...</p>
-      </div>
-    );
+    return <div className="p-10 text-gray-500">Loading order details...</div>;
   }
 
   if (isError || !order) {
-    return (
-      <div className="p-10">
-        <p className="text-red-500">Failed to load order details.</p>
-      </div>
-    );
+    return <div className="p-10 text-red-500">Failed to load order.</div>;
   }
 
   return (
-    <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
+    <div className="pt-20 mt-2 p-10 max-sm:px-6">
+      {/* Back */}
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-primary mb-4 hover:text-theme transition"
       >
-        <FaArrowLeft className="text-lg" />
-        <span className="font-medium">Back to Orders</span>
+        <FaArrowLeft />
+        Back to Orders
       </button>
 
-      <div className="flex max-sm:flex-col mb-3 max-sm:gap-3 justify-between">
+      {/* Header */}
+      <div className="flex max-sm:flex-col justify-between mb-4 gap-3">
         <h1 className="text-3xl font-semibold">Order Details • #{order.id}</h1>
-        <button
-          onClick={() => generateInvoice(order)}
-          className="bg-primary text-white px-5 w-fit py-3 rounded-lg text-sm font-medium hover:bg-primary/80 mb-4"
-        >
-          Download Invoice
-        </button>
+
+        <div className="flex gap-3 flex-wrap">
+          {order.tracking_id && (
+            <button
+              onClick={() => setShowTracking(true)}
+              className="bg-mute text-primary px-5 py-3 rounded-lg font-medium hover:-translate-y-0.5 transition"
+            >
+              Track Order
+            </button>
+          )}
+
+          <button
+            onClick={() => generateInvoice(order)}
+            className="bg-primary text-white px-5 py-3 rounded-lg font-medium hover:bg-primary/80 transition hover:-translate-y-0.5"
+          >
+            Download Invoice
+          </button>
+        </div>
       </div>
 
-      {/* Order Summary */}
+      {/* Summary */}
       <div className="grid grid-cols-2 gap-4 mb-6 bg-white p-6 rounded-xl shadow-sm border">
-        <div>
-          <p className="text-gray-500 text-sm">Order Date</p>
-          <p className="font-medium">
-            {new Date(order.orderdate).toLocaleString()}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-gray-500 text-sm">Payment Status</p>
-          <p className="font-medium text-theme">{order.paymentstatus}</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500 text-sm">Delivery Address</p>
-          <p className="font-medium">{order.deliveryaddress}</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500 text-sm">Amount Paid</p>
-          <p className="font-medium text-primary">₹{order.payableamount}</p>
-        </div>
+        <Info
+          label="Order Date"
+          value={new Date(order.orderdate).toLocaleString()}
+        />
+        <Info label="Payment Status" value={order.paymentstatus} />
+        <Info label="Delivery Address" value={order.deliveryaddress} />
+        <Info label="Amount Paid" value={`${order.payableamount} INR`} />
       </div>
 
-      {/* Order Items */}
+      {/* Items */}
       <h3 className="text-xl font-semibold mb-3 text-theme">Items</h3>
       <div className="bg-white p-5 rounded-xl shadow-sm border space-y-4">
         {order.items.map((item) => (
-          <div
-            key={item.id}
-            className="flex justify-between items-center border-b pb-3 last:pb-0 last:border-none"
-          >
-            <div className="flex items-center gap-4">
+          <div key={item.id} className="flex justify-between border-b pb-3">
+            <div className="flex gap-4">
               {item.color && (
                 <img
                   src={item.color}
                   alt={item.productname}
-                  className="w-14 h-14 rounded-lg border object-cover"
+                  className="w-14 h-14 rounded-lg border"
                 />
               )}
               <div>
@@ -101,33 +104,87 @@ const OrderDetails = () => {
                 <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
               </div>
             </div>
+            <p className="font-semibold text-primary">{item.totalprice} INR</p>
+          </div>
+        ))}
+      </div>
 
-            <p className="font-semibold text-primary">
-              ₹{Number(item.totalprice).toLocaleString()}
+      {/* ===================== TRACKING POPUP ===================== */}
+      {showTracking && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 relative animate-fade-in">
+            <button
+              onClick={() => setShowTracking(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
+            >
+              <FaTimes />
+            </button>
+
+            <h2 className="text-2xl font-semibold mb-1">Shipment Tracking</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Tracking ID: {order.tracking_id}
             </p>
-          </div>
-        ))}
-      </div>
 
-      {/* Payment Details */}
-      <h3 className="text-xl font-semibold mt-8 mb-3 text-theme">
-        Payment Details
-      </h3>
+            {trackingLoading && (
+              <p className="text-gray-500">Fetching tracking details...</p>
+            )}
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border space-y-2">
-        {order.payments.map((pay) => (
-          <div key={pay.id} className="p-3 border rounded-lg bg-theme/5">
-            <p className="text-sm">Method: {pay.paymentmethod}</p>
-            <p className="text-sm">Amount: ₹{pay.amount}</p>
-            <p className="text-sm">Status: {pay.status}</p>
+            {tracking && (
+              <div className="space-y-6">
+                {tracking.track.details.map((step, idx) => (
+                  <div key={idx} className="flex gap-4">
+                    {/* Timeline Dot */}
+                    <div className="flex flex-col items-center">
+                      <span
+                        className={`w-4 h-4 rounded-full ${
+                          step.status.toLowerCase().includes("cancel")
+                            ? "bg-red-500"
+                            : idx === tracking.track.details.length - 1
+                            ? "bg-theme"
+                            : "bg-gray-400"
+                        }`}
+                      />
+                      {idx !== tracking.track.details.length - 1 && (
+                        <span className="w-[2px] h-full bg-gray-300 mt-1" />
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div>
+                      <p className="font-medium">{step.status}</p>
+                      {step.location && (
+                        <p className="text-sm text-gray-500">{step.location}</p>
+                      )}
+                      {step.desc && (
+                        <p className="text-sm text-gray-600 mt-1">
+                          {step.desc}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(step.ctime).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default OrderDetails;
+
+/* ================= HELPERS ================= */
+
+const Info = ({ label, value }) => (
+  <div>
+    <p className="text-gray-500 text-sm">{label}</p>
+    <p className="font-medium">{value}</p>
+  </div>
+);
 
 const LOGO_URL = "https://unimacc.com/logo.svg";
 const COLORS = {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { generateOtp, verifyOtp, addUser, fetchUserById } from "../api/userApi";
+import { generateOtp, verifyOtp, fetchUserById } from "../api/userApi";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import CheckoutAddresses from "../components/checkout/CheckoutAddresses";
 import CheckoutSummary from "../components/checkout/CheckoutSummary";
@@ -11,20 +11,9 @@ const CheckoutPage = () => {
   const [user, setUser] = useState(null);
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
-  const [isSignup, setIsSignup] = useState(false);
   const [tempMessage, setTempMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [signupData, setSignupData] = useState({
-    firstname: "",
-    lastname: "",
-    dob: "",
-    email: "",
-    mobile: "",
-  });
-
-  const [cartItems, setCartItems] = useState([]);
-  const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -36,20 +25,21 @@ const CheckoutPage = () => {
     setTimeout(() => setTempMessage(""), 3000);
   };
 
-  // ✅ Load stored user & cart
+  // ===========================
+  // Load stored user
+  // ===========================
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser?.userid) {
       setUser(storedUser);
       setIsAuthenticated(true);
     }
-
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCartItems(storedCart);
   }, []);
 
-  // ✅ Fetch user details if logged in
-  const { data: fetchedUser, refetch: refetchUser } = useQuery({
+  // ===========================
+  // Fetch user details
+  // ===========================
+  const { data: fetchedUser } = useQuery({
     queryKey: ["checkoutUser", user?.userid],
     queryFn: () => fetchUserById(user.userid),
     enabled: !!user?.userid,
@@ -65,104 +55,69 @@ const CheckoutPage = () => {
     },
   });
 
-  // ---------------------------
-  // Input Handlers
-  // ---------------------------
-  const handleSignupChange = (e) => {
-    const { name, value } = e.target;
-    setSignupData((prev) => ({ ...prev, [name]: value }));
-  };
-
+  // ===========================
+  // Input Handler
+  // ===========================
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ---------------------------
+  // ===========================
   // Generate OTP
-  // ---------------------------
+  // ===========================
   const generateOtpMutation = useMutation({
     mutationFn: async () => {
-      const payload = {
+      return await generateOtp({
         channel: "whatsapp",
         identifier: formData.phone,
         purpose: "login",
-      };
-      return await generateOtp(payload);
+      });
     },
     onSuccess: () => {
       setIsOtpSent(true);
       setOtp("");
       showTempMessage("✅ OTP sent successfully on WhatsApp!");
     },
+    onError: () => {
+      showTempMessage("❌ Failed to send OTP");
+    },
   });
 
-  // ---------------------------
+  // ===========================
   // Verify OTP
-  // ---------------------------
+  // ===========================
   const verifyOtpMutation = useMutation({
     mutationFn: async () => {
-      const payload = {
+      return await verifyOtp({
         channel: "whatsapp",
         identifier: formData.phone,
         purpose: "login",
         code: otp,
-      };
-      return await verifyOtp(payload);
+      });
     },
     onSuccess: (res) => {
       if (res?.verified) {
         const newUser = { userid: res.user.userid };
         localStorage.setItem("user", JSON.stringify(newUser));
         setUser(newUser);
-        refetchUser();
-        showTempMessage("✅ OTP verified successfully!");
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 800);
+        setIsAuthenticated(true);
+        showTempMessage("✅ Login successful!");
       } else {
         showTempMessage("❌ Incorrect OTP!");
       }
     },
     onError: () => {
-      showTempMessage("❌ OTP verification failed. Please try again.");
+      showTempMessage("❌ OTP verification failed");
     },
   });
 
-  // ---------------------------
-  // Signup Mutation
-  // ---------------------------
-  const signupMutation = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        ...signupData,
-        roleId: [6],
-        usertypeid: 3,
-      };
-      return await addUser(payload);
-    },
-    onSuccess: (res) => {
-      if (res?.id) {
-        const newUser = { userid: res.id };
-        localStorage.setItem("user", JSON.stringify(newUser));
-        setUser(newUser);
-        refetchUser();
-        showTempMessage("✅ Account created successfully!");
-        setTimeout(() => {
-          window.location.reload();
-        }, 800);
-      }
-    },
-  });
-
-  // ---------------------------
-  // If Logged In → Show Checkout Sections
-  // ---------------------------
+  // ===========================
+  // Logged-in Checkout UI
+  // ===========================
   if (user && fetchedUser && isAuthenticated) {
     return (
       <div className="w-full min-h-screen pt-20 max-sm:pt-24 max-sm:px-6 p-10">
-        {/* Breadcrumb */}
         <div className="flex gap-1 font-medium my-3 text-sm">
           <button onClick={() => navigate("/")} className="text-primary">
             Home
@@ -175,12 +130,9 @@ const CheckoutPage = () => {
           <button className="text-theme">Checkout</button>
         </div>
 
-        <h1 className="text-3xl font-semibold mb-6 max-sm:text-2xl">
-          Checkout
-        </h1>
+        <h1 className="text-3xl font-semibold mb-6">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT SIDE — Delivery Address */}
           <CheckoutAddresses
             selectedAddress={selectedAddress}
             setSelectedAddress={setSelectedAddress}
@@ -188,21 +140,19 @@ const CheckoutPage = () => {
             showTempMessage={showTempMessage}
           />
 
-          {/* RIGHT SIDE — Order Summary */}
           <CheckoutSummary
             deliveryCharge={deliveryCharge}
-            verified={true}
-            isAuthenticated={true}
+            verified
+            isAuthenticated
             startLoading={setLoading}
             loading={loading}
-            addresses={addresses}
             selectedAddress={selectedAddress}
             showTempMessage={showTempMessage}
           />
         </div>
 
         {tempMessage && (
-          <div className="fixed top-32 right-5 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg animate-fade z-50">
+          <div className="fixed top-32 right-5 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50">
             {tempMessage}
           </div>
         )}
@@ -210,154 +160,57 @@ const CheckoutPage = () => {
     );
   }
 
-  // ---------------------------
-  // Not Logged In → Auth Popup (Sign-in/Signup)
-  // ---------------------------
+  // ===========================
+  // OTP Login Screen
+  // ===========================
   return (
     <div className="pt-28 p-10 max-sm:pt-24 max-sm:px-6">
-      {!isSignup ? (
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8">
-          <h1 className="text-3xl font-semibold mb-6">Sign In</h1>
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border p-8">
+        <h1 className="text-3xl font-semibold mb-6">Sign In</h1>
 
-          <form className="space-y-6">
-            {/* Phone Input */}
+        <form className="space-y-6">
+          <input
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="Enter your phone number"
+            className="w-full border rounded-md px-4 py-3"
+            required
+          />
+
+          {isOtpSent && (
             <input
               type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Enter your phone number"
-              className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
-              required
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP"
+              className="w-full border rounded-md px-4 py-3"
             />
+          )}
 
-            {/* OTP Input Box */}
-            {isOtpSent && (
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter OTP received on WhatsApp"
-                className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
-              />
-            )}
-
-            {/* Buttons */}
-            {!isOtpSent ? (
-              <button
-                type="button"
-                onClick={() => generateOtpMutation.mutate()}
-                className="bg-theme text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-theme/80"
-              >
-                Get OTP
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => verifyOtpMutation.mutate()}
-                className="bg-primary text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-primary/80"
-              >
-                Verify OTP
-              </button>
-            )}
-
-            <p
-              onClick={() => {
-                setIsSignup(true);
-                setIsOtpSent(false);
-                setOtp("");
-              }}
-              className="text-sm text-center text-primary cursor-pointer hover:underline"
-            >
-              Don’t have an account? Sign up
-            </p>
-          </form>
-        </div>
-      ) : (
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8">
-          <h1 className="text-3xl font-semibold mb-6">Create Account</h1>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              signupMutation.mutate();
-            }}
-            className="space-y-4"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input
-                type="text"
-                name="firstname"
-                value={signupData.firstname}
-                onChange={handleSignupChange}
-                placeholder="First Name"
-                required
-                className="border border-gray-300 rounded-md px-4 py-3 text-sm"
-              />
-
-              <input
-                type="text"
-                name="lastname"
-                value={signupData.lastname}
-                onChange={handleSignupChange}
-                placeholder="Last Name"
-                required
-                className="border border-gray-300 rounded-md px-4 py-3 text-sm"
-              />
-            </div>
-
-            <input
-              type="date"
-              name="dob"
-              value={signupData.dob}
-              onChange={handleSignupChange}
-              required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
-            />
-
-            <input
-              type="email"
-              name="email"
-              value={signupData.email}
-              onChange={handleSignupChange}
-              placeholder="Email"
-              required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
-            />
-
-            <input
-              type="text"
-              name="mobile"
-              value={signupData.mobile}
-              onChange={handleSignupChange}
-              placeholder="Mobile Number"
-              required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
-            />
-
+          {!isOtpSent ? (
             <button
-              type="submit"
-              className="bg-theme text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-theme/80"
+              type="button"
+              onClick={() => generateOtpMutation.mutate()}
+              className="bg-theme text-white px-7 py-3 rounded-lg"
             >
-              Create Account
+              Get OTP
             </button>
-
-            <p
-              onClick={() => {
-                setIsSignup(false);
-                setIsOtpSent(false);
-                setOtp("");
-              }}
-              className="text-sm text-center text-primary mt-4 cursor-pointer hover:underline"
+          ) : (
+            <button
+              type="button"
+              onClick={() => verifyOtpMutation.mutate()}
+              className="bg-primary text-white px-7 py-3 rounded-lg"
             >
-              Already have an account? Sign in
-            </p>
-          </form>
-        </div>
-      )}
+              Verify OTP
+            </button>
+          )}
+        </form>
+      </div>
 
       {tempMessage && (
-        <div className="fixed top-32 right-5 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg animate-fade z-50">
+        <div className="fixed top-32 right-5 bg-black text-white px-4 py-2 rounded-lg">
           {tempMessage}
         </div>
       )}

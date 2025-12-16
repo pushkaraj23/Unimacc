@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { generateOtp, verifyOtp, addUser, fetchUserById } from "../api/userApi";
+import { generateOtp, verifyOtp, fetchUserById } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import ProfileDetails from "../components/profile/ProfileDetails";
 import ProfileOrders from "../components/profile/ProfileOrders";
@@ -12,25 +12,30 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
-  const [isSignup, setIsSignup] = useState(false);
-
-  const [signupData, setSignupData] = useState({
-    firstname: "",
-    lastname: "",
-    dob: "",
-    email: "",
-    mobile: "",
-  });
-
   const [formData, setFormData] = useState({ phone: "" });
 
+  // 🔔 Small toast (errors / info)
+  const [toast, setToast] = useState({ message: "", type: "" });
+
+  // 🎉 Login success popup
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: "", type: "" }), 2000);
+  };
+
+  // ===========================
   // Load stored user
+  // ===========================
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("user"));
     if (stored?.userid) setUser(stored);
   }, []);
 
+  // ===========================
   // Fetch user details
+  // ===========================
   const { data: fetchedUser, refetch: refetchUser } = useQuery({
     queryKey: ["userDetails", user?.userid],
     queryFn: () => fetchUserById(user.userid),
@@ -46,91 +51,83 @@ const ProfilePage = () => {
     },
   });
 
-  // Logout Function
+  // ===========================
+  // Logout (NO redirect)
+  // ===========================
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("authToken");
     window.dispatchEvent(new Event("localStorageUpdated"));
     setUser(null);
-    window.location.reload(); // Refresh component
+
+    showToast("Logged out successfully 👋", "success");
   };
 
-  // Input Handlers
-  const handleSignupChange = (e) => {
-    const { name, value } = e.target;
-    setSignupData((prev) => ({ ...prev, [name]: value }));
-  };
-
+  // ===========================
+  // Input handler
+  // ===========================
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ===========================
   // Generate OTP
+  // ===========================
   const generateOtpMutation = useMutation({
-    mutationFn: async () => {
-      const payload = {
+    mutationFn: async () =>
+      generateOtp({
         channel: "whatsapp",
         identifier: formData.phone,
         purpose: "login",
-      };
-      return await generateOtp(payload);
-    },
+      }),
     onSuccess: () => {
       setIsOtpSent(true);
       setOtp("");
-      alert("✅ OTP sent successfully on WhatsApp!");
+      showToast("OTP sent on WhatsApp 📲", "success");
+    },
+    onError: () => {
+      showToast("Failed to send OTP", "error");
     },
   });
 
+  // ===========================
   // Verify OTP
+  // ===========================
   const verifyOtpMutation = useMutation({
-    mutationFn: async () => {
-      const payload = {
+    mutationFn: async () =>
+      verifyOtp({
         channel: "whatsapp",
         identifier: formData.phone,
         purpose: "login",
         code: otp,
-      };
-      return await verifyOtp(payload);
-    },
+      }),
     onSuccess: (res) => {
       if (res?.verified) {
         const newUser = { userid: res.user.userid };
         localStorage.setItem("user", JSON.stringify(newUser));
         setUser(newUser);
         refetchUser();
-        alert("✅ OTP verified successfully!");
+
+        // 🎉 Show success popup
+        setLoginSuccess(true);
+
+        // ⏳ Redirect after 3 seconds
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
       } else {
-        alert("❌ Incorrect OTP!");
+        showToast("Incorrect OTP", "error");
       }
+    },
+    onError: () => {
+      showToast("OTP verification failed", "error");
     },
   });
 
-  // Signup Mutation
-  const signupMutation = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        ...signupData,
-        roleId: [6],
-        usertypeid: 3,
-      };
-      return await addUser(payload);
-    },
-    onSuccess: (res) => {
-      if (res?.id) {
-        const newUser = { userid: res.id };
-        localStorage.setItem("user", JSON.stringify(newUser));
-        setUser(newUser);
-        refetchUser();
-        alert("✅ Account created successfully!");
-      }
-    },
-  });
-
-  // ---------------------------
-  // If Logged In → Show Profile
-  // ---------------------------
+  // ===========================
+  // Logged-in Profile View
+  // ===========================
   if (user && fetchedUser) {
     return (
       <div className="pt-20 p-10 max-sm:pt-24 max-sm:px-6">
@@ -142,10 +139,9 @@ const ProfilePage = () => {
             / <button className="text-theme">Profile</button>
           </div>
 
-          {/* ✅ LOGOUT BUTTON */}
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition"
           >
             Logout
           </button>
@@ -159,150 +155,108 @@ const ProfilePage = () => {
         </div>
 
         <ProfileOrders userid={user.userid} />
+        {/* 🎉 LOGIN SUCCESS POPUP */}
+        {loginSuccess && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-2xl px-10 py-8 text-center w-[90%] max-w-md animate-scale-in">
+              {/* ✅ Success Icon */}
+              <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+
+              {/* 🎉 Title */}
+              <h2 className="text-2xl font-bold text-gray-800 mb-1">
+                Logged in Successfully
+              </h2>
+
+              {/* ⏳ Subtitle */}
+              <p className="text-gray-500 text-sm mb-6">
+                Redirecting to home page...
+              </p>
+
+              {/* ⏱ Loader */}
+              <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full w-full bg-green-500 animate-progress"></div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  // ---------------------------
-  // Not Logged In (Sign-in + OTP)
-  // ---------------------------
+  // ===========================
+  // OTP Login View
+  // ===========================
   return (
-    <div className="pt-20 p-10  max-sm:px-6">
-      {!isSignup ? (
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8 mt-4 md:mb-10 md:mt-12">
-          <h1 className="text-3xl font-semibold mb-6">Sign In</h1>
+    <div className="pt-20 p-10 max-sm:px-6">
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8 mt-6">
+        <h1 className="text-3xl font-semibold mb-6">Sign In</h1>
 
-          <form className="space-y-6">
+        <form className="space-y-6">
+          <input
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="Enter your phone number"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm"
+            required
+          />
+
+          {isOtpSent && (
             <input
               type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Enter your phone number"
-              className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
-              required
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP received on WhatsApp"
+              className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm"
             />
+          )}
 
-            {isOtpSent && (
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter OTP received on WhatsApp"
-                className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-theme"
-              />
-            )}
-
-            {!isOtpSent ? (
-              <button
-                type="button"
-                onClick={() => generateOtpMutation.mutate()}
-                className="bg-theme text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-theme/80"
-              >
-                Get OTP
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => verifyOtpMutation.mutate()}
-                className="bg-primary text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-primary/80"
-              >
-                Verify OTP
-              </button>
-            )}
-
-            <p
-              onClick={() => {
-                setIsSignup(true);
-                setIsOtpSent(false);
-                setOtp("");
-              }}
-              className="text-sm text-center text-primary cursor-pointer group"
-            >
-              Don’t have an account? <span className="text-theme group-hover:underline">Sign up</span>
-            </p>
-          </form>
-        </div>
-      ) : (
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-8 mt-4 md:mb-10 md:mt-12">
-          <h1 className="text-3xl font-semibold mb-6">Create Account</h1>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              signupMutation.mutate();
-            }}
-            className="space-y-4"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input
-                type="text"
-                name="firstname"
-                value={signupData.firstname}
-                onChange={handleSignupChange}
-                placeholder="First Name"
-                required
-                className="border border-gray-300 rounded-md px-4 py-3 text-sm"
-              />
-
-              <input
-                type="text"
-                name="lastname"
-                value={signupData.lastname}
-                onChange={handleSignupChange}
-                placeholder="Last Name"
-                required
-                className="border border-gray-300 rounded-md px-4 py-3 text-sm"
-              />
-            </div>
-
-            <input
-              type="date"
-              name="dob"
-              value={signupData.dob}
-              onChange={handleSignupChange}
-              required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
-            />
-
-            <input
-              type="email"
-              name="email"
-              value={signupData.email}
-              onChange={handleSignupChange}
-              placeholder="Email"
-              required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
-            />
-
-            <input
-              type="text"
-              name="mobile"
-              value={signupData.mobile}
-              onChange={handleSignupChange}
-              placeholder="Mobile Number"
-              required
-              className="border border-gray-300 rounded-md px-4 py-3 text-sm w-full"
-            />
-
+          {!isOtpSent ? (
             <button
-              type="submit"
-              className="bg-theme text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-theme/80"
+              type="button"
+              onClick={() => generateOtpMutation.mutate()}
+              className="bg-theme text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-theme/80 transition"
             >
-              Create Account
+              Get OTP
             </button>
-
-            <p
-              onClick={() => {
-                setIsSignup(false);
-                setIsOtpSent(false);
-                setOtp("");
-              }}
-              className="text-sm text-center text-primary mt-4 cursor-pointer group"
+          ) : (
+            <button
+              type="button"
+              onClick={() => verifyOtpMutation.mutate()}
+              className="bg-primary text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-primary/80 transition"
             >
-              Already have an account? <span className="text-theme group-hover:underline">Sign in</span>
-            </p>
-          </form>
+              Verify OTP
+            </button>
+          )}
+        </form>
+      </div>
+
+      {/* 🔔 Small Toast */}
+      {toast.message && (
+        <div
+          className={`fixed top-24 right-6 z-50 px-4 py-2 rounded-lg text-sm shadow-lg transition-all duration-300
+          ${
+            toast.type === "success"
+              ? "bg-green-600 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {toast.message}
         </div>
       )}
     </div>
