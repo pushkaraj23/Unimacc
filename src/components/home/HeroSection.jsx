@@ -1,223 +1,144 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import "../style/hero.css";
 import { fetchHeroSectionContent } from "../../api/userApi";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const HeroSection = () => {
-  const navigate = useNavigate();
-
-  // ✅ Detect screen size for responsive image handling
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth < 768 : false
-  );
-
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [touchStartX, setTouchStartX] = useState(null);
-  const [touchEndX, setTouchEndX] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const touchStartX = useRef(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Fetch data using React Query
   const {
-    data: heroSlides = [],
+    data: slides = [],
     isLoading,
     isError,
   } = useQuery({
     queryKey: ["heroSectionContent"],
     queryFn: fetchHeroSectionContent,
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
   });
 
-  // ✅ Ensure at least 4 slides for proper looping visual balance
-  const adjustedSlides = useMemo(() => {
-    if (!heroSlides || heroSlides.length === 0) return [];
-    if (heroSlides.length >= 4) return heroSlides;
-
-    const duplicateCount = 4 - heroSlides.length;
-    return [...heroSlides, ...heroSlides.slice(0, duplicateCount)];
-  }, [heroSlides]);
-
-  // Make sure currentIndex resets if slides change length
+  /* ---------- Autoplay (desktop only) ---------- */
   useEffect(() => {
-    if (adjustedSlides.length > 0) {
-      setCurrentIndex(0);
-    }
-  }, [adjustedSlides.length]);
-
-  const slideCount = adjustedSlides.length;
-
-  // ✅ Autoplay (disabled on mobile)
-  useEffect(() => {
-    if (slideCount <= 1 || isMobile) return;
-
+    if (slides.length <= 1 || isMobile) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % slideCount);
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
-
     return () => clearInterval(interval);
-  }, [slideCount, isMobile]);
+  }, [slides.length, isMobile]);
 
-  const goToNext = () => {
-    if (slideCount === 0) return;
-    setCurrentIndex((prev) => (prev + 1) % slideCount);
+  /* ---------- Swipe handlers ---------- */
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
   };
 
-  const goToPrev = () => {
-    if (slideCount === 0) return;
-    setCurrentIndex((prev) => (prev - 1 + slideCount) % slideCount);
+  const onTouchEnd = (e) => {
+    if (!touchStartX.current) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? goNext() : goPrev();
+    }
+    touchStartX.current = null;
   };
 
-  // For circular distance (coverflow layout)
-  const getOffset = (index) => {
-    if (slideCount === 0) return 0;
-    let diff = index - currentIndex;
-    const half = slideCount / 2;
+  const goNext = () => setCurrentIndex((prev) => (prev + 1) % slides.length);
 
-    if (diff > half) diff -= slideCount;
-    if (diff < -half) diff += slideCount;
-
-    return diff;
-  };
+  const goPrev = () =>
+    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
 
   if (isLoading)
     return (
-      <div className="w-full h-[70vh] flex items-center justify-center text-gray-400">
-        Loading hero section...
+      <div className="flex items-center justify-center min-h-[60vh] text-gray-400">
+        Loading...
       </div>
     );
 
-  if (isError || slideCount === 0)
+  if (isError || slides.length === 0)
     return (
-      <div className="w-full h-[70vh] flex items-center justify-center text-red-400">
-        Failed to load hero section.
+      <div className="flex items-center justify-center min-h-[60vh] text-red-400">
+        Failed to load hero
       </div>
     );
-
-  const handleTouchStart = (e) => {
-    setTouchStartX(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = (e) => {
-    setTouchEndX(e.changedTouches[0].clientX);
-
-    if (touchStartX === null) return;
-
-    const diff = touchStartX - e.changedTouches[0].clientX;
-
-    // Threshold: minimum distance before we count it as a swipe
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        goToNext(); // Swipe left → Next slide
-      } else {
-        goToPrev(); // Swipe right → Previous slide
-      }
-    }
-
-    setTouchStartX(null);
-    setTouchEndX(null);
-  };
 
   return (
-    <div className="w-full flex items-center justify-center relative">
-      {/* Glow shadow like before */}
-      <div className="absolute bottom-5 max-sm:bottom-52 rounded-full bg-black/20 blur-3xl w-[80vw] h-[30vh]" />
+    <div
+      className="relative w-full overflow-hidden"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Slides */}
+      {slides.map((slide, index) => {
+        const imageSrc = isMobile
+          ? slide.mobileImage || slide.contentimage
+          : slide.contentimage;
 
-      <div
-        className="hero-swiper-wrapper w-full h-[60vh] max-sm:h-[56vh]"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Slides */}
-        {adjustedSlides.map((slide, index) => {
-          const offset = getOffset(index); // -N ... 0 ... +N
-          const absOffset = Math.abs(offset);
+        const isActive = index === currentIndex;
 
-          // Tweak these to get the exact feel you like
-          const translateX = offset * 260; // px shift left-right
-          const rotateY = offset * -30; // deg rotation
-          const scale = offset === 0 ? 1 : 0.8;
-          const opacity = absOffset > 3 ? 0 : 1; // fade far slides
-          const zIndex = 100 - absOffset; // center on top
-          const brightness = offset === 0 ? 1 : 0.4;
-
-          const imageSrc = isMobile
-            ? slide.mobileImage || slide.contentimage
-            : slide.contentimage;
-
-          return (
-            <div
-              key={`${slide.id}-${index}`}
-              className="hero-slide h-full w-[80vw]"
-              style={{
-                transform: `
-    translate(-50%, -50%)
-    translateX(${translateX}px)
-    translateZ(${-absOffset * 120}px)
-    rotateY(${rotateY}deg)
-    scale(${scale})
-  `,
-                opacity,
-                zIndex,
-                filter: `brightness(${brightness})`,
-              }}
-              // onClick={() => navigate(`/offers/${slide.offer_id}`)}
-            >
-              <img
-                src={imageSrc}
-                alt={slide.title}
-                className="object-contain h-full w-full"
-              />
-            </div>
-          );
-        })}
-
-        {/* Navigation arrows */}
-        {slideCount > 1 && (
-          <>
-            <button
-              type="button"
-              className="hero-nav hero-nav-left"
-              onClick={goToPrev}
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              className="hero-nav hero-nav-right"
-              onClick={goToNext}
-            >
-              ›
-            </button>
-          </>
-        )}
-
-        {/* Pagination dots */}
-        {slideCount > 1 && (
-          <div className="hero-pagination">
-            {adjustedSlides.map((_, index) => {
-              const isActive = index === currentIndex;
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  className={`hero-bullet ${
-                    isActive ? "hero-bullet-active" : ""
-                  }`}
-                  onClick={() => setCurrentIndex(index)}
-                />
-              );
-            })}
+        return (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-all duration-700 ease-in-out
+              ${
+                isActive
+                  ? "opacity-100 translate-x-0 relative"
+                  : "opacity-0 translate-x-4"
+              }
+            `}
+          >
+            <img
+              src={imageSrc}
+              alt={slide.title}
+              className="w-full h-auto object-cover select-none"
+              draggable={false}
+            />
           </div>
-        )}
-      </div>
+        );
+      })}
+
+      {/* Desktop arrows */}
+      {slides.length > 1 && !isMobile && (
+        <>
+          <button
+            onClick={goPrev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 
+              bg-black/30 hover:bg-black/50 text-white 
+              rounded-full p-2 transition backdrop-blur-sm"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          <button
+            onClick={goNext}
+            className="absolute right-4 top-1/2 -translate-y-1/2 
+              bg-black/30 hover:bg-black/50 text-white 
+              rounded-full p-2 transition backdrop-blur-sm"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </>
+      )}
+
+      {/* Pagination dots */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`h-2 w-2 rounded-full transition
+                ${index === currentIndex ? "bg-white" : "bg-white/40"}
+              `}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

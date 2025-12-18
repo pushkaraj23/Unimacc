@@ -21,7 +21,7 @@ const ServiceBanner = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-theme to-mute text-primary py-4 shadow-inner">
+    <section className="relative overflow-hidden bg-theme/90 text-primary py-4 shadow-inner">
       <div className="flex whitespace-nowrap animate-scroll">
         {/* Duplicate the content for seamless looping */}
         {[...Array(2)].map((_, loopIndex) => (
@@ -42,8 +42,8 @@ const ServiceBanner = () => {
       </div>
 
       {/* Gradient Fade on sides */}
-      <div className="absolute top-0 left-0 w-32 max-sm:w-16 h-full bg-gradient-to-r from-mute via-mute/80 to-transparent pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-32 max-sm:w-16 h-full bg-gradient-to-l from-mute via-mute/80 to-transparent pointer-events-none"></div>
+      <div className="absolute top-0 left-0 w-32 max-sm:w-16 h-full bg-gradient-to-r from-white/80 to-transparent pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-32 max-sm:w-16 h-full bg-gradient-to-l from-white/80 to-transparent pointer-events-none"></div>
 
       {/* Animation Styles */}
       <style>{`

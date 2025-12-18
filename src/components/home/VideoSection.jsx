@@ -94,7 +94,7 @@ const VideoSection = () => {
   const shouldShowButton = videos.length > limit;
 
   return (
-    <section className="py-12 px-5 sm:px-8 md:px-10 text-center">
+    <section className="py-16 px-5 sm:px-8 md:px-10 text-center">
       {/* --- Section Header --- */}
       <div className="border-b-2 border-primary/60 py-2 mb-8 flex justify-between items-center">
         <h1 className="text-2xl sm:text-3xl text-primary font-medium">

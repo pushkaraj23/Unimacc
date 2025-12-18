@@ -59,7 +59,7 @@ const SalesSection = () => {
 
   // ✅ Step 5: Render
   return (
-    <div className="mt-16">
+    <div className="mt-8">
       {/* --- Header Section --- */}
       <section className="border-b-2 border-primary/60 py-2 mb-5 flex pr-2 justify-between items-center mx-10 max-sm:mx-6">
         <h1 className="text-3xl text-primary font-normal">Save Big on Sales</h1>

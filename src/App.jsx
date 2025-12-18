@@ -18,6 +18,7 @@ import ReturnRefundPolicy from "./pages/ReturnRefundPolicy";
 import BlogsDetailed from "./pages/BlogsDetailed";
 import OrderDetails from "./components/profile/OrderDetails";
 import HotjarRouteTracker from "./utils/HotJarRouteTracker";
+import BlogsPage from "./pages/BlogsPage";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path="/order/:id" element={<OrderDetails />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/offers/:id" element={<OffersPage />} />
+        <Route path="/blogs" element={<BlogsPage />} />
         <Route path="/blogs/:id" element={<BlogsDetailed />} />
         <Route path="/privacy_policy" element={<PrivacyPolicy />} />
         <Route path="/shipping_policy" element={<ShippingPolicy />} />

@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategoriesRaw } from "../../api/userApi";
 import { useNavigate } from "react-router-dom";
 
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+
+import "swiper/css";
+
 const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1656411363355-808151c00f79?q=80&w=686&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  "https://images.unsplash.com/photo-1656411363355-808151c00f79?q=80&w=1200&auto=format&fit=crop";
 
 const CategoryListing = () => {
   const navigate = useNavigate();
 
-  // Fetch categories
   const {
     data: categories = [],
     isLoading,
@@ -19,92 +23,91 @@ const CategoryListing = () => {
     queryFn: fetchCategoriesRaw,
   });
 
-  // Floating tooltip state
-  const [hoverData, setHoverData] = useState({
-    visible: false,
-    text: "",
-    x: 0,
-    y: 0,
-  });
-
-  const handleMouseMove = (e, name) => {
-    setHoverData({
-      visible: true,
-      text: name,
-      x: e.clientX + 15,
-      y: e.clientY + 15,
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setHoverData({ visible: false, text: "", x: 0, y: 0 });
-  };
-
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="w-10 h-10 border-4 border-theme border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-theme border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
   if (isError)
     return (
       <p className="text-center text-red-600 py-10">
-        ⚠️ Failed to load categories. Please try again later.
+        ⚠️ Failed to load categories.
       </p>
     );
 
   return (
-    <section className="relative md:px-10 mb-2 rounded-2xl">
+    <section className="w-full px-6 md:px-16 py-16">
+      {/* Heading */}
+      <h2 className="text-center text-3xl md:text-4xl font-semibold tracking-wide mb-3 mx-auto">
+        Shop By Category
+      </h2>
+      <div className="flex w-full justify-center">
+        <div className="bg-theme w-1/2 md:w-1/5 h-1 rounded mb-12" />
+      </div>
 
-      {/* Centered Categories */}
-      <div
-        className="
-          flex justify-center max-sm:justify-start
-          gap-14 no-scrollbar max-sm:gap-0 py-2 px-2 overflow-x-scroll
-        "
+      <Swiper
+        modules={[Autoplay]}
+        autoplay={{
+          delay: 2000,
+          disableOnInteraction: false,
+        }}
+        loop={categories.length > 4}
+        spaceBetween={32}
+        slidesPerView={1}
+        breakpoints={{
+          640: {
+            slidesPerView: 1,
+          },
+          1024: {
+            slidesPerView: 4,
+          },
+        }}
+        className="!pb-2"
       >
         {categories.map((cat) => (
-          <div
-            key={cat.id}
-            onClick={() => navigate(`/products?category=${cat.id}`)}
-            onMouseMove={(e) => handleMouseMove(e, cat.name)}
-            onMouseLeave={handleMouseLeave}
-            className="
-              group cursor-pointer flex flex-col items-center text-center
-              transition-all duration-300 hover:-translate-y-2
-            "
-          >
-            <div className="relative">
-              <img
-                src={cat.imagepath || FALLBACK_IMAGE}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = FALLBACK_IMAGE;
-                }}
-                alt={cat.name}
-                loading="lazy"
-                className="
-                  w-20 h-20 md:w-24 md:h-24 object-contain rounded-xl
-                  transition-transform duration-700 group-hover:scale-110 z-10 relative
-                "
-              />
-              <div className="w-20 h-12 hover:w-28 hover:h-16 bg-black/30 blur-lg rounded-full absolute bottom-1 group-hover:bg-black/15 transition-all duration-500 z-0" />
-            </div>
-
-            <h2
-              className="
-                text-primary text-xs mt-2 w-24 text-center font-medium
-                group-hover:text-theme transition-colors duration-300
-              "
+          <SwiperSlide key={cat.id}>
+            <div
+              onClick={() => navigate(`/products?category=${cat.id}`)}
+              className="cursor-pointer"
             >
-              {cat.name}
-            </h2>
-          </div>
+              {/* CARD */}
+              <div className="relative w-full aspect-[1/1] rounded-lg overflow-hidden bg-[#d6d6d6]">
+                <img
+                  src={cat.imagepath || FALLBACK_IMAGE}
+                  onError={(e) => (e.target.src = FALLBACK_IMAGE)}
+                  alt={cat.name}
+                  className="
+                    w-full h-full object-cover
+                    transition-transform duration-700
+                    hover:scale-110
+                  "
+                />
+
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-black/20 hover:bg-black/30 transition" />
+
+                {/* Label */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+                  <div
+                    className="
+                      bg-white text-black
+                      px-6 py-2 rounded-md shadow
+                      text-sm md:text-base font-medium
+                      max-w-[180px]
+                      truncate text-center
+                    "
+                    title={cat.name}
+                  >
+                    {cat.name}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
         ))}
-        <div className="h-full w-12 bg-gradient-to-r from-white to-white/0 absolute left-0 top-0" />
-        <div className="h-full w-12 bg-gradient-to-l from-white to-white/0 absolute right-0 top-0" />
-      </div>
+      </Swiper>
     </section>
   );
 };

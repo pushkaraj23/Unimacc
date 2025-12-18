@@ -26,7 +26,8 @@ const Header = () => {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
   const [query, setQuery] = useState("");
-  const [profileOpen, setProfileOpen] = useState(false); // 👈 profile dropdown
+  const [profileOpen, setProfileOpen] = useState(false);
+
   const navigate = useNavigate();
   const profileRef = useRef(null);
 
@@ -39,13 +40,12 @@ const Header = () => {
     queryFn: fetchCategories,
   });
 
-  // ✅ Handle category click
   const handleCategoryClick = (id) => {
     setMenuOpen(false);
     navigate(`/products?category=${encodeURIComponent(id)}`);
   };
 
-  // ✅ Scroll hide/show header
+  /* ---------- Scroll hide/show ---------- */
   useEffect(() => {
     const controlHeader = () => {
       const currentScrollY = window.scrollY;
@@ -60,14 +60,13 @@ const Header = () => {
     return () => window.removeEventListener("scroll", controlHeader);
   }, [lastScrollY]);
 
-  // ✅ Update counts from localStorage
+  /* ---------- Counts ---------- */
   const updateCounts = () => {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    const compare = JSON.parse(localStorage.getItem("compare")) || [];
-    setCartCount(cart.length);
-    setWishlistCount(wishlist.length);
-    setCompareCount(compare.length);
+    setCartCount((JSON.parse(localStorage.getItem("cart")) || []).length);
+    setWishlistCount(
+      (JSON.parse(localStorage.getItem("wishlist")) || []).length
+    );
+    setCompareCount((JSON.parse(localStorage.getItem("compare")) || []).length);
   };
 
   useEffect(() => {
@@ -80,7 +79,7 @@ const Header = () => {
     };
   }, []);
 
-  // ✅ Close profile menu on outside click
+  /* ---------- Close profile on outside click ---------- */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -93,7 +92,6 @@ const Header = () => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault();
       const trimmed = query.trim();
       if (trimmed) {
         navigate(`/products?search=${encodeURIComponent(trimmed)}`);
@@ -101,7 +99,7 @@ const Header = () => {
     }
   };
 
-  // ✅ Handle profile actions
+  /* ---------- Profile actions ---------- */
   const handleProfileAction = async (action) => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -115,7 +113,6 @@ const Header = () => {
       case "profile":
         navigate("/profile");
         break;
-
       case "orders":
         navigate("/profile");
         setTimeout(() => {
@@ -125,41 +122,32 @@ const Header = () => {
           });
         }, 500);
         break;
-
       case "wishlist":
         navigate("/wishlist");
         break;
-
       case "refer":
-        try {
-          if (navigator.share) {
-            await navigator.share({
-              title: "Check out Unimacc!",
-              text: "Explore amazing bathroom fittings and accessories from Unimacc!",
-              url: window.location.origin,
-            });
-          } else {
-            navigator.clipboard.writeText(window.location.origin);
-            alert("🔗 Link copied to clipboard!");
-          }
-        } catch (error) {
-          console.error("Share failed:", error);
+        if (navigator.share) {
+          await navigator.share({
+            title: "Check out Unimacc!",
+            text: "Explore premium bathroom fittings from Unimacc",
+            url: window.location.origin,
+          });
+        } else {
+          navigator.clipboard.writeText(window.location.origin);
+          alert("🔗 Link copied!");
         }
         break;
-
       case "support":
         window.scrollTo({
           top: document.body.scrollHeight,
           behavior: "smooth",
         });
         break;
-
       case "signout":
         localStorage.removeItem("user");
-        alert("👋 Signed out successfully!");
+        alert("👋 Signed out!");
         navigate("/profile");
         break;
-
       default:
         break;
     }
@@ -170,14 +158,13 @@ const Header = () => {
     <>
       {/* HEADER */}
       <header
-        className={`fixed top-0 left-0 border-b-2 border-primary w-full bg-white shadow-sm z-50 transform transition-transform duration-300 ${
+        className={`fixed top-0 left-0 w-full bg-white border-b-2 py-3 max-sm:py-0 border-primary shadow-sm z-50 transition-transform duration-300 ${
           showHeader ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="flex items-center justify-between px-5 md:px-6 py-3 max-sm:py-4">
-          {/* Left Section */}
-          <div className="flex items-center space-x-4">
-            {/* Hamburger for mobile */}
+        <div className="flex items-center justify-between px-5 md:px-6 max-sm:py-3">
+          {/* Left */}
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-xl text-gray-700"
@@ -185,7 +172,6 @@ const Header = () => {
               {menuOpen ? <FaTimes /> : <FaBars />}
             </button>
 
-            {/* Logo */}
             <img
               src="/logo.svg"
               alt="Unimacc Logo"
@@ -194,166 +180,141 @@ const Header = () => {
             />
           </div>
 
-          {/* Categories Dropdown */}
-          <div className="hidden md:block relative group">
-            <button className="flex items-center text-primary/80 font-medium">
-              Categories
-              <svg
-                className="w-4 h-4 ml-1 text-primary/80"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
+          {/* ===== DESKTOP CATEGORY LIST ===== */}
+          <div className="hidden md:flex items-center gap-6">
+            <p
+              onClick={() => navigate("/products")}
+              className="font-medium text-primary/90 cursor-pointer text-sm hover:text-theme"
+            >
+              All
+            </p>
+            {!isCategoriesLoading &&
+              !isCategoriesError &&
+              Object.entries(categories).map(([parent, children]) => (
+                <div key={parent} className="relative group">
+                  <span
+                    onClick={() => handleCategoryClick(children.id)}
+                    className="font-medium text-primary/90 cursor-pointer text-sm hover:text-theme"
+                  >
+                    {parent}
+                  </span>
 
-            <div className="absolute hidden group-hover:block bg-white shadow-md mt-2 rounded w-56 -translate-y-2 z-50">
-              <ul className="text-sm text-primary/60 py-2 font-medium">
-                {isCategoriesLoading ? (
-                  <li className="px-4 py-2 text-gray-400">Loading...</li>
-                ) : isCategoriesError ? (
-                  <li className="px-4 py-2 text-red-500">Error loading</li>
-                ) : !categories || Object.keys(categories).length === 0 ? (
-                  <li className="px-4 py-2 text-gray-400">No Categories</li>
-                ) : (
-                  Object.entries(categories).map(([parent, children]) => (
-                    <li key={parent} className="px-4 py-2 hover:bg-gray-50">
-                      <span
-                        onClick={() => handleCategoryClick(children.id)}
-                        className="font-semibold text-primary cursor-pointer hover:text-theme"
-                      >
-                        {parent}
-                      </span>
-
-                      <ul className="pl-3 mt-1">
+                  {/* Subcategory dropdown */}
+                  {children.children.length !== 0 && (
+                    <div className="absolute left-0 top-full -translate-y-2 mt-2 hidden group-hover:block bg-white shadow-lg rounded-md w-56 z-50">
+                      <ul className="py-2 text-sm">
                         {children.children.map((child) => (
                           <li
                             key={child.id}
                             onClick={() => handleCategoryClick(child.id)}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            className="px-4 py-2 text-sm text-primary/80 hover:bg-gray-100 cursor-pointer"
                           >
                             {child.name}
                           </li>
                         ))}
                       </ul>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
 
-          {/* Search */}
-          <div className="flex items-center border border-gray-400 rounded-full px-4 py-2 w-1/2 max-sm:w-1/3 relative">
-            <FaSearch className="text-gray-500 mr-3 max-sm:absolute" />
+          {/* ===== SEARCH ===== */}
+          <div
+            className="flex items-center border border-gray-400 rounded-full px-4 py-2 
+            w-[28%] max-sm:w-2/5"
+          >
+            <FaSearch className="text-gray-500 mr-3" />
             <input
               type="text"
               placeholder="Search..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="bg-transparent flex-grow outline-none text-gray-700 placeholder-gray-400 max-sm:ml-6 w-full"
+              className="bg-transparent w-full outline-none text-gray-700 placeholder-gray-400"
             />
           </div>
 
-          {/* Icons */}
-          <div className="flex items-center space-x-6 text-gray-700 text-xl relative max-sm:pr-3">
-            {/* Compare */}
-            <div className="relative md:block">
+          {/* ===== ICONS ===== */}
+          <div className="flex items-center space-x-6 max-sm:space-x-0 text-gray-700 text-xl relative">
+            <div className="hidden md:block relative">
               <MdCompareArrows
                 onClick={() => navigate("/compare")}
                 className="cursor-pointer hover:text-orange-500"
-                title="Compare"
               />
               {compareCount > 0 && (
-                <span className="absolute -top-2 -right-3 bg-orange-500 text-white text-xs font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-2 -right-3 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                   {compareCount}
                 </span>
               )}
             </div>
 
-            {/* Wishlist */}
-            <div className="relative hidden md:block">
+            <div className="hidden md:block relative">
               <FaHeart
                 onClick={() => navigate("/wishlist")}
                 className="cursor-pointer hover:text-orange-500"
-                title="Wishlist"
               />
               {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-3 bg-orange-500 text-white text-xs font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-2 -right-3 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                   {wishlistCount}
                 </span>
               )}
             </div>
 
-            {/* Cart */}
-            <div className="relative hidden md:block">
+            <div className="hidden md:block relative">
               <FaShoppingCart
                 onClick={() => navigate("/cart")}
                 className="cursor-pointer hover:text-orange-500"
-                title="Cart"
               />
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-3 bg-orange-500 text-white text-xs font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-2 -right-3 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </div>
 
-            {/* Profile (Dropdown) */}
+            {/* Profile */}
             <div ref={profileRef} className="relative">
               <FaUserCircle
-                onClick={() => setProfileOpen((prev) => !prev)}
-                className="text-orange-500 cursor-pointer text-2xl"
-                title="Account"
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="text-orange-500 cursor-pointer text-3xl md:text-2xl"
               />
 
               {profileOpen && (
-                <div className="absolute -right-2 mt-3 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50 animate-fade-in">
+                <div className="absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg py-2 z-50">
                   <button
                     onClick={() => handleProfileAction("profile")}
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                    className="flex gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left"
                   >
                     <FaUser /> Profile
                   </button>
-
                   <button
                     onClick={() => handleProfileAction("orders")}
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                    className="flex gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left"
                   >
-                    <FaBoxOpen /> Your Orders
+                    <FaBoxOpen /> Orders
                   </button>
-
                   <button
                     onClick={() => handleProfileAction("wishlist")}
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                    className="flex gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left"
                   >
-                    <FaHeart /> Your Wishlist
+                    <FaHeart /> Wishlist
                   </button>
-
                   <button
                     onClick={() => handleProfileAction("refer")}
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                    className="flex gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left"
                   >
-                    <FaShareAlt /> Refer a Friend
+                    <FaShareAlt /> Refer
                   </button>
-
                   <button
                     onClick={() => handleProfileAction("support")}
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm text-primary w-full text-left"
+                    className="flex gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left"
                   >
                     <FaHandsHelping /> Support
                   </button>
-
                   <button
                     onClick={() => handleProfileAction("signout")}
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-red-50 text-sm text-red-600 w-full text-left"
+                    className="flex gap-3 px-4 py-2 hover:bg-red-50 text-red-600 w-full text-left"
                   >
                     <FaSignOutAlt /> Sign Out
                   </button>
@@ -372,6 +333,15 @@ const Header = () => {
       >
         <h2 className="text-xl font-bold my-3 px-6">Categories</h2>
         <ul className="text-gray-700">
+          <div
+            onClick={() => {
+              setMenuOpen(false);
+              navigate("/products");
+            }}
+            className="px-6 py-1 font-semibold text-primary bg-gray-50 cursor-pointer"
+          >
+            All
+          </div>
           {isCategoriesLoading ? (
             <li className="px-6 py-3 text-gray-400">Loading...</li>
           ) : isCategoriesError ? (
@@ -392,7 +362,7 @@ const Header = () => {
                     <li
                       key={child.id}
                       onClick={() => handleCategoryClick(child.id)}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      className="pl-8 py-2 hover:bg-gray-100 cursor-pointer"
                     >
                       {child.name}
                     </li>

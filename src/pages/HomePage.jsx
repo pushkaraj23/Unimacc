@@ -16,21 +16,22 @@ import CategoryListing from "../components/home/CategoryListing";
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen pt-20 max-sm:pt-24 w-full overflow-x-hidden">
-      <CategoryListing />
+    <div className="min-h-screen pt-16 max-sm:pt-18 w-full overflow-x-hidden">
       <HeroSection />
+      <ServiceBanner />
       <SalesSection />
       <Banner />
+      <CategoryListing />
       <TrendingSection />
       <AdBanners />
-      <AwardsSection />
-      <ServiceBanner />
       <div className="h-10" />
       <PopularSection />
       {/* <CategoryOne /> */}
       {/* <Bestsellers /> */}
       {/* <CategoryTwo /> */}
       <CategoryBanners />
+      <VideoSection />
+      <AwardsSection />
       <BlogsSection />
     </div>
   );
