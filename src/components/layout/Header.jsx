@@ -60,13 +60,14 @@ const Header = () => {
     return () => window.removeEventListener("scroll", controlHeader);
   }, [lastScrollY]);
 
-  /* ---------- Counts ---------- */
   const updateCounts = () => {
-    setCartCount((JSON.parse(localStorage.getItem("cart")) || []).length);
-    setWishlistCount(
-      (JSON.parse(localStorage.getItem("wishlist")) || []).length
-    );
-    setCompareCount((JSON.parse(localStorage.getItem("compare")) || []).length);
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const compare = JSON.parse(localStorage.getItem("compare")) || [];
+
+    setCartCount(cart.reduce((sum, i) => sum + (i.quantity || 1), 0));
+    setWishlistCount(wishlist.length);
+    setCompareCount(compare.length);
   };
 
   useEffect(() => {
@@ -415,9 +416,9 @@ const Header = () => {
           className="text-center text-gray-700 relative cursor-pointer"
         >
           <MdCompareArrows className="mx-auto text-lg mb-1" size={22} />
-          {cartCount > 0 && (
+          {compareCount > 0 && (
             <span className="absolute -top-2 right-0 bg-orange-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-              {cartCount}
+              {compareCount}
             </span>
           )}
           <p className="text-xs">Compare</p>

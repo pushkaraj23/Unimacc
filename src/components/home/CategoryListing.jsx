@@ -38,9 +38,9 @@ const CategoryListing = () => {
     );
 
   return (
-    <section className="w-full px-6 md:px-16 py-16">
+    <section className="w-full px-6 md:px-10 pt-6 pb-16">
       {/* Heading */}
-      <h2 className="text-center text-3xl md:text-4xl font-semibold tracking-wide mb-3 mx-auto">
+      <h2 className="text-center text-3xl md:text-4xl font-extrabold text-primary tracking-wide mb-3 mx-auto">
         Shop By Category
       </h2>
       <div className="flex w-full justify-center">

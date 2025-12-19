@@ -13,6 +13,7 @@ import ServiceBanner from "../components/shared/ServiceBanner";
 import VideoSection from "../components/home/VideoSection";
 import BlogsSection from "../components/home/BlogsSection";
 import CategoryListing from "../components/home/CategoryListing";
+import FindUsOn from "../components/shared/FindUsOn";
 
 const HomePage = () => {
   return (
@@ -33,6 +34,7 @@ const HomePage = () => {
       <VideoSection />
       <AwardsSection />
       <BlogsSection />
+      <FindUsOn />
     </div>
   );
 };

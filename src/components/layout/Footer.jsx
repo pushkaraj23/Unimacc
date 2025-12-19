@@ -1,16 +1,7 @@
 import { useState } from "react";
-import { Mail } from "lucide-react";
-import {
-  FaTwitter,
-  FaFacebookF,
-  FaInstagram,
-  FaGithub,
-  FaCcVisa,
-  FaCcMastercard,
-  FaPaypal,
-  FaApplePay,
-  FaGooglePay,
-} from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories } from "../../api/userApi";
+import { FaFacebookF, FaInstagram, FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
@@ -18,37 +9,39 @@ const Footer = () => {
   const navigate = useNavigate();
 
   const socialIcons = [
-    { name: "twitter", icon: <FaTwitter /> },
-    { name: "facebook", icon: <FaFacebookF /> },
-    { name: "instagram", icon: <FaInstagram /> },
-    { name: "github", icon: <FaGithub /> },
+    {
+      name: "facebook",
+      icon: <FaFacebookF />,
+      action: () =>
+        (window.location.herf =
+          "https://www.facebook.com/people/Unimacc-The-Home-Store/61584854606338/"),
+    },
+    {
+      name: "instagram",
+      icon: <FaInstagram />,
+      action: () =>
+        (window.location.href = "https://www.instagram.com/unimaccofficial/"),
+    },
+    {
+      name: "mail",
+      icon: <FaEnvelope />,
+      action: () => (window.location.href = "mailto:unimaccofficial@gmail.com"),
+    },
   ];
 
-  return (
-    <footer className="w-full relative pt-12 px-10 max-sm:px-6 bg-[#c6c3bf]/50 font-urbanist z-40">
-      {/* Newsletter Section */}
-      <section className="bg-gradient-to-tl from-primary to-theme w-full rounded-3xl flex flex-col lg:flex-row lg:items-center justify-center py-6 px-8 lg:text-left">
-        <h1 className="text-white text-4xl leading-snug font-normal">
-          Stay Up to Date With Our Latest Offers
-        </h1>
-        {/* <div className="w-full lg:w-[30vw] mt-6 lg:mt-0">
-          <div className="flex items-center bg-white rounded-full px-4 py-2 w-full">
-            <Mail className="text-gray-400 h-4 lg:h-5" />
-            <input
-              type="text"
-              placeholder="Enter Your Email Address..."
-              className="bg-transparent outline-none text-[3vw] py-[1.5vw] lg:py-0 lg:text-[1vw] text-primary/60 ml-2 w-full placeholder-gray-400"
-            />
-          </div>
-          <button className="w-full bg-white rounded-full py-[3vw] lg:py-[.5vw] text-[3.3vw] lg:text-[1.1vw] font-semibold mt-4 hover:bg-gray-100 transition">
-            Subscribe to Newsletter
-          </button>
-        </div> */}
-      </section>
+  /* ---------- Fetch Categories ---------- */
+  const { data: categories = {}, isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ["footer_categories"],
+    queryFn: fetchCategories,
+    staleTime: 5 * 60 * 1000,
+  });
 
-      {/* Main Footer Links */}
-      <section className="w-full flex flex-col lg:flex-row justify-between items-center mt-10 max-sm:mt-[34vw] border-b border-primary/30 pb-10 lg:text-left px-5 max-sm:px-0">
-        <div className="w-full lg:w-[23vw] mb-6 lg:mb-0 max-sm:px-2">
+  return (
+    <footer className="w-full relative pt-16 px-10 max-sm:px-6 bg-[#c6c3bf]/50 font-urbanist z-40">
+      {/* Main Footer */}
+      <section className="w-full flex flex-col lg:flex-row justify-between border-b border-primary/30 pb-10 px-5 max-sm:px-0">
+        {/* Brand */}
+        <div className="w-full lg:w-[23vw] mb-8 lg:mb-0 max-sm:px-2">
           <img src="/logo.svg" className="h-16" alt="logo" />
           <p className="text-[#827e7b] font-medium mt-3">
             We have products that suit your style and which you’re proud to own.
@@ -56,10 +49,11 @@ const Footer = () => {
           </p>
 
           {/* Social Icons */}
-          <div className="flex lg:justify-start mt-6 space-x-4 text-white">
+          <div className="flex mt-6 space-x-4 text-white">
             {socialIcons.map((item) => (
               <div
                 key={item.name}
+                onClick={item.action}
                 onMouseEnter={() => setHovered(item.name)}
                 onMouseLeave={() => setHovered("")}
                 className={`p-3 rounded-full cursor-pointer transition ${
@@ -74,50 +68,114 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Navigation */}
-        <div className="grid grid-cols-2 lg:flex lg:space-x-16 text-primary/60 gap-8 tracking-wide max-sm:w-full max-sm:px-3">
+        {/* Navigation */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:flex lg:space-x-16 gap-8 text-primary/60 tracking-wide max-sm:w-full max-sm:px-3">
+          {/* Pages */}
           <div>
-            <h3 className="uppercase font-semibold text-primary mb-1">
-              Company
-            </h3>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">About</p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">Features</p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">Works</p>
-            <p className="hover:cursor-pointer hover:underline text-sm mb-1">Career</p>
+            <h3 className="uppercase font-semibold text-primary mb-2">Pages</h3>
+            <p onClick={() => navigate("/")} className="footer-link">
+              Home
+            </p>
+            <p onClick={() => navigate("/products")} className="footer-link">
+              Products
+            </p>
+            <p onClick={() => navigate("/compare")} className="footer-link">
+              Compare
+            </p>
+            <p onClick={() => navigate("/wishlist")} className="footer-link">
+              Wishlist
+            </p>
+            <p onClick={() => navigate("/cart")} className="footer-link">
+              Cart
+            </p>
+            <p onClick={() => navigate("/profile")} className="footer-link">
+              Profile
+            </p>
+            <p onClick={() => navigate("/blogs")} className="footer-link">
+              Blogs
+            </p>
           </div>
+
+          {/* Categories */}
           <div>
-            <h3 className="uppercase font-semibold text-primary mb-1">
-              Help
+            <h3 className="uppercase font-semibold text-primary mb-2">
+              Categories
             </h3>
-            <p onClick={() => navigate("shipping_policy")} className="hover:cursor-pointer hover:underline text-sm mb-1">
+            {isCategoriesLoading ? (
+              <p className="text-sm text-primary/40">Loading...</p>
+            ) : (
+              Object.entries(categories).map(([name, data]) => (
+                <p
+                  key={data.id}
+                  onClick={() => navigate(`/products?category=${data.id}`)}
+                  className="footer-link"
+                >
+                  {name}
+                </p>
+              ))
+            )}
+          </div>
+
+          {/* Policies */}
+          <div>
+            <h3 className="uppercase font-semibold text-primary mb-2">Help</h3>
+            <p
+              onClick={() => navigate("shipping_policy")}
+              className="footer-link"
+            >
               Shipping Policy
             </p>
-            <p onClick={() => navigate("return_refund_policy")} className="hover:cursor-pointer hover:underline text-sm mb-1">
+            <p
+              onClick={() => navigate("return_refund_policy")}
+              className="footer-link"
+            >
               Return & Refund Policy
             </p>
-            <p  onClick={() => navigate("termsandconditions")} className="hover:cursor-pointer hover:underline text-sm mb-1">
+            <p
+              onClick={() => navigate("termsandconditions")}
+              className="footer-link"
+            >
               Terms & Conditions
             </p>
-            <p onClick={() => navigate("privacy_policy")} className="hover:cursor-pointer hover:underline text-sm mb-1">
+            <p
+              onClick={() => navigate("privacy_policy")}
+              className="footer-link"
+            >
               Privacy Policy
             </p>
           </div>
         </div>
       </section>
 
-      {/* Payment Icons */}
-      <section className="w-full p-4 max-sm:pb-24">
-        <div className="flex justify-center space-x-4 max-sm:space-x-2 max-sm:mt-4 text-primary/80 mb-3 text-4xl">
-          <FaCcVisa />
-          <FaCcMastercard />
-          <FaPaypal />
-          <FaApplePay />
-          <FaGooglePay />
+      {/* Payment Logos */}
+      <section className="w-full p-6 max-sm:pb-24">
+        <div className="flex justify-center items-center gap-8 mb-3">
+          <img
+            src="/razorpay.svg"
+            alt="Razorpay"
+            className="h-7 object-contain"
+          />
+          <img src="/ekart.png" alt="Ekart" className="h-6 object-contain" />
         </div>
-        <p className="text-[3vw] lg:text-[.9vw] font-medium text-center text-primary/50 mt-1">
+
+        <p className="text-[3vw] lg:text-[.9vw] font-medium text-center text-primary/50">
           Shop.co © 2000-2025, All Rights Reserved
         </p>
       </section>
+
+      {/* Footer Link Styles */}
+      <style>{`
+        .footer-link {
+          cursor: pointer;
+          font-size: 0.875rem;
+          margin-bottom: 0.25rem;
+          transition: all 0.2s ease;
+        }
+        .footer-link:hover {
+          text-decoration: underline;
+          color: var(--theme-color);
+        }
+      `}</style>
     </footer>
   );
 };

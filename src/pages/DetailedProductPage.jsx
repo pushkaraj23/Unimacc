@@ -183,52 +183,9 @@ const DetailedProductPage = () => {
 
   return (
     <>
-      <div className="grid grid-cols-7 items-start pt-24 md:pt-20 md:mt-2 max-sm:grid-cols-1 gap-5 px-5 lg:px-6 bg-mute pb-8">
-        {/* LEFT AD SECTION */}
-        <aside className="hidden lg:flex sticky top-5 flex-col gap-6 col-span-2">
-          <article className="relative w-full overflow-hidden rounded-lg">
-            <img
-              src="/sample/products_banner.png"
-              alt="Ad Banner"
-              className="rounded-md w-full h-auto"
-            />
-          </article>
-          <div className="relative h-[53vh] w-full">
-            {/* Scrollable content */}
-            <article className="overflow-y-scroll space-y-2 no-scrollbar h-full pb-8">
-              {isLoadingProducts && (
-                <div className="w-full h-full flex justify-center items-center"></div>
-              )}
-              {featuredProducts.map((item, index) => (
-                <div
-                  onClick={() => navigate(`/products/${item.id}`)}
-                  key={index}
-                  className="w-full bg-white/80 shadow-sm hover:cursor-pointer rounded-lg p-2 flex gap-2 items-center"
-                >
-                  <img
-                    src={item.thumbnailimage}
-                    className="h-16 min-w-16 max-w-16 rounded-lg"
-                    alt={item.name}
-                  />
-                  <div>
-                    <p className="text-sm font-medium text-primary">
-                      {item.name}
-                    </p>
-                    <p className="text-xs font-semibold text-theme mt-1">
-                      ₹{item.sellingprice}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </article>
-
-            {/* Fixed gradient overlay (does NOT scroll) */}
-            <div className="pointer-events-none absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-mute to-mute/0" />
-          </div>
-        </aside>
-
+      <div className="grid grid-cols-2 items-start pt-24 md:pt-20 md:mt-2 max-sm:grid-cols-1 gap-5 px-5 lg:px-6 bg-mute pb-8">
         {/* MAIN SECTION */}
-        <main className="flex flex-col items-center lg:sticky top-5 col-span-3 lg:flex-row gap-4 w-full">
+        <main className="flex flex-col items-center lg:sticky top-5 col-span-1 lg:flex-row gap-4 w-full">
           {/* PRODUCT IMAGES */}
           <div className="relative w-full h-auto rounded-lg flex items-center justify-center overflow-hidden border">
             <img
@@ -291,7 +248,7 @@ const DetailedProductPage = () => {
         </main>
 
         {/* RIGHT SECTION */}
-        <div className="flex flex-col gap-3 col-span-2 max-sm:col-span-3 sticky top-5">
+        <div className="flex flex-col gap-3 col-span-1 max-sm:col-span-1 sticky top-5">
           <p className="text-sm text-primary/70 font-medium">
             {product.category}
             {product.subcategory && (
@@ -341,7 +298,35 @@ const DetailedProductPage = () => {
               </div>
             </div>
           )}
-
+          {/* BUTTONS */}
+          <div className="grid grid-cols-7 gap-3 mt-3">
+            <button
+              onClick={() => handleAddToCart(true)}
+              className="col-span-3 bg-primary text-white px-6 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
+            >
+              Buy Now
+            </button>
+            <button
+              onClick={() => handleAddToCart(false)}
+              className={`flex items-center justify-center gap-2 border col-span-3 border-primary/75 font-medium px-4 py-3 rounded-md text-sm transition-all ${
+                isAdded
+                  ? "text-theme shadow-lg"
+                  : "hover:text-theme hover:shadow-md"
+              }`}
+            >
+              <FaShoppingCart /> {isAdded ? "Already Added" : "Add to Cart"}
+            </button>
+            <button
+              onClick={handleAddToWishlist}
+              className={`col-span-1 border font-medium border-primary/75 rounded-md text-sm transition-all flex justify-center items-center ${
+                isWishlisted
+                  ? "bg-theme text-white shadow-md"
+                  : "hover:text-theme hover:shadow-md"
+              }`}
+            >
+              <FaHeart />
+            </button>
+          </div>
           {/* DESCRIPTION */}
           <div className="mt-4">
             <p className="text-sm font-semibold mb-1">Description</p>
@@ -351,45 +336,18 @@ const DetailedProductPage = () => {
               dangerouslySetInnerHTML={{ __html: product.description }}
             />
           </div>
-
-          {/* BUTTONS */}
-          <div className="flex flex-wrap gap-2 mt-5">
-            <button
-              onClick={() => handleAddToCart(true)}
-              className="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
-            >
-              Place Order
-            </button>
-            <div className="w-full flex justify-between gap-2">
-              <button
-                onClick={handleAddToWishlist}
-                className={`flex items-center w-2/5 justify-center gap-2 border font-medium border-primary/75 px-4 py-3 rounded-md text-sm transition-all ${
-                  isWishlisted
-                    ? "bg-theme text-white shadow-md"
-                    : "hover:text-theme hover:shadow-md"
-                }`}
-              >
-                <FaHeart /> {isWishlisted ? "Wishlisted" : "Save"}
-              </button>
-
-              <button
-                onClick={() => handleAddToCart(false)}
-                className={`flex items-center justify-center gap-2 border w-3/5 border-primary/75 font-medium px-4 py-3 rounded-md text-sm transition-all ${
-                  isAdded
-                    ? "text-theme shadow-lg"
-                    : "hover:text-theme hover:shadow-md"
-                }`}
-              >
-                <FaShoppingCart /> {isAdded ? "Already Added" : "Add to Cart"}
-              </button>
-            </div>
-          </div>
         </div>
         {tempMessage && (
           <div className="fixed top-28 right-5 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-90 animate-fade z-50">
             {tempMessage}
           </div>
         )}
+      </div>
+
+      <div className="w-full grid grid-cols-2 max-sm:grid-cols-1 max-sm:px-5 gap-4 px-8 bg-mute pt-10 pb-20">
+        {allImages.map((img, index) => (
+          <img key={index} src={img} className="col-span-1 shadow-xl rounded-lg" alt={img} />
+        ))}
       </div>
 
       {/* Recommended Products */}
