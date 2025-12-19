@@ -183,7 +183,7 @@ const DetailedProductPage = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 items-start pt-24 md:pt-20 md:mt-2 max-sm:grid-cols-1 gap-5 px-5 lg:px-6 bg-mute pb-8">
+      <div className="grid grid-cols-2 items-start pt-24 md:pt-20 md:mt-2 max-sm:grid-cols-1 gap-10 px-8 lg:px-6">
         {/* MAIN SECTION */}
         <main className="flex flex-col items-center lg:sticky top-5 col-span-1 lg:flex-row gap-4 w-full">
           {/* PRODUCT IMAGES */}
@@ -344,9 +344,14 @@ const DetailedProductPage = () => {
         )}
       </div>
 
-      <div className="w-full grid grid-cols-2 max-sm:grid-cols-1 max-sm:px-5 gap-4 px-8 bg-mute pt-10 pb-20">
+      <div className="w-full grid grid-cols-2 max-sm:grid-cols-1 max-sm:px-5 gap-4 px-8 py-10">
         {allImages.map((img, index) => (
-          <img key={index} src={img} className="col-span-1 shadow-xl rounded-lg" alt={img} />
+          <img
+            key={index}
+            src={img}
+            className="col-span-1 shadow-xl rounded-lg"
+            alt={img}
+          />
         ))}
       </div>
 
