@@ -40,6 +40,8 @@ const Header = () => {
     queryFn: fetchCategories,
   });
 
+  const isLoggedIn = !!JSON.parse(localStorage.getItem("user"))?.userid;
+
   const handleCategoryClick = (id) => {
     setMenuOpen(false);
     navigate(`/products?category=${encodeURIComponent(id)}`);
@@ -277,11 +279,17 @@ const Header = () => {
             {/* Profile */}
             <div ref={profileRef} className="relative">
               <FaUserCircle
-                onClick={() => setProfileOpen(!profileOpen)}
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    navigate("/profile");
+                    return;
+                  }
+                  setProfileOpen((prev) => !prev);
+                }}
                 className="text-orange-500 cursor-pointer text-3xl md:text-2xl"
               />
 
-              {profileOpen && (
+              {isLoggedIn && profileOpen && (
                 <div className="absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg py-2 z-50">
                   <button
                     onClick={() => handleProfileAction("profile")}

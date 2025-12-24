@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchHeroSectionContent } from "../../api/userApi";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const touchStartX = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -87,13 +89,17 @@ const HeroSection = () => {
             className={`absolute inset-0 transition-all duration-700 ease-in-out
               ${
                 isActive
-                  ? "opacity-100 translate-x-0 relative"
-                  : "opacity-0 translate-x-4"
+                  ? "opacity-100 translate-x-0 relative pointer-events-auto cur"
+                  : "opacity-0 translate-x-4 pointer-events-none"
               }
             `}
           >
             <img
               src={imageSrc}
+              onClick={() => {
+                if (!slide.offer_id) return;
+                navigate(`/offers/${slide.offer_id}`);
+              }}
               alt={slide.title}
               className="w-full h-auto object-cover select-none"
               draggable={false}

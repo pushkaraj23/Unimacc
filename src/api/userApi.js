@@ -59,7 +59,10 @@ export const fetchCategoryById = async (id) => {
 
     return res.data.body || res.data;
   } catch (err) {
-    console.error(`❌ FETCH CATEGORY ${id} ERROR:`, err.response?.data || err.message);
+    console.error(
+      `❌ FETCH CATEGORY ${id} ERROR:`,
+      err.response?.data || err.message
+    );
     throw err;
   }
 };
@@ -126,7 +129,7 @@ export const fetchHeroSectionContent = async () => {
           contentimage: item.contentimage,
           title: parsed.title || "",
           mobileImage: parsed.mobileImage || "",
-          offer_id: item.offer_id || null, // ✅ Include offer_id
+          offer_id: item.offer_id ?? null, // ✅ Include offer_id
         };
       });
 

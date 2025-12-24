@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt, FaFire } from "react-icons/fa";
+import FrequentlyBoughtTogether from "../components/shared/FrequentlyBoughtTogether";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -10,10 +11,25 @@ const CartPage = () => {
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [total, setTotal] = useState(0);
 
+  // 🔥 Urgency viewers (random on refresh)
+  const [liveViewers] = useState(Math.floor(Math.random() * 150) + 50);
+
   // ✅ Load cart
   useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(savedCart);
+    const loadCart = () => {
+      const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+      setCart(savedCart);
+    };
+
+    loadCart(); // initial load
+
+    window.addEventListener("localStorageUpdated", loadCart);
+    window.addEventListener("storage", loadCart); // optional: cross-tab
+
+    return () => {
+      window.removeEventListener("localStorageUpdated", loadCart);
+      window.removeEventListener("storage", loadCart);
+    };
   }, []);
 
   // ✅ Dynamic totals
@@ -74,17 +90,26 @@ const CartPage = () => {
   };
 
   return (
-    <div className="w-full pt-20 px-10 max-lg:px-6 max-sm:px-4 min-h-screen">
+    <div className="w-full pt-16 px-10 max-lg:px-6 max-sm:px-4 min-h-screen">
       {/* Breadcrumb */}
-      <div className="flex gap-1 font-medium mt-3 mb-1 text-sm flex-wrap">
-        <button onClick={() => navigate("/")} className="text-primary">
-          Home
-        </button>
-        <span className="text-gray-400">/</span>
-        <button className="text-theme">Cart</button>
+      <div className="flex justify-between items-center flex-wrap gap-3 mt-3 mb-2">
+        <div className="flex gap-1 font-medium text-sm">
+          <button onClick={() => navigate("/")} className="text-primary">
+            Home
+          </button>
+          <span className="text-gray-400">/</span>
+          <button className="text-theme">Cart</button>
+        </div>
       </div>
 
       <h1 className="text-3xl font-semibold mb-4">Your Cart</h1>
+      {/* 🔥 LIVE VIEWERS URGENCY */}
+      <div className="flex items-center gap-2 mt-3 bg-red-50 border w-fit mb-5 max-sm:w-full border-red-200 px-4 py-2 rounded-full shadow-sm animate-pulse">
+        <FaFire className="text-red-500" />
+        <p className="text-sm font-semibold text-red-600">
+          {liveViewers} people viewing these products live. HURRY!!
+        </p>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-8 mb-12">
         {/* 🛒 Cart Items */}
@@ -99,7 +124,6 @@ const CartPage = () => {
 
               const maxStock = item.stocktable?.[0]?.quantity || 1;
 
-              // ✅ Per-product savings (UI only)
               const perItemSavings =
                 Math.max(
                   0,
@@ -111,7 +135,6 @@ const CartPage = () => {
               return (
                 <div key={`${item.id}-${variantId}`}>
                   <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
-                    {/* Product Info */}
                     <div className="flex items-center gap-4 w-full">
                       <img
                         onClick={() => navigate(`/products/${item.id}`)}
@@ -121,14 +144,9 @@ const CartPage = () => {
                       />
 
                       <div className="flex-1 min-w-0">
-                        {/* ✅ Truncated Name */}
                         <h3 className="font-semibold text-lg truncate max-w-[260px] sm:max-w-[340px]">
                           {item.name}
                         </h3>
-
-                        <p className="text-sm text-gray-500 mt-1">
-                          Category: {item.category}
-                        </p>
 
                         <p className="font-semibold text-lg mt-1 text-primary">
                           ₹{item.sellingprice}
@@ -137,20 +155,18 @@ const CartPage = () => {
                           </span>
                         </p>
 
-                        {/* ✅ Savings per product */}
                         {perItemSavings > 0 && (
                           <p className="text-sm text-green-600 font-medium mt-1">
                             You saved ₹{perItemSavings.toLocaleString()}
                           </p>
                         )}
 
-                        <p className="text-xs text-gray-500 mt-1">
-                          In Stock: {maxStock}
+                        <p className="text-xs text-red-500 font-semibold mt-1">
+                          Only {maxStock} left in stock
                         </p>
                       </div>
                     </div>
 
-                    {/* Quantity + Delete */}
                     <div className="flex items-center gap-5 max-md:w-full justify-end">
                       <div className="flex items-center border rounded-full px-4 py-1">
                         <button
@@ -239,6 +255,8 @@ const CartPage = () => {
           </div>
         )}
       </div>
+
+      {cart.length > 0 && <FrequentlyBoughtTogether id={cart[0].id} />}
     </div>
   );
 };

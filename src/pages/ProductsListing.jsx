@@ -8,10 +8,11 @@ import {
   fetchCategories,
   fetchProductsBySearch,
   fetchCategoryById,
+  fetchRecommendedProducts
 } from "../api/userApi";
 
 const ProductsListing = () => {
-  const [toggleSidebar, setToggleSidebar] = useState(false);
+  const [toggleSidebar, setToggleSidebar] = useState(true);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 

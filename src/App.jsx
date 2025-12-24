@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import {  BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -17,7 +17,6 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import ReturnRefundPolicy from "./pages/ReturnRefundPolicy";
 import BlogsDetailed from "./pages/BlogsDetailed";
 import OrderDetails from "./components/profile/OrderDetails";
-import HotjarRouteTracker from "./utils/HotJarRouteTracker";
 import BlogsPage from "./pages/BlogsPage";
 
 function App() {
@@ -25,7 +24,6 @@ function App() {
     <div className="bg-white">
       <Header />
       <ScrollToTop />
-      <HotjarRouteTracker />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsListing />} />
@@ -46,7 +44,7 @@ function App() {
       </Routes>
       <Footer />
     </div>
-  );
+  );  
 }
 
 export default App;
