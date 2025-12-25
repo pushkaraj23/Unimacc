@@ -9,12 +9,12 @@ const marketplaces = [
   {
     name: "Flipkart",
     logo: "/flipkart.png",
-    url: "https://www.flipkart.com",
+    url: "https://www.flipkart.com/unimacc-sss-shower-head-bathroom-overhead-shower-3-round-9-arm/p/itm173dbc10d0c86",
   },
   {
     name: "Meesho",
     logo: "/meesho.png",
-    url: "https://www.meesho.com",
+    url: "https://www.meesho.com/OrganizersandStorage?ms=2",
   },
 ];
 
@@ -26,9 +26,7 @@ const FindUsOn = ({
     <section className="w-full py-14 mb-16 px-6 md:px-10">
       {/* Heading */}
       <div className="text-center mb-3">
-        <h3 className="text-2xl text-primary/70 font-light">
-          {title}
-        </h3>
+        <h3 className="text-2xl text-primary/70 font-light">{title}</h3>
       </div>
 
       {/* Marketplace Cards */}

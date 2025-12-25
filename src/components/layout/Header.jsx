@@ -204,18 +204,21 @@ const Header = () => {
 
                   {/* Subcategory dropdown */}
                   {children.children.length !== 0 && (
-                    <div className="absolute left-0 top-full -translate-y-2 mt-2 hidden group-hover:block bg-white shadow-lg rounded-md w-56 z-50">
-                      <ul className="py-2 text-sm">
-                        {children.children.map((child) => (
-                          <li
-                            key={child.id}
-                            onClick={() => handleCategoryClick(child.id)}
-                            className="px-4 py-2 text-sm text-primary/80 hover:bg-gray-100 cursor-pointer"
-                          >
-                            {child.name}
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="absolute left-0 top-full -translate-y-2 p-3 mt-2 hidden group-hover:flex bg-white shadow-lg gap-2 rounded-md z-50">
+                      {children.children.map((child) => (
+                        <div
+                          key={child.id}
+                          onClick={() => handleCategoryClick(child.id)}
+                          className="p-4 text-sm min-w-32 rounded-lg text-primary/80 hover:bg-gray-100 w-fit cursor-pointer flex flex-col items-center gap-2"
+                        >
+                          <img
+                            src={child.imagepath}
+                            className="w-16 h-16 object-cover rounded-lg"
+                            alt={child.name}
+                          />
+                          <p className="text-xs text-center">{child.name}</p>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

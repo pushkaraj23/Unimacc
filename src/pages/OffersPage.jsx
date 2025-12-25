@@ -62,7 +62,7 @@ const OffersPage = () => {
   }
 
   return (
-    <section className="px-5 md:px-10 py-10 pt-24 md:pt-32">
+    <section className="px-5 md:px-10 py-10 pt-24">
       {/* --- Offer Title --- */}
       <div className="flex items-center justify-between border-b-2 border-primary/60 pb-2 mb-8">
         <h1 className="text-2xl sm:text-3xl font-medium text-primary">

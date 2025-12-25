@@ -13,19 +13,31 @@ const Footer = () => {
       name: "facebook",
       icon: <FaFacebookF />,
       action: () =>
-        (window.location.herf =
-          "https://www.facebook.com/people/Unimacc-The-Home-Store/61584854606338/"),
+        window.open(
+          "https://www.facebook.com/people/Unimacc/61571944983401",
+          "_blank",
+          "noopener,noreferrer"
+        ),
     },
     {
       name: "instagram",
       icon: <FaInstagram />,
       action: () =>
-        (window.location.href = "https://www.instagram.com/unimaccofficial/"),
+        window.open(
+          "https://www.instagram.com/unimaccofficial/",
+          "_blank",
+          "noopener,noreferrer"
+        ),
     },
     {
       name: "mail",
       icon: <FaEnvelope />,
-      action: () => (window.location.href = "mailto:unimaccofficial@gmail.com"),
+      action: () =>
+        window.open(
+          "mailto:unimaccofficial@gmail.com",
+          "_blank",
+          "noopener,noreferrer"
+        ),
     },
   ];
 

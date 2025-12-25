@@ -74,18 +74,19 @@ export const fetchCategories = async () => {
 
     let allCategories = res.data.body || [];
 
-    // Keep only active categories
+    // ✅ Keep only active categories
     allCategories = allCategories.filter((cat) => cat.isactive === true);
 
-    // Separate active parents and children
+    // ✅ Separate parents and children
     const parentCategories = allCategories.filter(
       (cat) => cat.parentid === null
     );
+
     const childCategories = allCategories.filter(
       (cat) => cat.parentid !== null
     );
 
-    // Build parent → children mapping with parent ID included
+    // ✅ Build parent → children map with imagepath
     const categoryMap = {};
 
     parentCategories.forEach((parent) => {
@@ -94,11 +95,13 @@ export const fetchCategories = async () => {
         .map((child) => ({
           id: child.id,
           name: child.name,
+          imagepath: child.imagepath || null, // ✅ child image
         }));
 
       categoryMap[parent.name] = {
         id: parent.id,
-        children: children,
+        imagepath: parent.imagepath || null, // ✅ parent image
+        children,
       };
     });
 
