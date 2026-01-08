@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import ProfileDetails from "../components/profile/ProfileDetails";
 import ProfileOrders from "../components/profile/ProfileOrders";
 import ProfileAddresses from "../components/profile/ProfileAddresses";
+import jwt_decode from "jwt-decode";
+import { addUser } from "../api/userApi";
+import GoogleLoginButton from "../components/googleLogin/GoogleLoginButton";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -53,12 +56,26 @@ const ProfilePage = () => {
 
   // ===========================
   // Logout (NO redirect)
-  // ===========================
+  // // ===========================
+  // const handleLogout = () => {
+  //   localStorage.removeItem("user");
+  //   localStorage.removeItem("authToken");
+  //   window.dispatchEvent(new Event("localStorageUpdated"));
+  //   setUser(null);
+
+  //   showToast("Logged out successfully 👋", "success");
+  // };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("authToken");
     window.dispatchEvent(new Event("localStorageUpdated"));
     setUser(null);
+
+    // 🔥 Tell Google to forget previous selection
+    if (window.google) {
+      window.google.accounts.id.disableAutoSelect();
+    }
 
     showToast("Logged out successfully 👋", "success");
   };
@@ -90,6 +107,70 @@ const ProfilePage = () => {
       showToast("Failed to send OTP", "error");
     },
   });
+
+  // const handleGoogleLogin = async (response) => {
+  //   try {
+  //     // 1️⃣ Decode Google token
+  //     const decoded = jwt_decode(response.credential);
+
+  //     // 2️⃣ Prepare payload for backend
+  //     const payload = {
+  //       firstname: decoded.given_name,
+  //       lastname: decoded.family_name,
+  //       dob: "2002-11-23",       // optional
+  //       email: decoded.email,
+  //       mobile: "9999999999",   // optional
+  //       roleId: [6],
+  //       usertypeid: 3,
+  //     };
+
+  //     // 3️⃣ Call backend API
+  //     const res = await addUser(payload);
+
+  //     // 4️⃣ Store user locally
+  //     localStorage.setItem(
+  //       "user",
+  //       JSON.stringify({ userid: res.id })
+  //     );
+
+  //     alert("Google Login Successful 🎉");
+  //   } catch (err) {
+  //     console.error("Google login failed", err);
+  //   }
+  // };
+
+
+  const handleGoogleLogin = async (response) => {
+    try {
+      // 1️⃣ Decode Google token
+      const decoded = jwt_decode(response.credential);
+
+      // 2️⃣ Prepare payload for backend
+      const payload = {
+        firstname: decoded.given_name,
+        lastname: decoded.family_name,
+        dob: "2002-11-23",       // optional
+        email: decoded.email,
+        mobile: "9999999999",   // optional
+        roleId: [6],
+        usertypeid: 3,
+      };
+
+      // 3️⃣ Call backend API
+      const res = await addUser(payload);
+
+      // 4️⃣ Store user locally
+      localStorage.setItem("user", JSON.stringify({ userid: res.id }));
+
+      // 🎉 Show success toast
+      showToast("Google Login Successful 🎉", "success");
+      navigate("/");
+
+    } catch (err) {
+      console.error("Google login failed", err);
+      showToast("Google login failed. Please try again.", "error");
+    }
+  };
 
   // ===========================
   // Verify OTP
@@ -243,6 +324,9 @@ const ProfilePage = () => {
               Verify OTP
             </button>
           )}
+          <div>
+            <GoogleLoginButton onSuccess={handleGoogleLogin} />
+          </div>
         </form>
       </div>
 
@@ -250,11 +334,10 @@ const ProfilePage = () => {
       {toast.message && (
         <div
           className={`fixed top-24 right-6 z-50 px-4 py-2 rounded-lg text-sm shadow-lg transition-all duration-300
-          ${
-            toast.type === "success"
+          ${toast.type === "success"
               ? "bg-green-600 text-white"
               : "bg-red-500 text-white"
-          }`}
+            }`}
         >
           {toast.message}
         </div>

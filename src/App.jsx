@@ -1,4 +1,4 @@
-import {  BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -18,33 +18,41 @@ import ReturnRefundPolicy from "./pages/ReturnRefundPolicy";
 import BlogsDetailed from "./pages/BlogsDetailed";
 import OrderDetails from "./components/profile/OrderDetails";
 import BlogsPage from "./pages/BlogsPage";
+import LoginPopup from "./pages/LoginPopup";
+import { LoginPopupProvider } from "./pages/LoginPopupContext";
+import DiscountCards from "./pages/DiscountCards";
 
 function App() {
   return (
-    <div className="bg-white">
-      <Header />
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductsListing />} />
-        <Route path="/products/:id" element={<DetailedProductPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/wishlist" element={<WishlistPage />} />
-        <Route path="/compare" element={<CompareProducts />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/order/:id" element={<OrderDetails />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/offers/:id" element={<OffersPage />} />
-        <Route path="/blogs" element={<BlogsPage />} />
-        <Route path="/blogs/:id" element={<BlogsDetailed />} />
-        <Route path="/privacy_policy" element={<PrivacyPolicy />} />
-        <Route path="/shipping_policy" element={<ShippingPolicy />} />
-        <Route path="/termsandconditions" element={<TermsAndConditions />} />
-        <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
-      </Routes>
-      <Footer />
-    </div>
-  );  
+    <LoginPopupProvider>
+      <div className="bg-white">
+        <Header />
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsListing />} />
+          <Route path="/products/:id" element={<DetailedProductPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/compare" element={<CompareProducts />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/order/:id" element={<OrderDetails />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/offers/:id" element={<OffersPage />} />
+          <Route path="/offers" element={<DiscountCards />} />
+          <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="/blogs/:id" element={<BlogsDetailed />} />
+          <Route path="/privacy_policy" element={<PrivacyPolicy />} />
+          <Route path="/shipping_policy" element={<ShippingPolicy />} />
+          <Route path="/termsandconditions" element={<TermsAndConditions />} />
+          <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
+        </Routes>
+        <Footer />
+
+        <LoginPopup />
+      </div>
+    </LoginPopupProvider>
+  );
 }
 
 export default App;

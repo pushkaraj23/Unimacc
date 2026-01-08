@@ -7,6 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 const CompareProducts = () => {
   const [compareList, setCompareList] = useState([]);
 
+  const stripHtml = (html) => {
+    if (!html) return "—";
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.textContent || temp.innerText || "";
+  };
+
   // 🧠 Load and auto-update compare products from localStorage
   useEffect(() => {
     const loadCompareList = () => {
@@ -146,15 +153,19 @@ const CompareProducts = () => {
                     key={item.id}
                     className="px-2 sm:px-6 py-3 sm:py-4 text-primary/75 min-w-[160px] sm:min-w-[22vw] max-w-[220px] text-xs sm:text-sm"
                   >
-                    <span className="line-clamp-3">
+                    {/* <span className="line-clamp-3">
                       {item.description ? item.description : "—"}
+                    </span> */}
+                    <span className="line-clamp-3">
+                      {stripHtml(item.description) || "—"}
                     </span>
+
                   </td>
                 ))}
               </tr>
 
               {/* Discount */}
-              <tr className="border-b border-theme/50">
+              {/* <tr className="border-b border-theme/50">
                 <td className="p-2 sm:p-4 font-medium text-primary/75 text-center bg-[#F5D5BE] sticky left-0 z-10">
                   Discount
                 </td>
@@ -168,7 +179,42 @@ const CompareProducts = () => {
                       : "—"}
                   </td>
                 ))}
+              </tr> */}
+              {/* Discount */}
+              <tr className="border-b border-theme/50">
+                <td className="p-2 sm:p-4 font-medium text-primary/75 text-center bg-[#F5D5BE] sticky left-0 z-10">
+                  Discount
+                </td>
+
+                {compareList.map((item) => {
+                  if (!item.mrp || !item.sellingprice) {
+                    return (
+                      <td
+                        key={item.id}
+                        className="px-2 sm:px-6 py-3 sm:py-4 min-w-[160px] sm:min-w-[22vw] max-w-[220px] text-xs sm:text-sm"
+                      >
+                        —
+                      </td>
+                    );
+                  }
+
+                  const saveAmount = item.mrp - item.sellingprice;
+                  const discountPercent = Math.round((saveAmount / item.mrp) * 100);
+
+                  return (
+                    <td
+                      key={item.id}
+                      className="px-2 sm:px-6 py-3 sm:py-4 text-theme font-semibold min-w-[160px] sm:min-w-[22vw] max-w-[220px] text-xs sm:text-sm"
+                    >
+                      {discountPercent > 0
+                        ? `${discountPercent}% OFF`  //(Save ₹${saveAmount.toLocaleString()})
+                        : "—"}
+                    </td>
+                  );
+                })}
               </tr>
+
+
 
               {/* Category */}
               <tr className="border-b border-theme/50">
@@ -186,7 +232,7 @@ const CompareProducts = () => {
               </tr>
 
               {/* Subcategory */}
-              <tr className="border-b border-theme/50">
+              {/* <tr className="border-b border-theme/50">
                 <td className="p-2 sm:p-4 font-medium text-primary/75 text-center bg-[#F5D5BE] sticky left-0 z-10">
                   Subcategory
                 </td>
@@ -197,11 +243,11 @@ const CompareProducts = () => {
                   >
                     {item.subCategory || "-"}
                   </td>
-                ))}
-              </tr>
+                ))} */}
+              {/* </tr> */}
 
               {/* Offer Time */}
-              <tr>
+              {/* <tr>
                 <td className="p-2 sm:p-4 font-medium text-primary/75 text-center bg-[#F5D5BE] sticky left-0 z-10">
                   Offer Validity
                 </td>
@@ -213,7 +259,7 @@ const CompareProducts = () => {
                     {item.offerTime || "-"}
                   </td>
                 ))}
-              </tr>
+              </tr> */}
             </tbody>
           </table>
         </div>

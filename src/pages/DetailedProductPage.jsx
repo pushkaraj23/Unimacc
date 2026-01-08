@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import { FaHeart, FaShoppingCart, FaTruck } from "react-icons/fa";
 import { fetchProductById, fetchProducts } from "../api/userApi";
 import RecommendedProducts from "../components/product/RecommendedProducts";
+import WriteReview from "../components/home/WriteReview";
+import ProductReviews from "../components/home/ProductReviews";
 
 const DetailedProductPage = () => {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ const DetailedProductPage = () => {
   const [isAdded, setIsAdded] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [activeAplusImageIndex, setActiveAplusImageIndex] = useState(0);
 
   // ✅ Fetch product
   const { data, isLoading, isError } = useQuery({
@@ -170,6 +173,12 @@ const DetailedProductPage = () => {
     ? selectedVariant.images
     : product?.imagepath || [];
 
+  const aplusImages = selectedVariant?.aplus_images?.length
+    ? selectedVariant.aplus_images
+    : product?.aplus_images?.length
+      ? product.aplus_images
+      : [];
+
   // ✅ Loading and Error States
   if (isLoading)
     return (
@@ -235,11 +244,10 @@ const DetailedProductPage = () => {
                 onClick={() => setActiveImageIndex(index)}
                 className={`
         w-14 sm:w-16 h-14 sm:h-16 object-cover rounded-md cursor-pointer border-2 transition-all duration-300 
-        ${
-          activeImageIndex === index
-            ? "border-theme brightness-100" // selected
-            : "border-gray-300 brightness-50 hover:brightness-75 hover:border-theme" // unselected
-        }
+        ${activeImageIndex === index
+                    ? "border-theme brightness-100" // selected
+                    : "border-gray-300 brightness-50 hover:brightness-75 hover:border-theme" // unselected
+                  }
       `}
                 alt={`thumb-${index}`}
               />
@@ -287,19 +295,28 @@ const DetailedProductPage = () => {
                     src={variant.color}
                     alt={`color-${i}`}
                     className={`w-10 sm:w-12 h-10 sm:h-12 object-cover border-2 rounded-md cursor-pointer transition 
-                        ${
-                          selectedVariant?.id === variant.id
-                            ? "border-theme scale-110"
-                            : "border-gray-300 hover:border-theme/70"
-                        }`}
+                        ${selectedVariant?.id === variant.id
+                        ? "border-theme scale-110"
+                        : "border-gray-300 hover:border-theme/70"
+                      }`}
                     onClick={() => handleVariantSelect(variant)}
                   />
                 ))}
               </div>
             </div>
           )}
+          {/* <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full  text-gray-700 text-lg italic  font-semibold">
+            <FaTruck className="text-lg" />
+            Free Shipping
+          </div> */}
+          <div className="inline-flex items-center gap-2 px-2 mt-2 py-1  rounded-full text-gray-700 text-lg italic font-semibold animate-pulse">
+            <FaTruck className="text-xl " />
+            Free Shipping
+          </div>
+
+
           {/* BUTTONS */}
-          <div className="grid grid-cols-7 gap-3 mt-3">
+          <div className="grid grid-cols-7 gap-3 mt-1">
             <button
               onClick={() => handleAddToCart(true)}
               className="col-span-3 bg-primary text-white px-6 rounded-md hover:bg-theme transition hover:shadow-md font-medium"
@@ -308,21 +325,19 @@ const DetailedProductPage = () => {
             </button>
             <button
               onClick={() => handleAddToCart(false)}
-              className={`flex items-center justify-center gap-2 border col-span-3 border-primary/75 font-medium px-4 py-3 rounded-md text-sm transition-all ${
-                isAdded
-                  ? "text-theme shadow-lg"
-                  : "hover:text-theme hover:shadow-md"
-              }`}
+              className={`flex items-center justify-center gap-2 border col-span-3 border-primary/75 font-medium px-4 py-3 rounded-md text-sm transition-all ${isAdded
+                ? "text-theme shadow-lg"
+                : "hover:text-theme hover:shadow-md"
+                }`}
             >
               <FaShoppingCart /> {isAdded ? "Already Added" : "Add to Cart"}
             </button>
             <button
               onClick={handleAddToWishlist}
-              className={`col-span-1 border font-medium border-primary/75 rounded-md text-sm transition-all flex justify-center items-center ${
-                isWishlisted
-                  ? "bg-theme text-white shadow-md"
-                  : "hover:text-theme hover:shadow-md"
-              }`}
+              className={`col-span-1 border font-medium border-primary/75 rounded-md text-sm transition-all flex justify-center items-center ${isWishlisted
+                ? "bg-theme text-white shadow-md"
+                : "hover:text-theme hover:shadow-md"
+                }`}
             >
               <FaHeart />
             </button>
@@ -335,6 +350,7 @@ const DetailedProductPage = () => {
               className="prose prose-sm max-w-none text-gray-700"
               dangerouslySetInnerHTML={{ __html: product.description }}
             />
+            <WriteReview productId={id} />
           </div>
         </div>
         {tempMessage && (
@@ -345,16 +361,28 @@ const DetailedProductPage = () => {
       </div>
 
       <div className="w-full grid grid-cols-2 max-sm:grid-cols-1 max-sm:px-5 gap-4 px-8 py-10">
-        {allImages.map((img, index) => (
+        {/* {allImages.map((img, index) => (
           <img
             key={index}
             src={img}
             className="col-span-1 shadow-xl rounded-lg"
             alt={img}
           />
+        ))} */}
+        {aplusImages.map((img, index) => (
+          <img
+            key={`aplus-${index}`}
+            src={img}
+            onClick={() => setActiveAplusImageIndex(index)}
+            className={`col-span-1 shadow-lg rounded-lg cursor-pointer transition border-2 
+              }`}
+            alt={`aplus-${index}`}
+          />
         ))}
       </div>
-
+      <div>
+        <ProductReviews id={id} />
+      </div>
       {/* Recommended Products */}
       <div className="mb-10">
         <RecommendedProducts id={id} />

@@ -539,3 +539,16 @@ export const fetchOrderTracking = async (trackingId) => {
   // assuming backend wraps response inside { code, body }
   return res.data.body;
 };
+
+
+export const getDiscounts = async () => {
+  try {
+    console.log('getDiscounts called');
+    const response = await axiosInstance.get("/discounts");
+    console.log('getDiscounts response received');
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching discounts:", error);
+    throw error;
+  }
+};
