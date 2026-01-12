@@ -6,6 +6,7 @@ import { fetchProductById, fetchProducts } from "../api/userApi";
 import RecommendedProducts from "../components/product/RecommendedProducts";
 import WriteReview from "../components/home/WriteReview";
 import ProductReviews from "../components/home/ProductReviews";
+import { Gift, Handshake, Package, Truck } from "lucide-react";
 
 const DetailedProductPage = () => {
   const navigate = useNavigate();
@@ -309,10 +310,10 @@ const DetailedProductPage = () => {
             <FaTruck className="text-lg" />
             Free Shipping
           </div> */}
-          <div className="inline-flex items-center gap-2 px-2 mt-2 py-1  rounded-full text-gray-700 text-lg italic font-semibold animate-pulse">
+          {/* <div className="inline-flex items-center gap-2 px-2 mt-2 py-1  rounded-full text-gray-700 text-lg italic font-semibold animate-pulse">
             <FaTruck className="text-xl " />
             Free Shipping
-          </div>
+          </div> */}
 
 
           {/* BUTTONS */}
@@ -341,6 +342,52 @@ const DetailedProductPage = () => {
             >
               <FaHeart />
             </button>
+          </div>
+          {/* Info Section */}
+          <div className="grid grid-cols-2 gap-2 md:gap-2">
+            {/* Top Row - Left */}
+            <div className="group flex items-start gap-4 p-5 rounded-xl bg-gradient-to-br from-white to-gray-50 hover:to-[#fdefdd]  transition-all duration-300 hover:shadow-md hover:shadow-[#F0E6DB]/30">
+              <div className="flex-shrink-0 p-3 rounded-lg bg-[#F9F5F0] group-hover:bg-[#C08A5B]/10 transition-colors duration-300">
+                <Truck className="w-6 h-6 text-[#C08A5B]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-900 text-base">Free Shipping</span>
+                <span className="text-gray-600 text-sm mt-1">On all orders over $50</span>
+              </div>
+            </div>
+
+            {/* Top Row - Right */}
+            <div className="group flex items-start gap-4 p-5 rounded-xl bg-gradient-to-br from-white to-gray-50 hover:to-[#fdefdd]  transition-all duration-300 hover:shadow-md hover:shadow-[#F0E6DB]/30">
+              <div className="flex-shrink-0 p-3 rounded-lg bg-[#F9F5F0] group-hover:bg-[#C08A5B]/10 transition-colors duration-300">
+                <Package className="w-6 h-6 text-[#C08A5B]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-900 text-base">48-Hour Returns</span>
+                <span className="text-gray-600 text-sm mt-1">Hassle-free exchange policy</span>
+              </div>
+            </div>
+
+            {/* Bottom Row - Left */}
+            <div className="group flex items-start gap-4 p-5 rounded-xl bg-gradient-to-br from-white to-gray-50 hover:to-[#fdefdd]  transition-all duration-300 hover:shadow-md hover:shadow-[#F0E6DB]/30">
+              <div className="flex-shrink-0 p-3 rounded-lg bg-[#F9F5F0] group-hover:bg-[#C08A5B]/10 transition-colors duration-300">
+                <Gift className="w-6 h-6 text-[#C08A5B]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-900 text-base">Exclusive Gift</span>
+                <span className="text-gray-600 text-sm mt-1">Free gift on prepaid orders</span>
+              </div>
+            </div>
+
+            {/* Bottom Row - Right */}
+            <div className="group flex items-start gap-4 p-5 rounded-xl bg-gradient-to-br from-white to-gray-50 hover:to-[#fdefdd]  transition-all duration-300 hover:shadow-md hover:shadow-[#F0E6DB]/30">
+              <div className="flex-shrink-0 p-3 rounded-lg bg-[#F9F5F0] group-hover:bg-[#C08A5B]/10 transition-colors duration-300">
+                <Handshake className="w-6 h-6 text-[#C08A5B]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-900 text-base">Trusted Quality</span>
+                <span className="text-gray-600 text-sm mt-1">10M+ satisfied customers</span>
+              </div>
+            </div>
           </div>
           {/* DESCRIPTION */}
           <div className="mt-4">

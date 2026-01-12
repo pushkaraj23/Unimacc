@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { FaHeart, FaShoppingCart, FaExchangeAlt } from "react-icons/fa";
+import { FaHeart, FaShoppingCart, FaExchangeAlt, FaTruck } from "react-icons/fa";
 
 const ItemCard = ({ product }) => {
   const navigate = useNavigate();
@@ -239,6 +239,10 @@ const ItemCard = ({ product }) => {
             </button>
           </div>
         </div>
+         <div className="inline-flex items-center gap-2 px-2 mt-1 py-1  rounded-full text-gray-600 text-md italic font-semibold ">
+            <FaTruck className="text-lg " />
+            Free Shipping
+          </div>
       </div>
 
       {/* ✅ Temporary Message */}
