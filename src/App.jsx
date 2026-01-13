@@ -21,6 +21,7 @@ import BlogsPage from "./pages/BlogsPage";
 import LoginPopup from "./pages/LoginPopup";
 import { LoginPopupProvider } from "./pages/LoginPopupContext";
 import DiscountCards from "./pages/DiscountCards";
+import CreatorCollectionPage from "./components/home/CreatorCollectionPage";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/creator/:id" element={<CreatorCollectionPage />} />
           <Route path="/products" element={<ProductsListing />} />
           <Route path="/products/:id" element={<DetailedProductPage />} />
           <Route path="/cart" element={<CartPage />} />

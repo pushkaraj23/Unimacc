@@ -667,7 +667,7 @@ const Header = () => {
                 </div>
               ))}
             <div
-              className="cursor-pointer"
+              className="font-medium text-primary/90 cursor-pointer text-sm hover:text-theme"
               onClick={() => navigate("/offers")}
             >
               offers
