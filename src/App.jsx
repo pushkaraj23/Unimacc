@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
+import CartDrawer from "./components/cart/CartDrawer";
+import { CartDrawerProvider } from "./context/CartDrawerContext";
 import ProductsListing from "./pages/ProductsListing";
 import DetailedProductPage from "./pages/DetailedProductPage";
 import ScrollToTop from "./utils/ScrollToTop";
@@ -26,9 +28,11 @@ import CreatorCollectionPage from "./components/home/CreatorCollectionPage";
 function App() {
   return (
     <LoginPopupProvider>
-      <div className="bg-white">
-        <Header />
-        <ScrollToTop />
+      <CartDrawerProvider>
+        <div className="bg-white">
+          <Header />
+          <CartDrawer />
+          <ScrollToTop />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/creator/:id" element={<CreatorCollectionPage />} />
@@ -49,10 +53,11 @@ function App() {
           <Route path="/termsandconditions" element={<TermsAndConditions />} />
           <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
         </Routes>
-        <Footer />
+          <Footer />
 
-        <LoginPopup />
-      </div>
+          <LoginPopup />
+        </div>
+      </CartDrawerProvider>
     </LoginPopupProvider>
   );
 }

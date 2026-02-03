@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaHeart, FaShoppingCart, FaTruck } from "react-icons/fa";
 import { fetchProductById, fetchProducts } from "../api/userApi";
+import { useCartDrawer } from "../context/CartDrawerContext";
 import RecommendedProducts from "../components/product/RecommendedProducts";
 import WriteReview from "../components/home/WriteReview";
 import ProductReviews from "../components/home/ProductReviews";
@@ -11,6 +12,7 @@ import { Gift, Handshake, Package, Truck } from "lucide-react";
 const DetailedProductPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { openCartDrawer } = useCartDrawer();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -117,6 +119,7 @@ const DetailedProductPage = () => {
       setIsAdded(true);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       window.dispatchEvent(new Event("localStorageUpdated"));
+      openCartDrawer();
     }
 
     if (placeorder) navigate("/cart");

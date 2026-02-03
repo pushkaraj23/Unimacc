@@ -3,6 +3,7 @@ import { fetchRecommendedProducts } from "../../api/userApi";
 import { FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useCartDrawer } from "../../context/CartDrawerContext";
 
 const FrequentlyBoughtTogether = ({ id }) => {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default FrequentlyBoughtTogether;
 
 const FBTCard = ({ product }) => {
   const navigate = useNavigate();
+  const { openCartDrawer } = useCartDrawer();
   const [isInCart, setIsInCart] = useState(false);
 
   const { id, name, sellingprice, imagepath = [], stocktable } = product;
@@ -69,6 +71,7 @@ const FBTCard = ({ product }) => {
     } else {
       updatedCart = [...cart, { ...product, quantity: 1 }];
       setIsInCart(true);
+      openCartDrawer();
     }
 
     localStorage.setItem("cart", JSON.stringify(updatedCart));

@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FaHeart, FaShoppingCart, FaExchangeAlt, FaTruck } from "react-icons/fa";
+import { useCartDrawer } from "../../context/CartDrawerContext";
 
 const ItemCard = ({ product }) => {
+  const { openCartDrawer } = useCartDrawer();
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isCompared, setIsCompared] = useState(false);
@@ -58,6 +60,7 @@ const ItemCard = ({ product }) => {
       updatedCart = [...existingCart, { ...product, quantity: 1 }];
       setIsInCart(true);
       showTempMessage("🛒 Added to Cart");
+      openCartDrawer();
     }
 
     localStorage.setItem("cart", JSON.stringify(updatedCart));

@@ -21,7 +21,7 @@ const HomePage = () => {
     <div className="min-h-screen pt-16 max-sm:pt-18 w-full overflow-x-hidden">
       <HeroSection />
       <ServiceBanner />
-      <WatchVideos />
+      {/* <WatchVideos /> */}
       <SalesSection />
       <Banner />
       <CategoryListing />
