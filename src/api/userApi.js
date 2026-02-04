@@ -193,6 +193,25 @@ export const fetchProductById = async (id) => {
   }
 };
 
+export const fetchProductBySlug = async (slug) => {
+  try {
+    const res = await axiosInstance.get(`/products/slug/${slug}`);
+
+    if (res.status !== 200) {
+      throw new Error("Failed to fetch product by slug");
+    }
+
+    return res.data.body || res.data;
+  } catch (error) {
+    console.error(
+      "❌ fetchProductBySlug error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+
 export const fetchRecommendedProducts = async (id) => {
   try {
     const res = await axiosInstance.get(`/products/recommended/${id}`);
@@ -212,7 +231,7 @@ export const fetchDiscountById = async (id) => {
   try {
     const res = await axiosInstance.get(`/discounts/${id}`);
     if (res.status !== 200) throw new Error("Failed to fetch discount");
-    return res.data.body || res.data; // return the document body or fallback to raw data
+    return res.data.body || res.data;
   } catch (error) {
     console.error(
       "❌ fetchDiscountById error:",
@@ -546,7 +565,7 @@ export const getDiscounts = async () => {
     console.log('getDiscounts called');
     const response = await axiosInstance.get("/discounts");
     console.log('getDiscounts response received');
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Error fetching discounts:", error);
     throw error;

@@ -33,26 +33,27 @@ function App() {
           <Header />
           <CartDrawer />
           <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/creator/:id" element={<CreatorCollectionPage />} />
-          <Route path="/products" element={<ProductsListing />} />
-          <Route path="/products/:id" element={<DetailedProductPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
-          <Route path="/compare" element={<CompareProducts />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/order/:id" element={<OrderDetails />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/offers/:id" element={<OffersPage />} />
-          <Route path="/offers" element={<DiscountCards />} />
-          <Route path="/blogs" element={<BlogsPage />} />
-          <Route path="/blogs/:id" element={<BlogsDetailed />} />
-          <Route path="/privacy_policy" element={<PrivacyPolicy />} />
-          <Route path="/shipping_policy" element={<ShippingPolicy />} />
-          <Route path="/termsandconditions" element={<TermsAndConditions />} />
-          <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/creator/:id" element={<CreatorCollectionPage />} />
+            <Route path="/products" element={<ProductsListing />} />
+            {/* <Route path="/products/:id" element={<DetailedProductPage />} /> */}
+            <Route path="/products/:slug" element={<DetailedProductPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/compare" element={<CompareProducts />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/order/:id" element={<OrderDetails />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/offers/:id" element={<OffersPage />} />
+            <Route path="/offers" element={<DiscountCards />} />
+            <Route path="/blogs" element={<BlogsPage />} />
+            <Route path="/blogs/:id" element={<BlogsDetailed />} />
+            <Route path="/privacy_policy" element={<PrivacyPolicy />} />
+            <Route path="/shipping_policy" element={<ShippingPolicy />} />
+            <Route path="/termsandconditions" element={<TermsAndConditions />} />
+            <Route path="/return_refund_policy" element={<ReturnRefundPolicy />} />
+          </Routes>
           <Footer />
 
           <LoginPopup />
