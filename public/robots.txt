@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap location (update with your production URL)
+Sitemap: https://unimacc.com/sitemap.xml
+
+# Disallow admin/private paths if any
+# Disallow: /api/
+# Disallow: /checkout

@@ -451,6 +451,7 @@ import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import { fetchProductBySlug, fetchProducts } from "../api/userApi"; // ✅ Changed import
 import { useCartDrawer } from "../context/CartDrawerContext";
 import RecommendedProducts from "../components/product/RecommendedProducts";
+import useSEO from "../utils/SEO";
 import WriteReview from "../components/home/WriteReview";
 import ProductReviews from "../components/home/ProductReviews";
 import { Gift, Handshake, Package, Truck } from "lucide-react";
@@ -482,6 +483,18 @@ const DetailedProductPage = () => {
   
   // ✅ Get product ID from fetched product (for reviews, recommendations, etc.)
   const productId = product?.id;
+
+  // SEO: product-specific meta tags
+  const productImage = product?.stocktable?.[0]?.images?.[0] || product?.imagepath?.[0];
+  useSEO({
+    title: product?.name,
+    description: product
+      ? `${product.name} - ₹${product.sellingprice}. ${product.category || ""} ${product.subcategory || ""}. Shop home essentials at Unimacc.`
+      : "Product Details",
+    image: productImage,
+    url: slug ? `/products/${slug}` : undefined,
+    type: "product",
+  });
 
   const {
     data: allProducts,

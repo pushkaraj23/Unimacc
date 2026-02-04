@@ -47,7 +47,7 @@ const FBTCard = ({ product }) => {
   const { openCartDrawer } = useCartDrawer();
   const [isInCart, setIsInCart] = useState(false);
 
-  const { id, name, sellingprice, imagepath = [], stocktable } = product;
+  const { id, slug, name, sellingprice, imagepath = [], stocktable } = product;
 
   const image =
     stocktable?.[0]?.images?.[0] ||
@@ -80,7 +80,7 @@ const FBTCard = ({ product }) => {
 
   return (
     <div
-      onClick={() => navigate(`/products/${id}`)}
+      onClick={() => navigate(`/products/${slug || id}`)}
       className="bg-white border rounded-xl p-3 shadow-sm hover:shadow-md transition cursor-pointer"
     >
       <img

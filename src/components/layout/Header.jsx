@@ -117,8 +117,8 @@ const Header = () => {
       case "refer":
         if (navigator.share) {
           await navigator.share({
-            title: "Check out Unimacc!",
-            text: "Explore premium bathroom fittings from Unimacc",
+            title: "Unimacc | Premium Home, Kitchen & Bathroom Essentials",
+            text: "Shop premium home organization, kitchen essentials & bathroom accessories at Unimacc",
             url: window.location.origin,
           });
         } else {
@@ -159,7 +159,7 @@ const Header = () => {
 
             <img
               src="/logo.svg"
-              alt="Unimacc Logo"
+              alt="Unimacc - Premium Home, Kitchen & Bathroom Essentials"
               className="h-8 cursor-pointer"
               onClick={() => navigate("/")}
             />

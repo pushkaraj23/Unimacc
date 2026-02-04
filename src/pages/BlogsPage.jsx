@@ -2,8 +2,15 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBlogs } from "../api/userApi";
 import BlogCard from "../components/shared/BlogCard";
+import useSEO from "../utils/SEO";
 
 const BlogsPage = () => {
+  useSEO({
+    title: "Blogs & Insights",
+    description: "Explore expert insights, design inspiration, and product updates for home essentials, kitchen & bathroom products. Tips on home organization and storage solutions.",
+    keywords: "home essentials blog, kitchen tips, bathroom organization, storage solutions, home decor",
+    url: "/blogs",
+  });
   const {
     data: blogs = [],
     isLoading,

@@ -137,7 +137,7 @@ const CartPage = () => {
                   <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-4">
                     <div className="flex items-center gap-4 w-full">
                       <img
-                        onClick={() => navigate(`/products/${item.id}`)}
+                        onClick={() => navigate(`/products/${item.slug || item.id}`)}
                         src={image}
                         alt={item.name}
                         className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border hover:cursor-pointer object-cover"

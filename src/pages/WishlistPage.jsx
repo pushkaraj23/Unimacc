@@ -117,7 +117,7 @@ const WishlistPage = () => {
                   {/* Product Info */}
                   <div className="flex items-start md:items-center gap-4 md:w-3/4">
                     <img
-                      onClick={() => navigate(`/products/${item.id}`)}
+                      onClick={() => navigate(`/products/${item.slug || item.id}`)}
                       src={image}
                       alt={item.name}
                       className="min-w-24 min-h-24 sm:min-w-28 sm:h-28 max-sm:w-20 max-sm:h-20 object-cover rounded-lg border hover:cursor-pointer"

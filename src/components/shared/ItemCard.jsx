@@ -19,6 +19,7 @@ const ItemCard = ({ product }) => {
 
   const {
     id,
+    slug,
     name,
     category,
     imagepath = [],
@@ -111,20 +112,20 @@ const ItemCard = ({ product }) => {
 
   return (
     <div
-      onClick={() => navigate(`/products/${id}`)}
+      onClick={() => navigate(`/products/${slug || id}`)}
       className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg hover:cursor-pointer transition-all duration-300 relative group"
     >
       {/* Product Image */}
       <div className="relative w-full h-[220px] sm:h-[250px] md:h-[280px] overflow-hidden">
         <img
           src={images[0]}
-          alt={name}
+          alt={name ? `${name} - ${category || "Home essentials"} | Unimacc` : "Product"}
           className="w-full h-full object-cover rounded-t-xl transition-opacity duration-500 group-hover:opacity-0"
         />
         {images[1] && (
           <img
             src={images[1]}
-            alt={name}
+            alt={name ? `${name} - ${category || "Home essentials"} | Unimacc` : "Product"}
             className="absolute top-0 left-0 w-full h-full object-cover rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           />
         )}

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDiscountById, fetchProducts } from "../api/userApi";
 import ItemCard from "../components/shared/ItemCard";
+import useSEO from "../utils/SEO";
 
 const OffersPage = () => {
   const { id } = useParams(); // 🔹 e.g. /offers/5
@@ -52,6 +53,12 @@ const OffersPage = () => {
       </div>
     );
   }
+
+  useSEO({
+    title: offer?.code ? `${offer.code} - Special Offer` : "Special Offers & Deals",
+    description: offer?.description || `Shop special offers on home essentials, kitchen & bathroom products. Best discount deals at Unimacc.`,
+    url: id ? `/offers/${id}` : "/offers",
+  });
 
   if (!offer) {
     return (

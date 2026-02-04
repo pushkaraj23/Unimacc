@@ -54,10 +54,10 @@ const Footer = () => {
       <section className="w-full flex flex-col lg:flex-row justify-between border-b border-primary/30 pb-10 px-5 max-sm:px-0">
         {/* Brand */}
         <div className="w-full lg:w-[23vw] mb-8 lg:mb-0 max-sm:px-2">
-          <img src="/logo.svg" className="h-16" alt="logo" />
+          <img src="/logo.svg" className="h-16" alt="Unimacc - Premium Home, Kitchen & Bathroom Essentials" />
           <p className="text-[#827e7b] font-medium mt-3">
             We have products that suit your style and which you’re proud to own.
-            From bathroom to kitchen essentials.
+            Premium home organization, kitchen essentials and bathroom accessories.
           </p>
 
           {/* Social Icons */}
@@ -132,25 +132,25 @@ const Footer = () => {
           <div>
             <h3 className="uppercase font-semibold text-primary mb-2">Help</h3>
             <p
-              onClick={() => navigate("shipping_policy")}
+              onClick={() => navigate("/shipping_policy")}
               className="footer-link"
             >
               Shipping Policy
             </p>
             <p
-              onClick={() => navigate("return_refund_policy")}
+              onClick={() => navigate("/return_refund_policy")}
               className="footer-link"
             >
               Return & Refund Policy
             </p>
             <p
-              onClick={() => navigate("termsandconditions")}
+              onClick={() => navigate("/termsandconditions")}
               className="footer-link"
             >
               Terms & Conditions
             </p>
             <p
-              onClick={() => navigate("privacy_policy")}
+              onClick={() => navigate("/privacy_policy")}
               className="footer-link"
             >
               Privacy Policy
@@ -171,7 +171,7 @@ const Footer = () => {
         </div>
 
         <p className="text-[3vw] lg:text-[.9vw] font-medium text-center text-primary/50">
-          Shop.co © 2000-2025, All Rights Reserved
+          Unimacc © 2000-2025, All Rights Reserved
         </p>
       </section>
 

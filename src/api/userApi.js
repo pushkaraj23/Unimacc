@@ -559,7 +559,6 @@ export const fetchOrderTracking = async (trackingId) => {
   return res.data.body;
 };
 
-
 export const getDiscounts = async () => {
   try {
     console.log('getDiscounts called');

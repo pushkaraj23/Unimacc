@@ -10,6 +10,7 @@ import {
   fetchCategoryById,
   fetchRecommendedProducts
 } from "../api/userApi";
+import useSEO from "../utils/SEO";
 
 const ProductsListing = () => {
   const [toggleSidebar, setToggleSidebar] = useState(true);
@@ -73,8 +74,27 @@ const ProductsListing = () => {
     setCategory(categoryParam || "All");
   }, [categoryParam]);
 
+  const categoryName = getCategoryNameById(categoryParam || category);
+  const seoTitle = searchQuery
+    ? `Search: ${searchQuery}`
+    : categoryName
+      ? `${categoryName} - Home & Kitchen Products`
+      : "All Products";
+  const seoDesc = searchQuery
+    ? `Find ${searchQuery} - shop home essentials, kitchen & bathroom products at Unimacc.`
+    : categoryName
+      ? `Shop ${categoryName} - premium home organization, storage solutions & more at best prices.`
+      : "Browse all home essentials, kitchen accessories, bathroom products & storage solutions. Best prices & free shipping.";
+
+  useSEO({
+    title: seoTitle,
+    description: seoDesc,
+    keywords: `${categoryName || ""} home essentials, kitchen essentials, bathroom essentials, storage solutions, ${searchQuery || ""}`.trim(),
+    url: searchQuery ? `/products?search=${encodeURIComponent(searchQuery)}` : categoryParam ? `/products?category=${categoryParam}` : "/products",
+  });
+
   // ---------- FIND CATEGORY/SUBCATEGORY NAME ----------
-  const getCategoryNameById = (id) => {
+  function getCategoryNameById(id) {
     if (!id || id === "All") return "";
 
     for (const [parent, info] of Object.entries(categories)) {
@@ -84,7 +104,7 @@ const ProductsListing = () => {
     }
 
     return id;
-  };
+  }
 
   // ---------- FILTER PRODUCTS ----------
   const filteredProducts = useMemo(() => {

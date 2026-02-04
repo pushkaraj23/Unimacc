@@ -151,7 +151,7 @@ const CartDrawer = () => {
                         className="w-20 h-20 rounded-lg object-cover shrink-0 border border-gray-100 cursor-pointer"
                         onClick={() => {
                           closeCartDrawer();
-                          navigate(`/products/${item.id}`);
+                          navigate(`/products/${item.slug || item.id}`);
                         }}
                       />
                       <div className="flex-1 min-w-0">
@@ -159,7 +159,7 @@ const CartDrawer = () => {
                           className="text-sm font-medium text-primary line-clamp-2 cursor-pointer hover:text-theme"
                           onClick={() => {
                             closeCartDrawer();
-                            navigate(`/products/${item.id}`);
+                            navigate(`/products/${item.slug || item.id}`);
                           }}
                         >
                           {item.name}
@@ -339,7 +339,7 @@ function CartDrawerRelated({ productId, onNavigate }) {
               key={product.id}
               onClick={() => {
                 onNavigate();
-                navigate(`/products/${product.id}`);
+                navigate(`/products/${product.slug || product.id}`);
               }}
               className="shrink-0 w-28 cursor-pointer group"
             >
